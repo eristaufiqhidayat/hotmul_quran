@@ -233,7 +233,7 @@ memfasilitasi:
 **2.2 Arsitektur Sistem**
 
 ![A diagram of a server AI-generated content may be
-incorrect.](./image1.png){width="2.2539654418197723in"
+incorrect.](assets/image1.png){width="2.2539654418197723in"
 height="3.160119203849519in"}
 
 **3. Requirements Detail**
@@ -421,7 +421,7 @@ Tools: Figma (Link mockup: contoh link)
 **2. Alur Penggantian Anggota**
 
 ![A screenshot of a computer AI-generated content may be
-incorrect.](./image2.png){width="3.8672779965004374in"
+incorrect.](assets/image2.png){width="3.8672779965004374in"
 height="2.0793153980752406in"}
 
 **3. Prioritas Pengembangan**
@@ -450,7 +450,7 @@ QuranTracker:
 **1. Fungsi Tracking Hafalan (2 Minggu)**
 
 ![A diagram of a company AI-generated content may be
-incorrect.](./image3.png){width="3.9751367016622923in"
+incorrect.](assets/image3.png){width="3.9751367016622923in"
 height="2.133784995625547in"}
 
 **Teknologi & Logika:**
@@ -497,19 +497,19 @@ height="2.133784995625547in"}
 -   **Alur Sistem:**
 
 > ![A diagram of a work flow AI-generated content may be
-> incorrect.](./image4.png){width="4.760991907261593in"
+> incorrect.](assets/image4.png){width="4.760991907261593in"
 > height="4.643365048118985in"}
 >
 > **Teknologi & Logika:**
 >
 > ![A screenshot of a computer screen AI-generated content may be
-> incorrect.](./image5.png){width="6.268055555555556in"
+> incorrect.](assets/image5.png){width="6.268055555555556in"
 > height="0.8847222222222222in"}
 >
 > **Algoritma Assign Juz:**
 >
 > ![A screen shot of a computer code AI-generated content may be
-> incorrect.](./image6.png){width="4.804478346456693in"
+> incorrect.](assets/image6.png){width="4.804478346456693in"
 > height="2.1802734033245845in"}
 >
 > **3. Akuntabilitas Real-Time**
@@ -534,7 +534,7 @@ height="2.133784995625547in"}
 
 > **Contoh Query Real-Time (Firebase):**
 >
-> ![](./image7.png){width="4.8369564741907265in"
+> ![](assets/image7.png){width="4.8369564741907265in"
 > height="1.0358770778652668in"}
 >
 > **Integrasi dengan Notifikasi**
@@ -549,12 +549,12 @@ height="2.133784995625547in"}
 -   **Contoh Payload (Firebase Cloud Messaging):**
 
 > ![A screen shot of a computer screen AI-generated content may be
-> incorrect.](./image8.png){width="4.73681539807524in"
+> incorrect.](assets/image8.png){width="4.73681539807524in"
 > height="1.1839413823272091in"}
 >
 > **Arsitektur Sistem (Simplified)**
 >
-> ![](./image9.png){width="4.146411854768154in"
+> ![](assets/image9.png){width="4.146411854768154in"
 > height="1.6460629921259842in"}
 >
 > **Testing Scenario**
@@ -591,7 +591,7 @@ height="2.133784995625547in"}
 >
 > **Struktur Data (Firebase Example)**
 >
-> ![](./image10.png){width="4.654213692038495in"
+> ![](assets/image10.png){width="4.654213692038495in"
 > height="1.6681124234470692in"}
 
 **\
@@ -599,12 +599,12 @@ height="2.133784995625547in"}
 
 > **State Diagram**
 >
-> ![](./image11.png){width="3.052509842519685in"
+> ![](assets/image11.png){width="3.052509842519685in"
 > height="3.34421697287839in"}
 >
 > **2. Alur Penggantian Anggota**
 >
-> ![](./image12.png){width="4.628721566054243in"
+> ![](assets/image12.png){width="4.628721566054243in"
 > height="2.734361329833771in"}
 >
 > **3. Implementasi Kode**
@@ -810,7 +810,7 @@ height="2.133784995625547in"}
 >
 > Jika tidak ada yang mengambil alih dalam 3 hari:
 >
-> ![](./image13.png){width="2.3458508311461066in"
+> ![](assets/image13.png){width="2.3458508311461066in"
 > height="3.6022725284339456in"}
 >
 > **6. Testing Scenario**
