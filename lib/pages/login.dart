@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'homepage.dart'; // Import halaman homepage
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,7 +19,9 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _loading = true);
 
     final response = await http.post(
-      Uri.parse("https://your-api.com/api/login"), // Ganti dengan API kamu
+      Uri.parse(
+        "https://hotmulquran.paud-arabika.com/api/v1/login",
+      ), // Ganti dengan API kamu
       body: {
         "email": _emailController.text,
         "password": _passwordController.text,
@@ -29,15 +32,30 @@ class _LoginPageState extends State<LoginPage> {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      if (data["token"] != null) {
-        // Simpan token atau arahkan ke halaman berikutnya
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Login berhasil")));
-      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        //const SnackBar(content: Text("Login gagal, periksa kembali")),
+        // SnackBar(content: Text("${data['access_token']}")),
+        SnackBar(
+          content: Text(
+            "Login berhasil! Selamat datang, ${data['user']['name']}",
+          ),
+        ),
+      );
+      // if (data["token"] != null) {
+      //   //     // Simpan token atau arahkan ke halaman berikutnya
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     //const SnackBar(content: Text("Login gagal, periksa kembali")),
+      //     SnackBar(content: Text("${response.body}")),
+      //   );
+      // }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Login gagal, periksa kembali")),
+        //const SnackBar(content: Text("Login gagal, periksa kembali")),
+        SnackBar(content: Text("${response.body}")),
       );
     }
   }
