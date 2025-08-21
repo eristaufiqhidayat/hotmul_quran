@@ -175,7 +175,3 @@ adb logcat | grep flutter
 * Gunakan **flutter\_launcher\_icons** agar ikon dan nama aplikasi konsisten.
 
 ---
-
-Kalau mau, saya bisa buatkan **versi visual checklist + diagram folder Flutter** supaya tinggal ikuti step by step, lebih gampang untuk proyek berikutnya.
-
-Mau saya buatkan versi visual itu juga?
