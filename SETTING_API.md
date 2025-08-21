@@ -1,4 +1,4 @@
-Oke, saya buatkan **panduan lengkap release APK Flutter** supaya semua berjalan lancar—API, gambar, ikon, nama aplikasi, dan permission—dengan langkah step by step:
+**panduan lengkap release APK Flutter** supaya semua berjalan lancar—API, gambar, ikon, nama aplikasi, dan permission—dengan langkah step by step:
 
 ---
 
