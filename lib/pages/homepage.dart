@@ -79,15 +79,18 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
-                  Text('Dashboard', style: TextStyle(fontSize: 14)),
                   Text(
-                    "MAJELIS KHOTMUL QUR'AN PUSAKA ILAHI",
+                    "MAJELIS KHOTMUL QUR'AN",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "PUSAKA ILAHI",
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
-            CircleAvatar(child: Text('A'), backgroundColor: Colors.orange),
+            //CircleAvatar(child: Text('A'), backgroundColor: Colors.orange),
           ],
         ),
         backgroundColor: Colors.green,
