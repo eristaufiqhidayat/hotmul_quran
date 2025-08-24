@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/pages/group_hotmul.dart';
 import 'login.dart'; // Import halaman login
 
 class HomeScreen extends StatelessWidget {
@@ -23,9 +24,10 @@ class HomeScreen extends StatelessWidget {
         break;
 
       case 'Anggota':
-        ScaffoldMessenger.of(
+        Navigator.push(
           context,
-        ).showSnackBar(SnackBar(content: Text("Menu Anggota diklik")));
+          MaterialPageRoute(builder: (context) => AnggotaPage()),
+        );
         break;
       case 'Dauroh':
         ScaffoldMessenger.of(

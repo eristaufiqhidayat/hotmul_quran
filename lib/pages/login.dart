@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/service/token_services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'homepage.dart'; // Import halaman homepage
@@ -32,6 +33,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
+      await saveToken(data['access_token']);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
