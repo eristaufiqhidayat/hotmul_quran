@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/pages/anggota/group_hotmul.dart';
+import 'package:hotmul_quran/pages/daurah/group_daurah.dart';
 import 'login.dart'; // Import halaman login
 
 class HomeScreen extends StatelessWidget {
@@ -32,9 +33,10 @@ class HomeScreen extends StatelessWidget {
         );
         break;
       case 'Dauroh':
-        ScaffoldMessenger.of(
+        Navigator.push(
           context,
-        ).showSnackBar(SnackBar(content: Text("Menu Dauroh diklik")));
+          MaterialPageRoute(builder: (context) => DaurahPage()),
+        );
         break;
       case 'Khatam':
         ScaffoldMessenger.of(
