@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/bulletText.dart';
+import 'package:hotmul_quran/widget/custom_textfile.dart';
 import 'package:http/http.dart' as http;
 
 class EditAnggotaPage extends StatefulWidget {
@@ -214,28 +215,22 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
+            CustomTextField(
               controller: idController,
-              decoration: const InputDecoration(
-                labelText: "Anggota ID",
-                border: OutlineInputBorder(),
-              ),
+              label: "Anggota ID",
+              icon: Icons.badge,
             ),
             const SizedBox(height: 16),
-            TextField(
+            CustomTextField(
               controller: nameController,
-              decoration: const InputDecoration(
-                labelText: "Nama Lengkap",
-                border: OutlineInputBorder(),
-              ),
+              label: "Nama Lengkap",
+              icon: Icons.person,
             ),
             const SizedBox(height: 16),
-            TextField(
+            CustomTextField(
               controller: groupController,
-              decoration: const InputDecoration(
-                labelText: "Daurah ID",
-                border: OutlineInputBorder(),
-              ),
+              label: "Daurah ID",
+              icon: Icons.group,
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 24),
