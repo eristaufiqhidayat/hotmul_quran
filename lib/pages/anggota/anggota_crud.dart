@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names, sort_child_properties_last
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -65,7 +67,6 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
     if (response.statusCode == 200) {
       Navigator.pop(context, true);
     } else {
-      print("Error body: ${response.body}");
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Gagal update data")));
@@ -104,7 +105,6 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
         updateUserAnggota();
       }
     } else {
-      print("Error body: ${response.body}");
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Gagal update data")));
@@ -136,7 +136,6 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
     if (response.statusCode == 200) {
       Navigator.pop(context, true);
     } else {
-      print("Error body: ${response.body}");
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Gagal update User Login")));
@@ -170,7 +169,6 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
     if (response.statusCode == 200) {
       Navigator.pop(context, true);
     } else {
-      print("Error body: ${response.body}");
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Gagal update User Login")));

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use, sort_child_properties_last
+
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/anggota/anggota_crud.dart';
@@ -202,11 +204,7 @@ class _AnggotaPageState extends State<AnggotaPage> {
                       return ListTile(
                         title: Text(item['name'] ?? ""),
                         subtitle: Text(
-                          "User id : " +
-                                  item['user_id'].toString() +
-                                  ", Daurah : " +
-                                  item['group_id'].toString() ??
-                              "",
+                          "User id : ${item['user_id']}, Daurah : ${item['group_id']}",
                         ),
                         trailing: PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, color: Colors.red),

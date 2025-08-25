@@ -1,3 +1,5 @@
+// ignore_for_file: use_key_in_widget_constructors, deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/pages/anggota/group_hotmul.dart';
 import 'login.dart'; // Import halaman login

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, unnecessary_string_interpolations
+
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:http/http.dart' as http;
