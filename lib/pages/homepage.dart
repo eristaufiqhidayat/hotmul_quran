@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hotmul_quran/pages/group_hotmul.dart';
+import 'package:hotmul_quran/pages/anggota/group_hotmul.dart';
 import 'login.dart'; // Import halaman login
 
 class HomeScreen extends StatelessWidget {

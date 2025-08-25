@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/const/global_const.dart';
+import 'package:hotmul_quran/pages/anggota/anggota_crud.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:hotmul_quran/service/token_services.dart';
@@ -21,13 +23,13 @@ class _AnggotaPageState extends State<AnggotaPage> {
     setState(() => isLoading = true);
     final token = await getToken(); // Ambil token dari SharedPreferences
     final url = Uri.parse(
-      "https://hotmulquran.paud-arabika.com/api/v1/anggota?page=$page&search=${search ?? ''}",
+      "${GlobalConst.url}/api/v1/anggota?page=$page&search=${search ?? ''}",
     );
     final response = await http.get(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-    print(response.body);
+    //print(response.body);
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       setState(() {
@@ -250,20 +252,11 @@ class _AnggotaPageState extends State<AnggotaPage> {
                                 children: [
                                   Icon(Icons.edit, color: Colors.blue),
                                   SizedBox(width: 8),
-                                  Text("Edit"),
+                                  Text("Update"),
                                 ],
                               ),
                             ),
-                            const PopupMenuItem(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete, color: Colors.red),
-                                  SizedBox(width: 8),
-                                  Text("Delete"),
-                                ],
-                              ),
-                            ),
+
                             const PopupMenuDivider(),
                             const PopupMenuItem(
                               value: 'khatam',
@@ -300,81 +293,6 @@ class _AnggotaPageState extends State<AnggotaPage> {
           // Pagination
           Padding(padding: const EdgeInsets.all(8.0), child: buildPagination()),
         ],
-      ),
-    );
-  }
-}
-
-class EditAnggotaPage extends StatefulWidget {
-  final Map<String, dynamic> anggota;
-
-  const EditAnggotaPage({super.key, required this.anggota});
-
-  @override
-  State<EditAnggotaPage> createState() => _EditAnggotaPageState();
-}
-
-class _EditAnggotaPageState extends State<EditAnggotaPage> {
-  late TextEditingController nameController;
-  late TextEditingController groupController;
-
-  @override
-  void initState() {
-    super.initState();
-    nameController = TextEditingController(text: widget.anggota['name']);
-    groupController = TextEditingController(
-      text: widget.anggota['group_id'].toString(),
-    );
-  }
-
-  Future<void> saveEdit() async {
-    final token = await getToken();
-    final url = Uri.parse(
-      "https://hotmulquran.paud-arabika.com/api/v1/anggota/${widget.anggota['id']}",
-    );
-    final response = await http.put(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-      body: {"name": nameController.text, "group_id": groupController.text},
-    );
-
-    if (response.statusCode == 200) {
-      Navigator.pop(context, true); // balik ke list dengan status sukses
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Gagal update data")));
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Edit Anggota")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: "Nama",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: groupController,
-              decoration: const InputDecoration(
-                labelText: "Group ID",
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(onPressed: saveEdit, child: const Text("Simpan")),
-          ],
-        ),
       ),
     );
   }
