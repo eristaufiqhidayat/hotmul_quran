@@ -1,11 +1,12 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
 
 class BulletText extends StatelessWidget {
   final String text;
   final Color color;
 
-  const BulletText({Key? key, required this.text, this.color = Colors.black})
-    : super(key: key);
+  const BulletText({super.key, required this.text, this.color = Colors.black});
 
   @override
   Widget build(BuildContext context) {
