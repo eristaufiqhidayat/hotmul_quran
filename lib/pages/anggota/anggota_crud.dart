@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/service/token_services.dart';
+import 'package:hotmul_quran/widget/bulletText.dart';
 import 'package:http/http.dart' as http;
 
 class EditAnggotaPage extends StatefulWidget {
@@ -287,12 +288,18 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                 ),
               ),
             ),
-            Text(
-              "* Warna panel biru berarti anggota sudah memiliki user login",
+            BulletText(
+              text:
+                  "Warna panel biru berarti anggota sudah memiliki user login",
+              color: Colors.blue.shade900,
             ),
-            Text(
-              "* Warna panel merah berarti anggota belum memiliki user login",
+
+            BulletText(
+              text:
+                  "Warna panel merah berarti anggota belum memiliki user login",
+              color: Colors.red.shade900,
             ),
+
             const SizedBox(height: 32),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
