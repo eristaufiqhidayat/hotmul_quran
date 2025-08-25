@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
-import 'package:hotmul_quran/widget/bulletText.dart';
 import 'package:hotmul_quran/widget/custom_textfile.dart';
 import 'package:http/http.dart' as http;
 
@@ -64,6 +63,7 @@ class _EditDaurahPageState extends State<EditDaurahPage> {
 
     final payload = {"group_id": group_id.text, "group_name": group_name.text};
 
+    // ignore: unused_local_variable
     final response = await http.put(
       url,
       headers: {
