@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/service/token_services.dart';
+import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/bulletText.dart';
 import 'package:hotmul_quran/widget/custom_textfile.dart';
 import 'package:http/http.dart' as http;
@@ -209,7 +210,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       userPass.text = statusAnggota['password'] ?? "";
     }
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit Anggota")),
+      appBar: PrimaryAppBar(title: "Edit Anggota"),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

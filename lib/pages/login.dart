@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, unnecessary_string_interpolations
 
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -22,9 +23,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _loading = true);
 
     final response = await http.post(
-      Uri.parse(
-        "https://hotmulquran.paud-arabika.com/api/v1/login",
-      ), // Ganti dengan API kamu
+      Uri.parse("${GlobalConst.url}/api/v1/login"), // Ganti dengan API kamu
       body: {
         "email": _emailController.text,
         "password": _passwordController.text,
@@ -40,22 +39,6 @@ class _LoginPageState extends State<LoginPage> {
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
-      ScaffoldMessenger.of(context).showSnackBar(
-        //const SnackBar(content: Text("Login gagal, periksa kembali")),
-        // SnackBar(content: Text("${data['access_token']}")),
-        SnackBar(
-          content: Text(
-            "Login berhasil! Selamat datang, ${data['user']['name']}",
-          ),
-        ),
-      );
-      // if (data["token"] != null) {
-      //   //     // Simpan token atau arahkan ke halaman berikutnya
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     //const SnackBar(content: Text("Login gagal, periksa kembali")),
-      //     SnackBar(content: Text("${response.body}")),
-      //   );
-      // }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         //const SnackBar(content: Text("Login gagal, periksa kembali")),
