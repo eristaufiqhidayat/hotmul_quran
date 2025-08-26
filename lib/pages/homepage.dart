@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/pages/anggota/group_hotmul.dart';
 import 'package:hotmul_quran/pages/daurah/group_daurah.dart';
+import 'package:hotmul_quran/pages/donasi/donasi.dart';
 import 'package:hotmul_quran/pages/khatam/khatam.dart';
 import 'login.dart'; // Import halaman login
 
@@ -46,9 +47,10 @@ class HomeScreen extends StatelessWidget {
         );
         break;
       case 'Donasi':
-        ScaffoldMessenger.of(
+        Navigator.push(
           context,
-        ).showSnackBar(SnackBar(content: Text("Menu Donasi diklik")));
+          MaterialPageRoute(builder: (context) => DonasiPage()),
+        );
         break;
       case 'Jadwal Khatam':
         ScaffoldMessenger.of(

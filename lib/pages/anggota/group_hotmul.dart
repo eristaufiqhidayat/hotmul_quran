@@ -98,7 +98,9 @@ class _AnggotaPageState extends State<AnggotaPage> {
             child: Row(
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    fetchData(page: 1, search: searchController.text);
+                  },
                   child: const Icon(Icons.refresh, color: Colors.black),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.resolveWith<Color>((
@@ -124,7 +126,20 @@ class _AnggotaPageState extends State<AnggotaPage> {
                   ),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditAnggotaPage(anggota: {}),
+                      ),
+                    ).then((updated) {
+                      if (updated == true) {
+                        fetchData(
+                          page: currentPage,
+                        ); // refresh list kalau ada update
+                      }
+                    });
+                  },
                   icon: const Icon(Icons.add, color: Colors.white),
                   label: const Text(
                     "New",

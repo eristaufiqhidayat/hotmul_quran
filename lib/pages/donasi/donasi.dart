@@ -2,20 +2,20 @@
 
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
-import 'package:hotmul_quran/pages/khatam/khatam_crud.dart';
+import 'package:hotmul_quran/pages/donasi/donasi_crud.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:hotmul_quran/service/token_services.dart';
 
-class KhatamPage extends StatefulWidget {
-  const KhatamPage({super.key});
+class DonasiPage extends StatefulWidget {
+  const DonasiPage({super.key});
 
   @override
-  State<KhatamPage> createState() => _KhatamPageState();
+  State<DonasiPage> createState() => _DonasiPageState();
 }
 
-class _KhatamPageState extends State<KhatamPage> {
+class _DonasiPageState extends State<DonasiPage> {
   int currentPage = 1;
   int lastPage = 1;
   List<dynamic> anggota = [];
@@ -26,12 +26,13 @@ class _KhatamPageState extends State<KhatamPage> {
     setState(() => isLoading = true);
     final token = await getToken(); // Ambil token dari SharedPreferences
     final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/khatam?page=$page&search=${search ?? ''}",
+      "${GlobalConst.url}/api/v1/donasi?page=$page&search=${search ?? ''}",
     );
     final response = await http.get(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
+    //print(response.body);
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
 
@@ -89,7 +90,7 @@ class _KhatamPageState extends State<KhatamPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PrimaryAppBar(title: "Khatam"),
+      appBar: PrimaryAppBar(title: "Donasi"),
       body: Column(
         children: [
           // Tombol Refresh + Add
@@ -130,7 +131,7 @@ class _KhatamPageState extends State<KhatamPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => EditKhatamPage(anggota: {}),
+                        builder: (context) => EditDonasiPage(anggota: {}),
                       ),
                     ).then((updated) {
                       if (updated == true) {
@@ -222,14 +223,8 @@ class _KhatamPageState extends State<KhatamPage> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Jumlah Khatam: ${item['jumlah_khatam']}"),
-                            Text(
-                              "Jumlah membadalkan: ${item['jumlah_membadalkan']}",
-                            ),
-                            Text(
-                              "Jumlah tidak baca: ${item['jumlah_tidak_baca']}",
-                            ),
-                            Text("Keterangan : ${item['keterangan']}"),
+                            Text("Jumlah Donasi: ${item['rp']}"),
+                            Text("Tanggal: ${item['tanggal']}"),
                           ],
                         ),
                         isThreeLine: true,
@@ -241,7 +236,7 @@ class _KhatamPageState extends State<KhatamPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      EditKhatamPage(anggota: item),
+                                      EditDonasiPage(anggota: item),
                                 ),
                               ).then((updated) {
                                 if (updated == true) {
