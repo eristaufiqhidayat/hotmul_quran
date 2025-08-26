@@ -32,10 +32,10 @@ class _DaurahPageState extends State<DaurahPage> {
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-    print("response status code ${response.statusCode}");
+    //print("response status code ${response.statusCode}");
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
-      print(result);
+      // print(result);
       setState(() {
         anggota = result['data'];
         currentPage = result['current_page'];
@@ -125,7 +125,20 @@ class _DaurahPageState extends State<DaurahPage> {
                   ),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditDaurahPage(anggota: {}),
+                      ),
+                    ).then((updated) {
+                      if (updated == true) {
+                        fetchData(
+                          page: currentPage,
+                        ); // refresh list kalau ada update
+                      }
+                    });
+                  },
                   icon: const Icon(Icons.add, color: Colors.white),
                   label: const Text(
                     "New",

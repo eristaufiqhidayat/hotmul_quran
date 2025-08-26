@@ -26,16 +26,16 @@ class _KhatamPageState extends State<KhatamPage> {
     setState(() => isLoading = true);
     final token = await getToken(); // Ambil token dari SharedPreferences
     final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/daurah?page=$page&search=${search ?? ''}",
+      "${GlobalConst.url}/api/v1/khatam?page=$page&search=${search ?? ''}",
     );
     final response = await http.get(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-    print("response status code ${response.statusCode}");
+    //print("response status code ${response.statusCode}");
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
-      print(result);
+      //print(result);
       setState(() {
         anggota = result['data'];
         currentPage = result['current_page'];
@@ -90,7 +90,7 @@ class _KhatamPageState extends State<KhatamPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PrimaryAppBar(title: "Daurah"),
+      appBar: PrimaryAppBar(title: "Khatam"),
       body: Column(
         children: [
           // Tombol Refresh + Add
@@ -125,7 +125,20 @@ class _KhatamPageState extends State<KhatamPage> {
                   ),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditKhatamPage(anggota: {}),
+                      ),
+                    ).then((updated) {
+                      if (updated == true) {
+                        fetchData(
+                          page: currentPage,
+                        ); // refresh list kalau ada update
+                      }
+                    });
+                  },
                   icon: const Icon(Icons.add, color: Colors.white),
                   label: const Text(
                     "New",
@@ -204,8 +217,10 @@ class _KhatamPageState extends State<KhatamPage> {
                     itemBuilder: (context, index) {
                       final item = anggota[index];
                       return ListTile(
-                        title: Text(item['group_name'] ?? ""),
-                        subtitle: Text("Daurah id : ${item['group_id']}"),
+                        title: Text(item['user_id'].toString() ?? ""),
+                        subtitle: Text(
+                          "Jumlah Khatam id : ${item['jumlah_khatam'].toString() ?? ""}",
+                        ),
                         trailing: PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, color: Colors.red),
                           onSelected: (value) {

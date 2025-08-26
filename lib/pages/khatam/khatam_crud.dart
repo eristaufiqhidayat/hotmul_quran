@@ -7,6 +7,7 @@ import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/custom_textfile.dart';
+import 'package:hotmul_quran/widget/datetimepicker.dart';
 import 'package:http/http.dart' as http;
 
 class EditKhatamPage extends StatefulWidget {
@@ -19,83 +20,355 @@ class EditKhatamPage extends StatefulWidget {
 }
 
 class _EditKhatamPageState extends State<EditKhatamPage> {
-  late TextEditingController group_id;
-  late TextEditingController group_name;
+  late TextEditingController id;
+  late TextEditingController jumlah_khatam;
+  // user_id controller tidak lagi dipakai untuk input (pakai dropdown)
+  late TextEditingController jumlah_membadalkan;
+  late TextEditingController jumlah_tidak_baca;
+  late TextEditingController keterangan;
+  late TextEditingController tanggal;
+  String? tanggalForDb;
+  List<Map<String, dynamic>> users = [];
+  int? selectedUser;
+
+  List<dynamic> groups = [];
+  String? selectedUserId;
+  bool isLoadingGroups = true;
 
   @override
   void initState() {
     super.initState();
-    //print(widget.anggota);
-    group_name = TextEditingController(text: widget.anggota['group_name']);
-    group_id = TextEditingController(
-      text: widget.anggota['group_id'].toString(),
+
+    id = TextEditingController(text: widget.anggota['id']?.toString() ?? '');
+    jumlah_khatam = TextEditingController(
+      text: widget.anggota['jumlah_khatam']?.toString() ?? '',
     );
+    jumlah_membadalkan = TextEditingController(
+      text: widget.anggota['jumlah_membadalkan']?.toString() ?? '',
+    );
+    jumlah_tidak_baca = TextEditingController(
+      text: widget.anggota['jumlah_tidak_baca']?.toString() ?? '',
+    );
+    keterangan = TextEditingController(
+      text: widget.anggota['keterangan'] ?? '',
+    );
+    tanggal = TextEditingController(text: widget.anggota['tanggal'] ?? '');
+
+    // simpan user_id yg lama sebagai string (bisa null)
+    selectedUserId = widget.anggota['user_id']?.toString();
+
+    // ambil list groups untuk dropdown
+    fetchGroups();
+    //fetchUsers();
+  }
+
+  Future<void> fetchUsers() async {
+    final token = await getToken();
+    final url = Uri.parse("${GlobalConst.url}/api/v1/anggota");
+
+    final response = await http.get(
+      url,
+      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+    );
+    if (response.statusCode == 200) {
+      final body = jsonDecode(response.body);
+
+      // cek apakah ada "data" (Laravel paginate)
+      final data = body is Map<String, dynamic> && body.containsKey("data")
+          ? body["data"]
+          : body;
+
+      setState(() {
+        users = List<Map<String, dynamic>>.from(data);
+      });
+
+      debugPrint("Users loaded: $users");
+    } else {
+      debugPrint("Failed to load users: ${response.body}");
+    }
+  }
+
+  Future<void> fetchGroups() async {
+    if (!mounted) return; // amanin sebelum masuk
+    setState(() {
+      isLoadingGroups = true;
+    });
+
+    try {
+      final token = await getToken();
+      final url = Uri.parse("${GlobalConst.url}/api/v1/anggota2");
+
+      final response = await http.get(
+        url,
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+
+        List<dynamic> list;
+        if (body is Map && body.containsKey('data') && body['data'] is List) {
+          list = body['data'];
+        } else if (body is List) {
+          list = body;
+        } else {
+          list = [];
+        }
+
+        if (!mounted) return; // <--- tambah ini
+        setState(() {
+          groups = list;
+          if (selectedUserId != null) {
+            final exists = groups.any(
+              (g) => g['user_id']?.toString() == selectedUserId,
+            );
+            if (!exists) {
+              selectedUserId = groups.isNotEmpty
+                  ? groups[0]['user_id']?.toString()
+                  : null;
+            }
+          } else {
+            selectedUserId = groups.isNotEmpty
+                ? groups[0]['user_id']?.toString()
+                : null;
+          }
+        });
+      } else {
+        if (!mounted) return; // <--- tambah ini
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gagal memuat daftar group')),
+        );
+      }
+    } catch (e) {
+      debugPrint('fetchGroups error: $e');
+      if (!mounted) return; // <--- tambah ini
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error saat memuat daftar group')),
+      );
+    } finally {
+      if (!mounted) return; // <--- tambah ini
+      setState(() {
+        isLoadingGroups = false;
+      });
+    }
+  }
+
+  String _groupLabel(dynamic item) {
+    if (item == null) return '';
+    return (item['name'] ?? item['group_name'] ?? item.toString()).toString();
   }
 
   Future<void> saveDelete() async {
     final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/anggota/${group_id.text}");
+    final url = Uri.parse("${GlobalConst.url}/api/v1/khatam/${id.text}");
 
-    final payload = {"group_id": group_id.text, "group_name": group_name.text};
+    final payload = {"id": id.text};
 
     final response = await http.delete(
       url,
       headers: {
         "Accept": "application/json",
         "Authorization": "Bearer $token",
-        "Content-Type": "application/json", // penting
+        "Content-Type": "application/json",
       },
-      body: jsonEncode(payload), // jadi JSON
+      body: jsonEncode(payload),
     );
 
     if (response.statusCode == 200) {
+      if (!mounted) return;
       Navigator.pop(context, true);
     } else {
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Gagal update data")));
+      ).showSnackBar(const SnackBar(content: Text("Gagal hapus data")));
     }
   }
 
   Future<void> saveEdit() async {
+    if (selectedUserId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Pilih user/group terlebih dahulu")),
+      );
+      return;
+    }
+
     final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/anggota/${group_id.text}");
+    final url = Uri.parse("${GlobalConst.url}/api/v1/khatam/${id.text}");
 
-    final payload = {"group_id": group_id.text, "group_name": group_name.text};
-
-    // ignore: unused_local_variable
+    final payload = {
+      "user_id": selectedUserId,
+      "jumlah_khatam": jumlah_khatam.text,
+      "jumlah_membadalkan": jumlah_membadalkan.text,
+      "jumlah_tidak_baca": jumlah_tidak_baca.text,
+      "keterangan": keterangan.text,
+      "tanggal": tanggal.text,
+    };
+    print(payload);
     final response = await http.put(
       url,
       headers: {
         "Accept": "application/json",
         "Authorization": "Bearer $token",
-        "Content-Type": "application/json", // penting
+        "Content-Type": "application/json",
       },
-      body: jsonEncode(payload), // jadi JSON
+      body: jsonEncode(payload),
     );
+    print(response.body);
+    //debugPrint('saveEdit resp: ${response.statusCode} ${response.body}');
+    if (!mounted) return;
+    if (response.statusCode == 200) {
+      Navigator.pop(context, true);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal simpan data")));
+    }
+  }
+
+  Future<void> saveNew() async {
+    if (selectedUserId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Pilih user/group terlebih dahulu")),
+      );
+      return;
+    }
+
+    final token = await getToken();
+    final url = Uri.parse("${GlobalConst.url}/api/v1/khatam/");
+
+    final payload = {
+      "user_id": selectedUserId,
+      "jumlah_khatam": jumlah_khatam.text,
+      "jumlah_membadalkan": jumlah_membadalkan.text,
+      "jumlah_tidak_baca": jumlah_tidak_baca.text,
+      "keterangan": keterangan.text,
+      "tanggal": tanggal.text,
+    };
+
+    final response = await http.post(
+      url,
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode(payload),
+    );
+
+    debugPrint('saveNew resp: ${response.statusCode} ${response.body}');
+    if (!mounted) return;
+    if (response.statusCode == 200) {
+      Navigator.pop(context, true);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal simpan new data")));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    //print(statusAnggota);
-
+    //int? selectedUserId;
     return Scaffold(
       appBar: PrimaryAppBar(title: "Edit Anggota"),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            CustomTextField(controller: id, label: "id", icon: Icons.badge),
+            const SizedBox(height: 16),
+
+            // Ubah dari String? ke int?
+            // DropdownButtonFormField<int>(
+            //   value: users.any((u) => u['id'] == selectedUserId)
+            //       ? selectedUserId
+            //       : null, // kalau tidak ada di list, pakai null
+            //   items: users.map<DropdownMenuItem<int>>((user) {
+            //     return DropdownMenuItem<int>(
+            //       value: user['id'], // pastikan ini int
+            //       child: Text(user['name']),
+            //     );
+            //   }).toList(),
+            //   onChanged: (value) {
+            //     setState(() {
+            //       selectedUserId = value;
+            //     });
+            //   },
+            // ),
+
+            //Dropdown: tunjukkan loading saat ambil groups
+            isLoadingGroups
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      children: const [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        SizedBox(width: 12),
+                        Text('Memuat daftar group...'),
+                      ],
+                    ),
+                  )
+                : DropdownButtonFormField<String>(
+                    value:
+                        groups.any(
+                          (g) => g['user_id']?.toString() == selectedUserId,
+                        )
+                        ? selectedUserId
+                        : null,
+                    decoration: const InputDecoration(
+                      labelText: "Pilih User / Group",
+                      border: OutlineInputBorder(),
+                    ),
+                    items: groups.map<DropdownMenuItem<String>>((item) {
+                      final val = item['user_id']?.toString();
+                      return DropdownMenuItem<String>(
+                        value: val,
+                        child: Text(_groupLabel(item)),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedUserId = value;
+                      });
+                    },
+                  ),
+            const SizedBox(height: 24),
             CustomTextField(
-              controller: group_id,
-              label: "Daurah ID",
-              icon: Icons.badge,
+              controller: jumlah_membadalkan,
+              label: "Jumlah Membadalkan",
+              icon: Icons.person,
             ),
             const SizedBox(height: 16),
             CustomTextField(
-              controller: group_name,
-              label: "Nama Daurah",
+              controller: jumlah_tidak_baca,
+              label: "Jumlah Tidak Baca",
               icon: Icons.person,
+            ),
+            const SizedBox(height: 16),
+            CustomTextField(
+              controller: jumlah_khatam,
+              label: "Jumlah Khatam",
+              icon: Icons.person,
+            ),
+            const SizedBox(height: 16),
+            CustomTextField(
+              controller: keterangan,
+              label: "Keterangan",
+              icon: Icons.person,
+            ),
+            const SizedBox(height: 16),
+            DatePickerField(
+              label: "Tanggal",
+              controller: tanggal, // isinya langsung yyyy-MM-dd
             ),
             const SizedBox(height: 24),
             Row(
@@ -104,67 +377,82 @@ class _EditKhatamPageState extends State<EditKhatamPage> {
                 SizedBox(
                   width: 100,
                   child: ElevatedButton(
-                    onPressed: saveEdit,
-                    child: const Text(
-                      "Simpan",
-                      style: TextStyle(
-                        color: Colors.white,
-                      ), // biar tulisan putih
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(40), // tinggi tombol
-                      backgroundColor: Colors.blue, // warna background tombol
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          8,
-                        ), // sudut agak melengkung
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 16),
-                SizedBox(
-                  width: 100,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text("Konfirmasi"),
-                            content: const Text(
-                              "Yakin ingin menghapus data ini?",
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: const Text("Batal"),
-                              ),
-                              ElevatedButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                child: const Text("Hapus"),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-
-                      if (confirm == true) {
-                        saveDelete(); // baru eksekusi hapus kalau user pilih "Hapus"
+                    onPressed: () {
+                      if (widget.anggota["id"] != null) {
+                        saveEdit();
+                      } else {
+                        saveNew();
                       }
                     },
-                    child: const Text(
-                      "Hapus",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: () {
+                      if (widget.anggota["id"] != null) {
+                        return const Text(
+                          "Update",
+                          style: TextStyle(color: Colors.white),
+                        );
+                      } else {
+                        return const Text(
+                          "Simpan",
+                          style: TextStyle(color: Colors.white),
+                        );
+                      }
+                    }(),
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(40),
-                      backgroundColor: Colors.red,
+                      backgroundColor: Colors.blue,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
+                ),
+                const SizedBox(width: 16),
+                SizedBox(
+                  width: 100,
+                  child: widget.anggota["id"] != null
+                      ? ElevatedButton(
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text("Konfirmasi"),
+                                  content: const Text(
+                                    "Yakin ingin menghapus data ini?",
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
+                                      child: const Text("Batal"),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
+                                      child: const Text("Hapus"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+
+                            if (confirm == true) {
+                              saveDelete();
+                            }
+                          },
+                          child: const Text(
+                            "Hapus",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(40),
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                 ),
               ],
             ),
