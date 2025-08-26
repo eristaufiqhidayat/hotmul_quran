@@ -32,10 +32,9 @@ class _KhatamPageState extends State<KhatamPage> {
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-    //print("response status code ${response.statusCode}");
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
-      //print(result);
+
       setState(() {
         anggota = result['data'];
         currentPage = result['current_page'];
