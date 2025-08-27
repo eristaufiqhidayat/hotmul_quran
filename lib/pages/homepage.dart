@@ -6,7 +6,8 @@ import 'package:hotmul_quran/pages/daurah/group_daurah.dart';
 import 'package:hotmul_quran/pages/donasi/donasi.dart';
 import 'package:hotmul_quran/pages/jadwal/jadwal.dart';
 import 'package:hotmul_quran/pages/khatam/khatam.dart';
-import 'login.dart'; // Import halaman login
+import 'package:hotmul_quran/widget/drawer.dart';
+import 'login.dart'; // Import halaman login// Import MenuItem from drawer.dart
 
 class HomeScreen extends StatelessWidget {
   final List<MenuItem> menuItems = [
@@ -17,7 +18,7 @@ class HomeScreen extends StatelessWidget {
     MenuItem('Jadwal Khatam', Icons.calendar_today),
     MenuItem('Reward', Icons.card_giftcard),
     MenuItem('Laporan', Icons.pie_chart),
-    MenuItem('Logout', Icons.login), // Tambah menu Login
+    MenuItem('Logout', Icons.login),
   ];
 
   void _onMenuClick(BuildContext context, String title) {
@@ -28,7 +29,6 @@ class HomeScreen extends StatelessWidget {
           MaterialPageRoute(builder: (context) => LoginPage()),
         );
         break;
-
       case 'Anggota':
         Navigator.push(
           context,
@@ -79,11 +79,16 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: AppDrawer(
+        menuItems: menuItems,
+        onItemSelected: (title) => _onMenuClick(context, title),
+      ),
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: AssetImage('assets/logo.png'), // masukkan logo
+              backgroundImage: AssetImage('assets/logo.png'),
               radius: 20,
             ),
             SizedBox(width: 10),
@@ -93,19 +98,26 @@ class HomeScreen extends StatelessWidget {
                 children: const [
                   Text(
                     "MAJELIS KHOTMUL QUR'AN",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   Text(
                     "PUSAKA ILAHI",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
             ),
-            //CircleAvatar(child: Text('A'), backgroundColor: Colors.orange),
           ],
         ),
-        backgroundColor: Colors.green,
+        backgroundColor: Color.fromARGB(255, 15, 99, 18),
         toolbarHeight: 100,
       ),
       body: Padding(
@@ -145,11 +157,4 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class MenuItem {
-  final String title;
-  final IconData icon;
-
-  MenuItem(this.title, this.icon);
 }
