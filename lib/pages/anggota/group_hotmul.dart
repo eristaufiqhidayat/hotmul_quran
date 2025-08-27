@@ -25,8 +25,18 @@ class _AnggotaPageState extends State<AnggotaPage> {
   TextEditingController searchController = TextEditingController();
 
   Future<void> fetchData({int page = 1, String? search}) async {
+    if (!mounted) return;
     setState(() => isLoading = true);
-    final token = await getToken(); // Ambil token dari SharedPreferences
+
+    final token = await getValidAccessToken();
+
+    if (token == null) {
+      // token kosong, langsung logout dan balik ke login
+      await logout();
+      return;
+      // hentikan proses
+    }
+
     final url = Uri.parse(
       "${GlobalConst.url}/api/v1/anggota?page=$page&search=${search ?? ''}",
     );
@@ -123,7 +133,13 @@ class _AnggotaPageState extends State<AnggotaPage> {
                     itemBuilder: (context, index) {
                       final item = anggota[index];
                       return ListTile(
-                        title: Text(item['name'] ?? ""),
+                        title: Text(
+                          item['name'] ?? "",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
                         subtitle: Text(
                           "User id : ${item['user_id']}, Daurah : ${item['group_id']}",
                         ),

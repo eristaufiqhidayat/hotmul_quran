@@ -25,8 +25,18 @@ class _DaurahPageState extends State<DaurahPage> {
   TextEditingController searchController = TextEditingController();
 
   Future<void> fetchData({int page = 1, String? search}) async {
+    if (!mounted) return;
     setState(() => isLoading = true);
-    final token = await getToken(); // Ambil token dari SharedPreferences
+
+    final token = await getValidAccessToken();
+
+    if (token == null) {
+      // token kosong, langsung logout dan balik ke login
+      await logout();
+      return;
+      // hentikan proses
+    }
+
     final url = Uri.parse(
       "${GlobalConst.url}/api/v1/daurah?page=$page&search=${search ?? ''}",
     );
@@ -124,7 +134,13 @@ class _DaurahPageState extends State<DaurahPage> {
                     itemBuilder: (context, index) {
                       final item = anggota[index];
                       return ListTile(
-                        title: Text(item['group_name'] ?? ""),
+                        title: Text(
+                          item['group_name'] ?? "",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
                         subtitle: Text("Daurah id : ${item['group_id']}"),
                         trailing: PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, color: Colors.red),

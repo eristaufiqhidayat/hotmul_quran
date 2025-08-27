@@ -25,8 +25,18 @@ class _DonasiPageState extends State<DonasiPage> {
   TextEditingController searchController = TextEditingController();
 
   Future<void> fetchData({int page = 1, String? search}) async {
+    if (!mounted) return;
     setState(() => isLoading = true);
-    final token = await getToken(); // Ambil token dari SharedPreferences
+
+    final token = await getValidAccessToken();
+
+    if (token == null) {
+      // token kosong, langsung logout dan balik ke login
+      await logout();
+      return;
+      // hentikan proses
+    }
+
     final url = Uri.parse(
       "${GlobalConst.url}/api/v1/donasi?page=$page&search=${search ?? ''}",
     );
@@ -125,7 +135,13 @@ class _DonasiPageState extends State<DonasiPage> {
                     itemBuilder: (context, index) {
                       final item = anggota[index];
                       return ListTile(
-                        title: Text(item['group_name'].toString()),
+                        title: Text(
+                          item['group_name'].toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
