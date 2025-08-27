@@ -2,22 +2,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
-import 'package:hotmul_quran/pages/donasi/donasi_crud.dart';
+import 'package:hotmul_quran/pages/jadwal/jadwal_crud.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
+import 'package:hotmul_quran/widget/pagination.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:hotmul_quran/service/token_services.dart';
 
-class DonasiPage extends StatefulWidget {
-  const DonasiPage({super.key});
+class jadwalPage extends StatefulWidget {
+  const jadwalPage({super.key});
 
   @override
-  State<DonasiPage> createState() => _DonasiPageState();
+  State<jadwalPage> createState() => _jadwalPageState();
 }
 
-class _DonasiPageState extends State<DonasiPage> {
+class _jadwalPageState extends State<jadwalPage> {
   int currentPage = 1;
   int lastPage = 1;
   List<dynamic> anggota = [];
@@ -28,7 +29,7 @@ class _DonasiPageState extends State<DonasiPage> {
     setState(() => isLoading = true);
     final token = await getToken(); // Ambil token dari SharedPreferences
     final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/donasi?page=$page&search=${search ?? ''}",
+      "${GlobalConst.url}/api/v1/jadwal?page=$page&search=${search ?? ''}",
     );
     final response = await http.get(
       url,
@@ -54,45 +55,10 @@ class _DonasiPageState extends State<DonasiPage> {
     fetchData();
   }
 
-  Widget buildPagination() {
-    List<Widget> pages = [];
-
-    for (int i = 1; i <= lastPage; i++) {
-      if (i == 1 ||
-          i == lastPage ||
-          (i >= currentPage - 2 && i <= currentPage + 2)) {
-        pages.add(
-          InkWell(
-            onTap: () => fetchData(page: i),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: i == currentPage ? Colors.blue : Colors.white,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.grey),
-              ),
-              child: Text(
-                "$i",
-                style: TextStyle(
-                  color: i == currentPage ? Colors.white : Colors.black,
-                ),
-              ),
-            ),
-          ),
-        );
-      } else if (i == currentPage - 3 || i == currentPage + 3) {
-        pages.add(const Text("..."));
-      }
-    }
-
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: pages);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PrimaryAppBar(title: "Donasi"),
+      appBar: PrimaryAppBar(title: "jadwal"),
       body: Column(
         children: [
           // Tombol Refresh + Add
@@ -102,7 +68,7 @@ class _DonasiPageState extends State<DonasiPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditDonasiPage(anggota: {}),
+                  builder: (context) => EditjadwalPage(anggota: {}),
                 ),
               ).then((updated) {
                 if (updated == true) fetchData(page: currentPage);
@@ -125,12 +91,19 @@ class _DonasiPageState extends State<DonasiPage> {
                     itemBuilder: (context, index) {
                       final item = anggota[index];
                       return ListTile(
-                        title: Text(item['group_name'].toString()),
+                        title: Text(
+                          item['nama_acara'].toString(),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Jumlah Donasi: ${item['rp']}"),
-                            Text("Tanggal: ${item['tanggal']}"),
+                            Text("Tempat: ${item['nama_tempat']}"),
+                            Text("waktu: ${item['waktu']}"),
                           ],
                         ),
                         isThreeLine: true,
@@ -142,7 +115,7 @@ class _DonasiPageState extends State<DonasiPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      EditDonasiPage(anggota: item),
+                                      EditjadwalPage(anggota: item),
                                 ),
                               ).then((updated) {
                                 if (updated == true) {
@@ -174,7 +147,15 @@ class _DonasiPageState extends State<DonasiPage> {
           ),
 
           // Pagination
-          Padding(padding: const EdgeInsets.all(8.0), child: buildPagination()),
+          // ganti bagian Pagination
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: PaginationWidget(
+              currentPage: currentPage,
+              lastPage: lastPage,
+              onPageChanged: (page) => fetchData(page: page),
+            ),
+          ),
         ],
       ),
     );
