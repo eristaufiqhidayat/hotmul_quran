@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/jadwal/jadwal_crud.dart';
-import 'package:hotmul_quran/pages/login.dart';
+//import 'package:hotmul_quran/pages/login.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/pagination.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';

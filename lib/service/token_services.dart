@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:math';
+//import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
@@ -54,8 +54,8 @@ Future<bool> isTokenExpired(String token) async {
 
     final expiry = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
 
-    final now = DateTime.now();
-    Duration remaining = expiry.difference(now);
+    //final now = DateTime.now();
+    //Duration remaining = expiry.difference(now);
     //print(remaining);
     return DateTime.now().isAfter(expiry);
   } catch (e) {
