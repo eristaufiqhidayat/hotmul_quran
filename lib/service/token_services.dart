@@ -9,10 +9,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:http/http.dart' as http;
 
-Future<void> saveToken(String token, String refresh_token) async {
+Future<void> saveToken(
+  String token,
+  String refresh_token,
+  String name,
+  String email,
+) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString('access_token', token);
   await prefs.setString('refresh_token', refresh_token);
+  await prefs.setString('name', name);
+  await prefs.setString('email', email);
   //print("refresh token disimpan: $refresh_token");
 }
 
@@ -61,6 +68,16 @@ Future<bool> isTokenExpired(String token) async {
   } catch (e) {
     return true;
   }
+}
+
+Future<String?> getUser() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString("name");
+}
+
+Future<String?> getEmail() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString("email");
 }
 
 /// Dapatkan token (auto refresh jika perlu)

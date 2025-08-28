@@ -34,7 +34,12 @@ class _LoginPageState extends State<LoginPage> {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      await saveToken(data['access_token'], data['refresh_token']);
+      await saveToken(
+        data['access_token'],
+        data['refresh_token'],
+        data['name'],
+        data['email'],
+      );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),

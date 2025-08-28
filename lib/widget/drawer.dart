@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/service/token_services.dart';
 
 class MenuItem {
   final String title;
@@ -18,30 +19,73 @@ class AppDrawer extends StatelessWidget {
     required this.onItemSelected,
   });
 
+  Future<Map<String, String>> getUserFromLocal() async {
+    final name = await getUser(); // asumsikan getUser() async
+    final email = await getEmail(); // asumsikan getEmail() async
+    return {'name': ?name, 'email': ?email};
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(color: Color.fromARGB(255, 15, 99, 18)),
-            child: Text(
-              'Menu',
-              style: TextStyle(color: Colors.white, fontSize: 24),
-            ),
-          ),
-          ...menuItems.map(
-            (item) => ListTile(
-              leading: Icon(item.icon, color: Color.fromARGB(255, 15, 99, 18)),
-              title: Text(item.title),
-              onTap: () {
-                Navigator.pop(context); // Tutup drawer
-                onItemSelected(item.title);
-              },
-            ),
-          ),
-        ],
+      child: FutureBuilder<Map<String, String>>(
+        future: getUserFromLocal(),
+        builder: (context, snapshot) {
+          String name = snapshot.data?['name'] ?? '';
+          String email = snapshot.data?['email'] ?? '';
+
+          return ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 15, 99, 18),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: AssetImage('assets/logo.png'),
+                      radius: 30,
+                    ),
+                    SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          email,
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              ...menuItems.map(
+                (item) => ListTile(
+                  leading: Icon(
+                    item.icon,
+                    color: Color.fromARGB(255, 15, 99, 18),
+                  ),
+                  title: Text(item.title),
+                  onTap: () {
+                    Navigator.pop(context);
+                    onItemSelected(item.title);
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
