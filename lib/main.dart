@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/pages/splashscreen.dart';
 import 'pages/login.dart';
+import 'pages/homepage.dart';
 
-//import 'pages/homepage.dart';
-// import file login.dart
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -18,7 +19,14 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       title: 'Hotmul Quran',
       theme: ThemeData(primarySwatch: Colors.green),
-      home: LoginPage(), // ✅ Scaffold berada di dalam MaterialApp
+
+      // ✅ Gunakan route
+      initialRoute: '/',
+      routes: {
+        '/': (context) => AnimatedSplashScreen(),
+        '/login': (context) => LoginPage(),
+        '/home': (context) => HomeScreen(),
+      },
     );
   }
 }

@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:convert';
 //import 'dart:math';
 
@@ -14,12 +16,16 @@ Future<void> saveToken(
   String refresh_token,
   String name,
   String email,
+  String anggota_id,
+  String group_id,
 ) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString('access_token', token);
   await prefs.setString('refresh_token', refresh_token);
   await prefs.setString('name', name);
   await prefs.setString('email', email);
+  await prefs.setString('anggota_id', anggota_id);
+  await prefs.setString('group_id', group_id);
   //print("refresh token disimpan: $refresh_token");
 }
 
@@ -78,6 +84,16 @@ Future<String?> getUser() async {
 Future<String?> getEmail() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getString("email");
+}
+
+Future<String?> getAnggota_id() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString("anggota_id");
+}
+
+Future<String?> getGroup_id() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString("group_id");
 }
 
 /// Dapatkan token (auto refresh jika perlu)

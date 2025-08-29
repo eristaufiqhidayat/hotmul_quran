@@ -39,6 +39,8 @@ class _LoginPageState extends State<LoginPage> {
         data['refresh_token'],
         data['name'],
         data['email'],
+        data['anggota_id'].toString(),
+        data['group_id'].toString(),
       );
       Navigator.pushReplacement(
         context,
