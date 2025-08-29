@@ -5,7 +5,7 @@ import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'homepage.dart'; // Import halaman homepage
+import 'dashboard.dart'; // Import halaman homepage
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(builder: (context) => Dashboard()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

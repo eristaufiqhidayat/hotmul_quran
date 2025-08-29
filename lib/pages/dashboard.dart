@@ -9,7 +9,7 @@ import 'package:hotmul_quran/pages/khatam/khatam.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'login.dart'; // Import halaman login// Import MenuItem from drawer.dart
 
-class HomeScreen extends StatelessWidget {
+class Dashboard extends StatelessWidget {
   final List<MenuItem> menuItems = [
     MenuItem('Anggota', Icons.person),
     MenuItem('Dauroh', Icons.menu),

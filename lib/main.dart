@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/pages/splashscreen.dart';
 import 'pages/login.dart';
-import 'pages/homepage.dart';
+import 'pages/dashboard.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => AnimatedSplashScreen(),
         '/login': (context) => LoginPage(),
-        '/home': (context) => HomeScreen(),
+        '/dashboard': (context) => Dashboard(),
       },
     );
   }
