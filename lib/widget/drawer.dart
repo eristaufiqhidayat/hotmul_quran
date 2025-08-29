@@ -1,24 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/pages/anggota/group_hotmul.dart';
+import 'package:hotmul_quran/pages/daurah/group_daurah.dart';
+import 'package:hotmul_quran/pages/donasi/donasi.dart';
+import 'package:hotmul_quran/pages/jadwal/jadwal.dart';
+import 'package:hotmul_quran/pages/khatam/khatam.dart';
+import 'package:hotmul_quran/pages/login.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 
-class MenuItem {
+class MenuDrawer {
   final String title;
   final IconData icon;
-  MenuItem(this.title, this.icon);
+  MenuDrawer(this.title, this.icon);
 }
 
-typedef MenuItemCallback = void Function(String title);
+final List<MenuDrawer> menuDrawers = [
+  MenuDrawer('Home Page', Icons.person),
+  MenuDrawer('Logout', Icons.login),
+];
+void onDrawerClick(BuildContext context, String title) {
+  switch (title) {
+    case 'Logout':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+      break;
+
+    default:
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Menu $title belum ada aksi")));
+  }
+}
 
 class AppDrawer extends StatelessWidget {
-  final List<MenuItem> menuItems;
-  final MenuItemCallback onItemSelected;
-
-  const AppDrawer({
-    super.key,
-    required this.menuItems,
-    required this.onItemSelected,
-  });
-
   Future<Map<String, String>> getUserFromLocal() async {
     final name = await getUser(); // asumsikan getUser() async
     final email = await getEmail(); // asumsikan getEmail() async
@@ -83,7 +98,7 @@ class AppDrawer extends StatelessWidget {
                   ],
                 ),
               ),
-              ...menuItems.map(
+              ...menuDrawers.map(
                 (item) => ListTile(
                   leading: Icon(
                     item.icon,
@@ -92,7 +107,7 @@ class AppDrawer extends StatelessWidget {
                   title: Text(item.title),
                   onTap: () {
                     Navigator.pop(context);
-                    onItemSelected(item.title);
+                    onDrawerClick(context, item.title);
                   },
                 ),
               ),
