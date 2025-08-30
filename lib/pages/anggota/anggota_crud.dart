@@ -8,6 +8,7 @@ import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/bulletText.dart';
 import 'package:hotmul_quran/widget/custom_textfile.dart';
+import 'package:hotmul_quran/widget/dropdown_groupUser.dart';
 import 'package:http/http.dart' as http;
 
 class EditAnggotaPage extends StatefulWidget {
@@ -28,6 +29,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
   bool cekDataPro = false;
   Map<String, dynamic> statusAnggota = {};
   late MaterialColor warnaUserPanel;
+  List<Map<String, dynamic>> groupUsers = [];
 
   @override
   void initState() {
@@ -199,6 +201,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, dynamic>? selectedUser;
     //print(statusAnggota);
     if (statusAnggota.isEmpty) {
       warnaUserPanel = Colors.red;
@@ -246,6 +249,16 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SizedBox(height: 8),
+                    GroupUserDropdown(
+                      value: selectedUser, // default value
+                      onChanged: (value) {
+                        setState(() => selectedUser = value);
+                        debugPrint(
+                          "Parent menerima: ${value?["id"]} - ${value?["name"]}",
+                        );
+                      },
+                    ),
                     const SizedBox(height: 8),
                     const Text(
                       "Username",

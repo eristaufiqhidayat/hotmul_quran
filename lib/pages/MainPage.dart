@@ -19,7 +19,7 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _pages = [
     const KhotmilQuranPage(),
     const SurahListPage(),
-    const SurahDetailPage(surahId: 1),
+    const SurahDetailPage(number: 1, name: 'Al-Fatihah'),
     const DoaApp(),
     const ProfilePage(),
   ];
