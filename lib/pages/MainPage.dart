@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/pages/doa.dart';
+import 'package:hotmul_quran/pages/home.dart';
+import 'package:hotmul_quran/pages/profile.dart';
 import 'package:hotmul_quran/pages/surah_list.dart';
 import 'package:hotmul_quran/pages/surah_detil_page.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
@@ -14,11 +17,11 @@ class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    const SurahListPage(),
+    const KhotmilQuranPage(),
     const SurahListPage(),
     const SurahDetailPage(surahId: 1),
-    const SurahListPage(),
-    const SurahListPage(),
+    const DoaApp(),
+    const ProfilePage(),
   ];
 
   @override

@@ -18,7 +18,6 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:hotmul_quran/pages/homepage2.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:http/http.dart' as http;
