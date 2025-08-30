@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/main.dart';
+import 'package:hotmul_quran/pages/homepage.dart';
 import 'package:hotmul_quran/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -150,9 +151,13 @@ Future<void> logout() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove("access_token");
   await prefs.remove("refresh_token");
+  await prefs.remove("name");
+  await prefs.remove("email");
+  await prefs.remove("anggota_id");
+  await prefs.remove("group_id");
   // misalnya arahkan ke halaman login
   navigatorKey.currentState?.pushAndRemoveUntil(
-    MaterialPageRoute(builder: (_) => LoginPage()),
+    MaterialPageRoute(builder: (_) => QuranApp()),
     (route) => false,
   );
 }

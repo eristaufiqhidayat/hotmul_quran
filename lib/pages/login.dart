@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/service/token_services.dart';
+import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dashboard.dart'; // Import halaman homepage
@@ -57,6 +58,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: AppDrawer(),
+      appBar: AppBar(title: const Text("Login"), backgroundColor: Colors.green),
       backgroundColor: Colors.green[50],
       body: Center(
         child: SingleChildScrollView(

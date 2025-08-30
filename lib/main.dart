@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/pages/homepage.dart';
 import 'package:hotmul_quran/pages/splashscreen.dart';
 import 'pages/login.dart';
 import 'pages/dashboard.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => AnimatedSplashScreen(),
         '/login': (context) => LoginPage(),
         '/dashboard': (context) => Dashboard(),
+        '/homepage': (context) => QuranApp(),
       },
     );
   }
