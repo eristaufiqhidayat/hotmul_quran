@@ -77,17 +77,55 @@ class KhotmilQuranPage extends StatelessWidget {
                     'Menjadi bekal spiritual:',
                     'Khotmil Quran juga berfungsi sebagai bekal spiritual bagi umat Muslim, terutama dalam menyambut bulan suci Ramadan.',
                   ),
+                  const SizedBox(height: 16),
+                  _buildBulletPoint(
+                    'Pembacaan bersama:',
+                    'Kegiatan ini bisa dilakukan secara mandiri, berjamaah (tatap muka), atau daring, dengan tujuan menyempurnakan pembacaan Al-Quran dari awal hingga akhir. ',
+                  ),
                   const SizedBox(height: 24),
                   _buildSectionTitle('Proses dan Pelaksanaan'),
                   const SizedBox(height: 12),
                   _buildBulletPoint(
-                    'Penyelesaian bacaan:',
-                    'Peserta akan membaca Al-Qur\'an dari surah Al-Fatihah sampai An-Nas.',
+                    '1. Pendaftaran (jika acara terpusat):',
+                    'Jika mengikuti acara yang terpusat, daftar melalui platform yang disediakan, buat akun, dan daftarkan grup peserta Anda. ',
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   _buildBulletPoint(
-                    'Pembacaan bersama:',
-                    'Seringkali dilakukan secara bersama-sama oleh seluruh peserta di atas panggung untuk dibaca dengan tartil (pelan dan benar).',
+                    '2. Pembagian Bacaan:',
+                    'Al-Quran dibagi menjadi 30 juz, dan setiap peserta mendapatkan bagian juznya masing-masing untuk dibaca. ',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildBulletPoint(
+                    '3. Pelaksanaan Mandiri/Berjamaah:',
+                    'Peserta membaca bagian Al-Quran yang telah dibagi, baik secara mandiri di rumah maupun secara berjamaah di suatu tempat pada waktu yang ditentukan. ',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildBulletPoint(
+                    '4. Konfirmasi Penyelesaian:',
+                    'Setelah selesai membaca bagiannya, peserta mengonfirmasi penyelesaiannya kepada panitia atau koordinator. ',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildBulletPoint(
+                    '5. Acara Puncak/Khataman:',
+                    '- Tawasul: Membaca tawasul untuk menghormati Nabi Muhammad SAW, keluarganya, dan para sahabatnya. '
+                        '- Pembacaan Surat Terakhir: Membaca 22 surat terakhir Al-Quran, dimulai dari Surat Ad-Duha hingga An-Naas, secara berurutan. ',
+                  ),
+                  _buildBulletPoint2(
+                    '',
+                    '- Doa Khatam Al-Quran: Melafalkan doa khusus setelah selesai membaca Al-Quran seluruhnya. ',
+                  ),
+                  _buildBulletPoint2(
+                    '',
+                    '- Pembacaan Surat Terakhir: Membaca 22 surat terakhir Al-Quran, dimulai dari Surat Ad-Duha hingga An-Naas, secara berurutan. ',
+                  ),
+                  _buildBulletPoint2(
+                    '',
+                    '- Doa Khatam Al-Quran: Melafalkan doa khusus setelah selesai membaca Al-Quran seluruhnya. ',
+                  ),
+                  const SizedBox(height: 12),
+                  _buildBulletPoint(
+                    '6. Tasyakuran (Opsional):',
+                    'Kegiatan ini dapat ditutup dengan tasyakuran atau syukuran, yang merupakan ungkapan rasa syukur kepada Allah SWT atas selesainya pembacaan Al-Quran. ',
                   ),
                   const SizedBox(height: 32),
                   Center(
@@ -169,6 +207,27 @@ class KhotmilQuranPage extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Text(
+            content,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 15,
+              height: 1.5,
+            ),
+            textAlign: TextAlign.justify,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBulletPoint2(String title, String content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         const SizedBox(height: 4),
         Padding(
           padding: const EdgeInsets.only(left: 16),

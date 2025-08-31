@@ -4,6 +4,8 @@ import 'package:hotmul_quran/pages/daurah/group_daurah.dart';
 import 'package:hotmul_quran/pages/donasi/donasi.dart';
 import 'package:hotmul_quran/pages/jadwal/jadwal.dart';
 import 'package:hotmul_quran/pages/khatam/khatam.dart';
+import 'package:hotmul_quran/pages/khotmul/khotmul.dart';
+import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
 
 //import 'package:hotmul_quran/widget/drawer.dart';
 class MenuItem {
@@ -80,10 +82,11 @@ void onMenuClick(BuildContext context, String title) {
 
 void onMenuClick2(BuildContext context, String title) {
   switch (title) {
-    case 'Hotmul':
-      ScaffoldMessenger.of(
+    case 'Khotmul':
+      Navigator.push(
         context,
-      ).showSnackBar(SnackBar(content: Text("Menu $title diklik")));
+        MaterialPageRoute(builder: (context) => KhotmulPage()),
+      );
       break;
     case 'Donasi':
       Navigator.push(

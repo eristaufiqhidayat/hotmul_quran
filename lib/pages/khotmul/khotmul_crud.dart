@@ -11,16 +11,16 @@ import 'package:hotmul_quran/widget/custom_textfile.dart';
 import 'package:hotmul_quran/widget/dropdown_groupUser.dart';
 import 'package:http/http.dart' as http;
 
-class EditAnggotaPage extends StatefulWidget {
+class EditKhotmulPage extends StatefulWidget {
   final Map<String, dynamic> anggota;
 
-  const EditAnggotaPage({super.key, required this.anggota});
+  const EditKhotmulPage({super.key, required this.anggota});
 
   @override
-  State<EditAnggotaPage> createState() => _EditAnggotaPageState();
+  State<EditKhotmulPage> createState() => _EditKhotmulPageState();
 }
 
-class _EditAnggotaPageState extends State<EditAnggotaPage> {
+class _EditKhotmulPageState extends State<EditKhotmulPage> {
   late TextEditingController nameController;
   late TextEditingController idController;
   late TextEditingController groupController;

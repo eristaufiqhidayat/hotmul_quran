@@ -18,10 +18,10 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
   List<Map<String, dynamic>> verses = [];
   bool loading = true;
   final Set<int> _bookmarks = {};
-
-  // 🎵 Audio Surah (full 1 surah)
   final AudioPlayer _surahPlayer = AudioPlayer();
   bool _isSurahPlaying = false;
+
+  String? bismillah;
 
   @override
   void initState() {
@@ -47,9 +47,14 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
       final List ayatArab = dataArab['data']['ayahs'];
       final List ayatIndo = dataIndo['data']['ayahs'];
 
-      // gabungkan arab + terjemah
       List<Map<String, dynamic>> hasil = [];
       for (int i = 0; i < ayatArab.length; i++) {
+        // Simpan Bismillah jika ada pada ayat pertama
+        if (i == 0 && ayatArab[i]['text'].contains("بسم الله الرحمن الرحيم")) {
+          bismillah = ayatArab[i]['text'];
+          continue; // jangan masukkan sebagai ayat biasa
+        }
+
         hasil.add({
           "number": ayatArab[i]['numberInSurah'],
           "arab": ayatArab[i]['text'],
@@ -68,7 +73,6 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
     }
   }
 
-  // 🎵 Fungsi Play Surah Full
   Future<void> _toggleSurahPlay() async {
     final surahUrl =
         "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${widget.number}.mp3";
@@ -80,7 +84,6 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
       await _surahPlayer.play(UrlSource(surahUrl));
       setState(() => _isSurahPlaying = true);
 
-      // auto stop kalau selesai
       _surahPlayer.onPlayerComplete.listen((event) {
         setState(() => _isSurahPlaying = false);
       });
@@ -89,7 +92,7 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
 
   @override
   void dispose() {
-    _surahPlayer.dispose(); // hentikan player saat keluar halaman
+    _surahPlayer.dispose();
     super.dispose();
   }
 
@@ -97,11 +100,13 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.green.shade700,
         title: Text(widget.name),
         actions: [
           IconButton(
             icon: Icon(_isSurahPlaying ? Icons.stop_circle : Icons.play_circle),
             tooltip: _isSurahPlaying ? "Stop Surah" : "Play Surah",
+            color: Colors.white,
             onPressed: _toggleSurahPlay,
           ),
         ],
@@ -109,9 +114,30 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-              itemCount: verses.length,
+              itemCount: verses.length + (bismillah != null ? 1 : 0),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               itemBuilder: (context, index) {
-                final v = verses[index];
+                // tampilkan Bismillah di awal
+                if (bismillah != null && index == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: Center(
+                      child: Text(
+                        bismillah!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontFamily: 'Amiri',
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                final int verseIndex = bismillah != null ? index - 1 : index;
+                final v = verses[verseIndex];
                 final textArab = v['arab'];
                 final terjemah = v['terjemah'];
                 final audioUrl = v['audio'];
@@ -120,6 +146,7 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
                 final bookmarked = _bookmarks.contains(ayahNumber);
 
                 return _AyahTile(
+                  surahNumber: widget.number,
                   textArab: textArab,
                   terjemah: terjemah,
                   audioUrl: audioUrl,
@@ -134,8 +161,7 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
                       }
                     });
                   },
-                  disablePlay:
-                      _isSurahPlaying, // ⛔ disable ayat kalau surah full sedang play
+                  disablePlay: _isSurahPlaying,
                 );
               },
             ),
@@ -143,7 +169,9 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
   }
 }
 
+// -------------------- AYAH TILE --------------------
 class _AyahTile extends StatefulWidget {
+  final int surahNumber;
   final String textArab;
   final String terjemah;
   final String audioUrl;
@@ -153,6 +181,7 @@ class _AyahTile extends StatefulWidget {
   final bool disablePlay;
 
   const _AyahTile({
+    required this.surahNumber,
     required this.textArab,
     required this.terjemah,
     required this.audioUrl,
@@ -171,8 +200,7 @@ class _AyahTileState extends State<_AyahTile> {
   bool _isPlaying = false;
 
   Future<void> _togglePlay() async {
-    if (widget.disablePlay)
-      return; // ⛔ jangan play kalau full surah sedang jalan
+    if (widget.disablePlay) return;
 
     if (_isPlaying) {
       await _player.stop();
@@ -188,7 +216,8 @@ class _AyahTileState extends State<_AyahTile> {
   }
 
   Future<void> _shareAyah() async {
-    final text = '${widget.textArab}\n\n${widget.terjemah}';
+    final text =
+        'Surah ${widget.surahNumber}, Ayat ${widget.ayahNumber}\n\n${widget.textArab}\n\n${widget.terjemah}';
     await Share.share(text);
   }
 
@@ -201,49 +230,75 @@ class _AyahTileState extends State<_AyahTile> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.all(8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.green.shade700, width: 1.5),
+      ),
+      color: Colors.green.shade50,
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+      elevation: 3,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // Arab
+            // Nomor surah & ayat
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Surah ${widget.surahNumber} | Ayat ${widget.ayahNumber}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green.shade900,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            // Teks Arab
             Text(
               widget.textArab,
               textAlign: TextAlign.right,
-              style: const TextStyle(fontSize: 22, fontFamily: 'Amiri'),
+              style: const TextStyle(
+                fontSize: 22,
+                fontFamily: 'Amiri',
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 8),
-            // Terjemah
+            const SizedBox(height: 10),
+            // Terjemahan
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 widget.terjemah,
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(fontSize: 16, color: Colors.black87),
               ),
             ),
+            const SizedBox(height: 10),
+            // Row tombol: share, play, bookmark
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.share, color: Colors.blue),
+                  icon: const Icon(Icons.share),
+                  color: Colors.blue.shade700,
                   onPressed: _shareAyah,
                   tooltip: "Bagikan",
                 ),
-                // Tombol Play
                 IconButton(
-                  icon: Icon(
-                    _isPlaying ? Icons.stop : Icons.play_arrow,
-                    color: widget.disablePlay ? Colors.grey : Colors.blue,
-                  ),
+                  icon: Icon(_isPlaying ? Icons.stop : Icons.play_arrow),
+                  color: widget.disablePlay
+                      ? Colors.grey
+                      : Colors.green.shade700,
                   onPressed: widget.disablePlay ? null : _togglePlay,
                 ),
-                // Tombol Bookmark
                 IconButton(
                   icon: Icon(
                     widget.bookmarked ? Icons.bookmark : Icons.bookmark_border,
-                    color: widget.bookmarked ? Colors.amber : null,
                   ),
+                  color: widget.bookmarked
+                      ? Colors.orange.shade700
+                      : Colors.green.shade400,
                   onPressed: widget.onToggleBookmark,
                 ),
               ],
