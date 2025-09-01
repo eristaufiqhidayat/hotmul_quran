@@ -2,8 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
-import 'package:hotmul_quran/pages/khotmul/khotmul_crud.dart';
-import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
+import 'package:hotmul_quran/pages/anggota/anggota_crud.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
@@ -11,14 +10,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:hotmul_quran/service/token_services.dart';
 
-class KhotmulPage extends StatefulWidget {
-  const KhotmulPage({super.key});
+class ListAnggotaPage extends StatefulWidget {
+  const ListAnggotaPage({super.key});
 
   @override
-  State<KhotmulPage> createState() => _KhotmulPageState();
+  State<ListAnggotaPage> createState() => _ListAnggotaPageState();
 }
 
-class _KhotmulPageState extends State<KhotmulPage> {
+class _ListAnggotaPageState extends State<ListAnggotaPage> {
   int currentPage = 1;
   int lastPage = 1;
   List<dynamic> anggota = [];
@@ -32,18 +31,20 @@ class _KhotmulPageState extends State<KhotmulPage> {
     final token = await getValidAccessToken();
 
     if (token == null) {
+      // token kosong, langsung logout dan balik ke login
       await logout();
       return;
+      // hentikan proses
     }
 
     final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/khotmul?page=$page&search=${search ?? ''}",
+      "${GlobalConst.url}/api/v1/anggota?page=$page&search=${search ?? ''}",
     );
     final response = await http.get(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-
+    //print(response.body);
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       setState(() {
@@ -100,7 +101,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PrimaryAppBar(title: "Khotmul Quran"),
+      appBar: PrimaryAppBar(title: "Anggota"),
       body: Column(
         children: [
           // Tombol Refresh + Add
@@ -110,7 +111,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditKhotmulPage(anggota: {}),
+                  builder: (context) => EditAnggotaPage(anggota: {}),
                 ),
               ).then((updated) {
                 if (updated == true) fetchData(page: currentPage);
@@ -134,20 +135,13 @@ class _KhotmulPageState extends State<KhotmulPage> {
                       return ListTile(
                         title: Text(
                           item['name'] ?? "",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
                         subtitle: Text(
-                          "User ID : ${item['anggota_id'] ?? '-'}\n"
-                          "Group ID : ${item['group_id'] ?? '-'}\n"
-                          "Juz : ${item['juz'] ?? '-'}, Surah : ${item['surah'] ?? '-'}\n"
-                          "Ayat : ${item['ayah_awal'] ?? '-'} - ${item['ayah_akhir'] ?? '-'}\n"
-                          "Catatan : ${item['catatan'] ?? ''}\n"
-                          "Path : ${item['path'] ?? '-'}\n"
-                          "Mime : ${item['mime_type'] ?? '-'}\n"
-                          "Size : ${item['size'] ?? '-'}",
+                          "User id : ${item['user_id']}, Daurah : ${item['group_id']}",
                         ),
                         trailing: PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, color: Colors.red),
@@ -156,11 +150,14 @@ class _KhotmulPageState extends State<KhotmulPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => RecorderPage(),
+                                  builder: (context) =>
+                                      EditAnggotaPage(anggota: item),
                                 ),
                               ).then((updated) {
                                 if (updated == true) {
-                                  fetchData(page: currentPage);
+                                  fetchData(
+                                    page: currentPage,
+                                  ); // refresh list kalau ada update
                                 }
                               });
                             } else if (value == 'delete') {
@@ -188,15 +185,13 @@ class _KhotmulPageState extends State<KhotmulPage> {
                               value: 'edit',
                               child: Row(
                                 children: [
-                                  Icon(
-                                    Icons.record_voice_over,
-                                    color: Colors.blue,
-                                  ),
+                                  Icon(Icons.edit, color: Colors.blue),
                                   SizedBox(width: 8),
-                                  Text("Share Khotmul"),
+                                  Text("Update"),
                                 ],
                               ),
                             ),
+
                             const PopupMenuDivider(),
                             const PopupMenuItem(
                               value: 'khatam',

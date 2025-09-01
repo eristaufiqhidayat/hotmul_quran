@@ -5,7 +5,7 @@ import 'package:hotmul_quran/pages/donasi/donasi.dart';
 import 'package:hotmul_quran/pages/jadwal/jadwal.dart';
 import 'package:hotmul_quran/pages/khatam/khatam.dart';
 import 'package:hotmul_quran/pages/khotmul/khotmul.dart';
-import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
+//import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
 
 //import 'package:hotmul_quran/widget/drawer.dart';
 class MenuItem {

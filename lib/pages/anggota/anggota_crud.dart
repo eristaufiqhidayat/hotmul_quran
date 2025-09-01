@@ -223,171 +223,174 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       appBar: PrimaryAppBar(title: "Edit Anggota"),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomTextField(
-              controller: idController,
-              label: "Anggota ID",
-              icon: Icons.badge,
-            ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              controller: nameController,
-              label: "Nama Lengkap",
-              icon: Icons.person,
-            ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              controller: groupController,
-              label: "Daurah ID",
-              icon: Icons.group,
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 24),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.blue),
-                borderRadius: BorderRadius.circular(8),
-                color: warnaUserPanel, // background aktif
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomTextField(
+                controller: idController,
+                label: "Anggota ID",
+                icon: Icons.badge,
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    GroupUserDropdown(
-                      value: selectedUser, // default value
-                      onChanged: (value) {
-                        setState(() => selectedUser = value);
-                        debugPrint(
-                          "Parent menerima: ${value?["id"]} - ${value?["name"]}",
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      "Username",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ), // biar teks kelihatan
-                    ),
-                    TextField(
-                      controller: userName,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        filled: true, // aktifkan warna background
-                        fillColor: Colors.white, // biar kotak input putih
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Password",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextField(
-                      controller: userPass,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      obscureText: true, // password disembunyikan
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                controller: nameController,
+                label: "Nama Lengkap",
+                icon: Icons.person,
               ),
-            ),
-            BulletText(
-              text:
-                  "Warna panel biru berarti anggota sudah memiliki user login",
-              color: Colors.blue.shade900,
-            ),
-
-            BulletText(
-              text:
-                  "Warna panel merah berarti anggota belum memiliki user login",
-              color: Colors.red.shade900,
-            ),
-
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 100,
-                  child: ElevatedButton(
-                    onPressed: saveEdit,
-                    child: const Text(
-                      "Simpan",
-                      style: TextStyle(
-                        color: Colors.white,
-                      ), // biar tulisan putih
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(40), // tinggi tombol
-                      backgroundColor: Colors.blue, // warna background tombol
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          8,
-                        ), // sudut agak melengkung
-                      ),
-                    ),
-                  ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                controller: groupController,
+                label: "Daurah ID",
+                icon: Icons.group,
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 24),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.blue),
+                  borderRadius: BorderRadius.circular(8),
+                  color: warnaUserPanel, // background aktif
                 ),
-                SizedBox(width: 16),
-                SizedBox(
-                  width: 100,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final confirm = await showDialog<bool>(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text("Konfirmasi"),
-                            content: const Text(
-                              "Yakin ingin menghapus data ini?",
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context, false),
-                                child: const Text("Batal"),
-                              ),
-                              ElevatedButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                child: const Text("Hapus"),
-                              ),
-                            ],
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+                      GroupUserDropdown(
+                        value: selectedUser, // default value
+                        onChanged: (value) {
+                          setState(() => selectedUser = value);
+                          debugPrint(
+                            "Parent menerima: ${value?["id"]} - ${value?["name"]}",
                           );
                         },
-                      );
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        "Username",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ), // biar teks kelihatan
+                      ),
+                      TextField(
+                        controller: userName,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          filled: true, // aktifkan warna background
+                          fillColor: Colors.white, // biar kotak input putih
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        "Password",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      TextField(
+                        controller: userPass,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        obscureText: true, // password disembunyikan
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                ),
+              ),
+              BulletText(
+                text:
+                    "Warna panel biru berarti anggota sudah memiliki user login",
+                color: Colors.blue.shade900,
+              ),
 
-                      if (confirm == true) {
-                        saveDelete(); // baru eksekusi hapus kalau user pilih "Hapus"
-                      }
-                    },
-                    child: const Text(
-                      "Hapus",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(40),
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+              BulletText(
+                text:
+                    "Warna panel merah berarti anggota belum memiliki user login",
+                color: Colors.red.shade900,
+              ),
+
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: saveEdit,
+                      child: const Text(
+                        "Simpan",
+                        style: TextStyle(
+                          color: Colors.white,
+                        ), // biar tulisan putih
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(40), // tinggi tombol
+                        backgroundColor: Colors.blue, // warna background tombol
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            8,
+                          ), // sudut agak melengkung
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  SizedBox(width: 16),
+                  SizedBox(
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text("Konfirmasi"),
+                              content: const Text(
+                                "Yakin ingin menghapus data ini?",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: const Text("Batal"),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  child: const Text("Hapus"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        if (confirm == true) {
+                          saveDelete(); // baru eksekusi hapus kalau user pilih "Hapus"
+                        }
+                      },
+                      child: const Text(
+                        "Hapus",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(40),
+                        backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

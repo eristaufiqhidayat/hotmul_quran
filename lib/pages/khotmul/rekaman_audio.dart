@@ -110,7 +110,7 @@ class _RecorderPageState extends State<RecorderPage> {
     var response = await request.send();
 
     // Baca response body
-    final respStr = await response.stream.bytesToString();
+    //final respStr = await response.stream.bytesToString();
 
     if (!mounted) return;
     if (response.statusCode == 200) {
