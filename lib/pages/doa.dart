@@ -112,9 +112,16 @@ class _DoaListPageState extends State<DoaListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kumpulan Doa'),
+        title: const Text(
+          'Kumpulan Doa',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: _refresh),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _refresh,
+            color: Colors.white,
+          ),
         ],
         backgroundColor: Colors.green.shade700,
       ),

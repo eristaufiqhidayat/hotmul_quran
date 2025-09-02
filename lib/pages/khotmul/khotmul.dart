@@ -24,6 +24,8 @@ class _KhotmulPageState extends State<KhotmulPage> {
   List<dynamic> anggota = [];
   bool isLoading = false;
   TextEditingController searchController = TextEditingController();
+  var anggota_id;
+  var group_id;
 
   Future<void> fetchData({int page = 1, String? search}) async {
     if (!mounted) return;
@@ -37,13 +39,16 @@ class _KhotmulPageState extends State<KhotmulPage> {
     }
 
     final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/khotmul?page=$page&search=${search ?? ''}",
+      "${GlobalConst.url}/api/v1/khotmul?group_id=$group_id&page=$page&search=${search ?? ''}",
     );
+
     final response = await http.get(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-
+    print(
+      "${GlobalConst.url}/api/v1/khotmul?group_id=$group_id&page=$page&search=${search ?? ''}",
+    );
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       setState(() {
@@ -60,6 +65,18 @@ class _KhotmulPageState extends State<KhotmulPage> {
   void initState() {
     super.initState();
     fetchData();
+    _loadAnggotaId();
+    _loadGroupId();
+  }
+
+  Future<void> _loadAnggotaId() async {
+    anggota_id = await getAnggota_id();
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _loadGroupId() async {
+    group_id = await getGroup_id();
+    if (mounted) setState(() {});
   }
 
   Widget buildPagination() {
@@ -131,48 +148,63 @@ class _KhotmulPageState extends State<KhotmulPage> {
                     itemCount: anggota.length,
                     itemBuilder: (context, index) {
                       final item = anggota[index];
+                      MaterialColor warna;
+                      IconData button;
+                      item['status'] == "" || item['status'] == null
+                          ? {warna = Colors.red, button = Icons.close}
+                          : {warna = Colors.green, button = Icons.check};
                       return ListTile(
-                        title: Text(
-                          item['name'] ?? "",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                        leading: CircleAvatar(
+                          backgroundColor: warna,
+                          child: Text(
+                            item['juz'] != null ? item['juz'].toString() : '-',
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
-                        subtitle: Text(
-                          "User ID : ${item['anggota_id'] ?? '-'}\n"
-                          "Group ID : ${item['group_id'] ?? '-'}\n"
-                          "Juz : ${item['juz'] ?? '-'}, Surah : ${item['surah'] ?? '-'}\n"
-                          "Ayat : ${item['ayah_awal'] ?? '-'} - ${item['ayah_akhir'] ?? '-'}\n"
-                          "Catatan : ${item['catatan'] ?? ''}\n"
-                          "Path : ${item['path'] ?? '-'}\n"
-                          "Mime : ${item['mime_type'] ?? '-'}\n"
-                          "Size : ${item['size'] ?? '-'}",
+                        title: Text(
+                          "Juz ${item['juz'] ?? ''}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: anggota_id == item['anggota_id'].toString()
+                                ? Colors.blue
+                                : Colors.black,
+                          ),
                         ),
+                        subtitle: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Nama : ${item['name'] ?? '-'}\nGroup : ${item['group_id'] ?? '-'}\nPeriode : ${item['periode'] ?? '-'}\n",
+                              style: TextStyle(
+                                color: warna,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  "Status ",
+                                  style: TextStyle(
+                                    color: warna,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Icon(button, color: warna),
+                              ],
+                            ),
+                          ],
+                        ),
+
                         trailing: PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, color: Colors.red),
                           onSelected: (value) {
-                            if (value == 'edit') {
+                            if (value == 'khatam') {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => RecorderPage(),
-                                ),
-                              ).then((updated) {
-                                if (updated == true) {
-                                  fetchData(page: currentPage);
-                                }
-                              });
-                            } else if (value == 'delete') {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Delete ${item['name']}"),
-                                ),
-                              );
-                            } else if (value == 'khatam') {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Add Khatam ${item['name']}"),
+                                  builder: (context) =>
+                                      RecorderPage(khotmulId: item['id']),
                                 ),
                               );
                             } else if (value == 'donasi') {
@@ -185,7 +217,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
                           },
                           itemBuilder: (context) => [
                             const PopupMenuItem(
-                              value: 'edit',
+                              value: 'khatam',
                               child: Row(
                                 children: [
                                   Icon(
@@ -193,21 +225,11 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                     color: Colors.blue,
                                   ),
                                   SizedBox(width: 8),
-                                  Text("Share Khotmul"),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuDivider(),
-                            const PopupMenuItem(
-                              value: 'khatam',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.check_circle, color: Colors.green),
-                                  SizedBox(width: 8),
                                   Text("Add Khatam"),
                                 ],
                               ),
                             ),
+                            const PopupMenuDivider(),
                             const PopupMenuItem(
                               value: 'donasi',
                               child: Row(
