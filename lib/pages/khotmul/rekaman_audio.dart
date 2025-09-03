@@ -265,6 +265,7 @@ class _RecorderPageState extends State<RecorderPage> {
                       itemBuilder: (context, index) {
                         final item = anggota[index];
                         MaterialColor warna;
+                        // ignore: unused_local_variable
                         IconData button;
                         item['status'] == ""
                             ? {warna = Colors.red, button = Icons.close}
