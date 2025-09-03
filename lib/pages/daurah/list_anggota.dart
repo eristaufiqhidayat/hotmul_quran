@@ -11,7 +11,8 @@ import 'dart:convert';
 import 'package:hotmul_quran/service/token_services.dart';
 
 class ListAnggotaPage extends StatefulWidget {
-  const ListAnggotaPage({super.key});
+  final int group_id;
+  const ListAnggotaPage({super.key, required this.group_id});
 
   @override
   State<ListAnggotaPage> createState() => _ListAnggotaPageState();
@@ -38,7 +39,7 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
     }
 
     final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/anggota?page=$page&search=${search ?? ''}",
+      "${GlobalConst.url}/api/v1/anggota?group_id=${widget.group_id}&page=$page&search=${search ?? ''}",
     );
     final response = await http.get(
       url,
@@ -132,7 +133,25 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
                     itemCount: anggota.length,
                     itemBuilder: (context, index) {
                       final item = anggota[index];
+
+                      // ambil per_page dari API (kalau ada), default 10 biar aman
+                      final int perPage = anggota.isNotEmpty
+                          ? anggota.length
+                          : 10;
+
+                      // hitung no urut
+                      final noUrut = (index + 1) + (currentPage - 1) * perPage;
                       return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.blue,
+                          child: Text(
+                            "$noUrut",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                         title: Text(
                           item['name'] ?? "",
                           style: TextStyle(

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/daurah/daurah_crud.dart';
+import 'package:hotmul_quran/pages/daurah/list_anggota.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
@@ -141,7 +142,13 @@ class _DaurahPageState extends State<DaurahPage> {
                             color: Colors.black,
                           ),
                         ),
-                        subtitle: Text("Daurah id : ${item['group_id']}"),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Daurah id : ${item['group_id']}"),
+                            Text("Jumlah Anggota : ${item['total_user']}"),
+                          ],
+                        ),
                         trailing: PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, color: Colors.red),
                           onSelected: (value) {
@@ -151,6 +158,21 @@ class _DaurahPageState extends State<DaurahPage> {
                                 MaterialPageRoute(
                                   builder: (context) =>
                                       EditDaurahPage(anggota: item),
+                                ),
+                              ).then((updated) {
+                                if (updated == true) {
+                                  fetchData(
+                                    page: currentPage,
+                                  ); // refresh list kalau ada update
+                                }
+                              });
+                            } else if (value == 'listangota') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ListAnggotaPage(
+                                    group_id: item["group_id"],
+                                  ),
                                 ),
                               ).then((updated) {
                                 if (updated == true) {
@@ -169,6 +191,16 @@ class _DaurahPageState extends State<DaurahPage> {
                                   Icon(Icons.edit, color: Colors.blue),
                                   SizedBox(width: 8),
                                   Text("Update"),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'listangota',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.people, color: Colors.red),
+                                  SizedBox(width: 8),
+                                  Text("List Anggota"),
                                 ],
                               ),
                             ),
