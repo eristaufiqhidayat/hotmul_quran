@@ -112,7 +112,8 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditAnggotaPage(anggota: {}),
+                  builder: (context) =>
+                      EditAnggotaPage(anggota: {}, daurah_id: widget.group_id),
                 ),
               ).then((updated) {
                 if (updated == true) fetchData(page: currentPage);

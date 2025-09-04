@@ -169,6 +169,36 @@ class _RecorderPageState extends State<RecorderPage> {
     print(response.statusCode);
     if (!mounted) return;
     if (response.statusCode == 200) {
+      updateStatus();
+      Navigator.pop(context, true);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal upload data")));
+    }
+  }
+
+  Future<void> updateStatus() async {
+    final token = await getToken();
+    final url = Uri.parse(
+      "${GlobalConst.url}/api/v1/khotmul/updateStatus/${widget.khotmulId.toString()}",
+    );
+    print(
+      "${GlobalConst.url}/api/v1/khotmul/updateStatus/${widget.khotmulId.toString()}",
+    );
+    final payload = {"status": "send_voice"};
+    final response = await http.post(
+      url,
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json", // penting
+      },
+      body: jsonEncode(payload), // jadi JSON
+    );
+    print(response.body);
+    if (!mounted) return;
+    if (response.statusCode == 200) {
       Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(

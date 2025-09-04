@@ -18,6 +18,7 @@ Future<void> saveToken(
   String email,
   String anggota_id,
   String group_id,
+  String daurah_id,
 ) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString('access_token', token);
@@ -26,6 +27,7 @@ Future<void> saveToken(
   await prefs.setString('email', email);
   await prefs.setString('anggota_id', anggota_id);
   await prefs.setString('group_id', group_id);
+  await prefs.setString('daurah_id', daurah_id);
   //print("refresh token disimpan: $refresh_token");
 }
 
@@ -96,6 +98,11 @@ Future<String?> getGroup_id() async {
   return prefs.getString("group_id");
 }
 
+Future<String?> getDaurah_id() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString("daurah_id");
+}
+
 /// Dapatkan token (auto refresh jika perlu)
 Future<String?> getValidAccessToken() async {
   final prefs = await SharedPreferences.getInstance();
@@ -154,6 +161,7 @@ Future<void> logout() async {
   await prefs.remove("email");
   await prefs.remove("anggota_id");
   await prefs.remove("group_id");
+  await prefs.remove("daurah_id");
   // misalnya arahkan ke halaman login
   navigatorKey.currentState?.pushAndRemoveUntil(
     MaterialPageRoute(builder: (_) => QuranApp()),

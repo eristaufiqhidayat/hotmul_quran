@@ -23,6 +23,7 @@ class _DonasiPageState extends State<DonasiPage> {
   List<dynamic> anggota = [];
   bool isLoading = false;
   TextEditingController searchController = TextEditingController();
+  var anggota_id;
 
   Future<void> fetchData({int page = 1, String? search}) async {
     if (!mounted) return;
@@ -38,7 +39,7 @@ class _DonasiPageState extends State<DonasiPage> {
     }
 
     final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/donasi?page=$page&search=${search ?? ''}",
+      "${GlobalConst.url}/api/v1/donasi?user_id=${anggota_id}&page=$page&search=${search ?? ''}",
     );
     final response = await http.get(
       url,
@@ -62,6 +63,12 @@ class _DonasiPageState extends State<DonasiPage> {
   void initState() {
     super.initState();
     fetchData();
+    _loadAnggotaId();
+  }
+
+  Future<void> _loadAnggotaId() async {
+    anggota_id = await getAnggota_id();
+    if (mounted) setState(() {});
   }
 
   Widget buildPagination() {

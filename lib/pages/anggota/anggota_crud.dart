@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names, sort_child_properties_last
+// ignore_for_file: use_build_context_synchronously, non_constant_identifier_names, sort_child_properties_last, unnecessary_null_comparison
 
 import 'dart:convert';
 
@@ -8,13 +8,14 @@ import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/bulletText.dart';
 import 'package:hotmul_quran/widget/custom_textfile.dart';
+import 'package:hotmul_quran/widget/dropdown_daurah_anggota.dart';
 import 'package:hotmul_quran/widget/dropdown_groupUser.dart';
 import 'package:http/http.dart' as http;
 
 class EditAnggotaPage extends StatefulWidget {
   final Map<String, dynamic> anggota;
-
-  const EditAnggotaPage({super.key, required this.anggota});
+  final int? daurah_id;
+  const EditAnggotaPage({super.key, required this.anggota, this.daurah_id});
 
   @override
   State<EditAnggotaPage> createState() => _EditAnggotaPageState();
@@ -31,6 +32,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
   late MaterialColor warnaUserPanel;
   List<Map<String, dynamic>> groupUsers = [];
   Map<String, dynamic>? selectedUser;
+  Map<String, dynamic>? daurah;
 
   @override
   void initState() {
@@ -38,7 +40,9 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
     //print(widget.anggota);
     nameController = TextEditingController(text: widget.anggota['name']);
     idController = TextEditingController(
-      text: widget.anggota['user_id'].toString(),
+      text: widget.anggota['user_id'] != null
+          ? widget.anggota['user_id'].toString()
+          : "",
     );
     groupController = TextEditingController(
       text: widget.anggota['group_id'].toString(),
@@ -46,6 +50,20 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
     userName = TextEditingController(text: widget.anggota['name']);
     userPass = TextEditingController(text: "password");
     cekData(anggota_id: widget.anggota['user_id'] ?? 1);
+    //pri
+    if (widget.daurah_id != null) {
+      daurah = {
+        "group_id": widget.daurah_id,
+        "group_name": "Daurah ${widget.daurah_id}" ?? "Tidak diketahui",
+      };
+    } else {
+      daurah = {
+        "group_id": widget.anggota['group_id'],
+        "group_name":
+            "Daurah ${widget.anggota['group_id']}" ?? "Tidak diketahui",
+      };
+    }
+    print(daurah);
     selectedUser = {
       "id": widget.anggota['group_id'],
       "name": widget.anggota['group_name'] ?? "Tidak diketahui",
@@ -61,7 +79,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
     final payload = {
       "user_id": idController.text,
       "name": nameController.text,
-      "group_id": groupController.text,
+      "group_id": daurah?["group_id"].toString(),
     };
 
     final response = await http.delete(
@@ -92,9 +110,9 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
     final payload = {
       "user_id": idController.text,
       "name": nameController.text,
-      "group_id": selectedUser?["id"].toString(), // dari dropdown
+      "group_id": daurah?["group_id"].toString(), // dari dropdown
     };
-    //print(payload);
+    print("Save edit $payload");
     final response = await http.put(
       url,
       headers: {
@@ -104,7 +122,9 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       },
       body: jsonEncode(payload), // jadi JSON
     );
+    print(response.body);
     if (!mounted) return;
+
     if (response.statusCode == 200) {
       Navigator.pop(context, true);
       if (userName.text.isNotEmpty &&
@@ -144,6 +164,34 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
     );
 
     if (response.statusCode == 200) {
+      Navigator.pop(context, true);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal update User Login")));
+    }
+  }
+
+  Future<void> addAnggota() async {
+    final token = await getToken();
+    final url = Uri.parse("${GlobalConst.url}/api/v1/anggota");
+
+    final payload = {
+      "name": nameController.text,
+      "group_id": widget.daurah_id.toString(),
+    };
+    print("Add Anggota $payload");
+    final response = await http.post(
+      url,
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json", // penting
+      },
+      body: jsonEncode(payload), // jadi JSON
+    );
+    print(response.statusCode);
+    if (response.statusCode == 201) {
       Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(
@@ -239,6 +287,15 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                 icon: Icons.person,
               ),
               const SizedBox(height: 16),
+              daurahDropdown(
+                value: daurah?["group_id"] as int?, // default value
+                onChanged: (value) {
+                  setState(() => daurah = value);
+                  debugPrint(
+                    "Parent menerima: ${value?["group_id"]} - ${value?["group_name"]}",
+                  );
+                },
+              ),
               CustomTextField(
                 controller: groupController,
                 label: "Daurah ID",
@@ -324,7 +381,9 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                   SizedBox(
                     width: 100,
                     child: ElevatedButton(
-                      onPressed: saveEdit,
+                      onPressed: idController.text.trim().isEmpty
+                          ? addAnggota
+                          : saveEdit,
                       child: const Text(
                         "Simpan",
                         style: TextStyle(

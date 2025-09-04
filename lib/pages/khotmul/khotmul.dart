@@ -26,6 +26,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
   TextEditingController searchController = TextEditingController();
   var anggota_id;
   var group_id;
+  var daurah_id;
 
   Future<void> fetchData({int page = 1, String? search}) async {
     if (!mounted) return;
@@ -39,16 +40,16 @@ class _KhotmulPageState extends State<KhotmulPage> {
     }
 
     final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/khotmul?group_id=$group_id&page=$page&search=${search ?? ''}",
+      "${GlobalConst.url}/api/v1/khotmul?group_id=$daurah_id&page=$page&search=${search ?? ''}",
     );
-
+    print(
+      "${GlobalConst.url}/api/v1/khotmul?group_id=$daurah_id&page=$page&search=${search ?? ''}",
+    );
     final response = await http.get(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-    print(
-      "${GlobalConst.url}/api/v1/khotmul?group_id=$group_id&page=$page&search=${search ?? ''}",
-    );
+    print("Khotmul ${response.body}");
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       setState(() {
@@ -67,6 +68,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
     fetchData();
     _loadAnggotaId();
     _loadGroupId();
+    _loadDaurahId();
   }
 
   Future<void> _loadAnggotaId() async {
@@ -76,6 +78,13 @@ class _KhotmulPageState extends State<KhotmulPage> {
 
   Future<void> _loadGroupId() async {
     group_id = await getGroup_id();
+
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _loadDaurahId() async {
+    daurah_id = await getDaurah_id();
+
     if (mounted) setState(() {});
   }
 
@@ -200,13 +209,18 @@ class _KhotmulPageState extends State<KhotmulPage> {
                           icon: const Icon(Icons.more_vert, color: Colors.red),
                           onSelected: (value) {
                             if (value == 'khatam') {
-                              Navigator.push(
+                              final result = Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
                                       RecorderPage(khotmulId: item['id']),
                                 ),
                               );
+                              if (result == true) {
+                                // panggil ulang load data grid
+                                fetchData();
+                                setState(() {});
+                              }
                             } else if (value == 'donasi') {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(

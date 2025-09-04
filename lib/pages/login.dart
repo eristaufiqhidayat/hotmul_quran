@@ -42,6 +42,7 @@ class _LoginPageState extends State<LoginPage> {
         data['email'],
         data['anggota_id'].toString(),
         data['group_id'].toString(),
+        data['daurah_id'].toString(),
       );
       Navigator.pushReplacement(
         context,
