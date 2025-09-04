@@ -54,13 +54,12 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
     if (widget.daurah_id != null) {
       daurah = {
         "group_id": widget.daurah_id,
-        "group_name": "Daurah ${widget.daurah_id}" ?? "Tidak diketahui",
+        "group_name": "Daurah ${widget.daurah_id}",
       };
     } else {
       daurah = {
         "group_id": widget.anggota['group_id'],
-        "group_name":
-            "Daurah ${widget.anggota['group_id']}" ?? "Tidak diketahui",
+        "group_name": "Daurah ${widget.anggota['group_id']}",
       };
     }
     print(daurah);

@@ -204,6 +204,16 @@ class _DaurahPageState extends State<DaurahPage> {
                                 ],
                               ),
                             ),
+                            const PopupMenuItem(
+                              value: 'khotmul',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.book, color: Colors.black),
+                                  SizedBox(width: 8),
+                                  Text("Khotmul/JUZ"),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       );

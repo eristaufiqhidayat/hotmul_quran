@@ -42,14 +42,14 @@ class _KhotmulPageState extends State<KhotmulPage> {
     final url = Uri.parse(
       "${GlobalConst.url}/api/v1/khotmul?group_id=$daurah_id&page=$page&search=${search ?? ''}",
     );
-    print(
-      "${GlobalConst.url}/api/v1/khotmul?group_id=$daurah_id&page=$page&search=${search ?? ''}",
-    );
+    // print(
+    //   "${GlobalConst.url}/api/v1/khotmul?group_id=$daurah_id&page=$page&search=${search ?? ''}",
+    // );
     final response = await http.get(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-    print("Khotmul ${response.body}");
+    //print("Khotmul ${response.body}");
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       setState(() {
@@ -205,60 +205,69 @@ class _KhotmulPageState extends State<KhotmulPage> {
                           ],
                         ),
 
-                        trailing: PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_vert, color: Colors.red),
-                          onSelected: (value) {
-                            if (value == 'khatam') {
-                              final result = Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      RecorderPage(khotmulId: item['id']),
+                        trailing: anggota_id == item['anggota_id'].toString()
+                            ? PopupMenuButton<String>(
+                                icon: const Icon(
+                                  Icons.more_vert,
+                                  color: Colors.blue,
                                 ),
-                              );
-                              if (result == true) {
-                                // panggil ulang load data grid
-                                fetchData();
-                                setState(() {});
-                              }
-                            } else if (value == 'donasi') {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Add Donasi ${item['name']}"),
-                                ),
-                              );
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'khatam',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.record_voice_over,
-                                    color: Colors.blue,
+                                onSelected: (value) async {
+                                  if (value == 'khatam') {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            RecorderPage(khotmulId: item['id']),
+                                      ),
+                                    );
+
+                                    if (result == true) {
+                                      await fetchData(
+                                        page: currentPage,
+                                      ); // refresh data
+                                    }
+                                  } else if (value == 'donasi') {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Add Donasi ${item['name']}",
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+
+                                itemBuilder: (context) => [
+                                  const PopupMenuItem(
+                                    value: 'khatam',
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.record_voice_over,
+                                          color: Colors.blue,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text("Add Khatam"),
+                                      ],
+                                    ),
                                   ),
-                                  SizedBox(width: 8),
-                                  Text("Add Khatam"),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuDivider(),
-                            const PopupMenuItem(
-                              value: 'donasi',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.account_balance_wallet,
-                                    color: Colors.purple,
+                                  const PopupMenuDivider(),
+                                  const PopupMenuItem(
+                                    value: 'donasi',
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.account_balance_wallet,
+                                          color: Colors.purple,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text("Add Donasi"),
+                                      ],
+                                    ),
                                   ),
-                                  SizedBox(width: 8),
-                                  Text("Add Donasi"),
                                 ],
-                              ),
-                            ),
-                          ],
-                        ),
+                              )
+                            : Icon(Icons.more_vert, color: Colors.red),
                       );
                     },
                     separatorBuilder: (context, index) =>
