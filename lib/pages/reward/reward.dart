@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
-import 'package:hotmul_quran/pages/donasi/donasi_crud.dart';
+import 'package:hotmul_quran/pages/reward/reward_crud.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
@@ -11,14 +11,14 @@ import 'dart:convert';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:intl/intl.dart';
 
-class DonasiPage extends StatefulWidget {
-  const DonasiPage({super.key});
+class RewardPage extends StatefulWidget {
+  const RewardPage({super.key});
 
   @override
-  State<DonasiPage> createState() => _DonasiPageState();
+  State<RewardPage> createState() => _RewardPageState();
 }
 
-class _DonasiPageState extends State<DonasiPage> {
+class _RewardPageState extends State<RewardPage> {
   int currentPage = 1;
   int lastPage = 1;
   List<dynamic> anggota = [];
@@ -45,7 +45,7 @@ class _DonasiPageState extends State<DonasiPage> {
     }
 
     final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/donasi?group_user=$group_user&user_id=${anggota_id}&page=$page&search=${search ?? ''}",
+      "${GlobalConst.url}/api/v1/reward?group_user=$group_user&user_id=${anggota_id}&page=$page&search=${search ?? ''}",
     );
     final response = await http.get(
       url,
@@ -121,7 +121,7 @@ class _DonasiPageState extends State<DonasiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PrimaryAppBar(title: "Donasi"),
+      appBar: PrimaryAppBar(title: "Reward"),
       body: Column(
         children: [
           // Tombol Refresh + Add
@@ -131,7 +131,7 @@ class _DonasiPageState extends State<DonasiPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditDonasiPage(anggota: {}),
+                  builder: (context) => EditRewardPage(anggota: {}),
                 ),
               ).then((updated) {
                 if (updated == true) fetchData(page: currentPage);
@@ -177,7 +177,7 @@ class _DonasiPageState extends State<DonasiPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      EditDonasiPage(anggota: item),
+                                      EditRewardPage(anggota: item),
                                 ),
                               ).then((updated) {
                                 if (updated == true) {

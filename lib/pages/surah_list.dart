@@ -55,12 +55,23 @@ class SurahListPage extends StatelessWidget {
                   "${s.translationId} (${s.ayahCount} ayat)",
                   style: const TextStyle(fontSize: 14),
                 ),
-                trailing: Text(
-                  s.nameArabic,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                trailing: SizedBox(
+                  width: 100, // atur sesuai kebutuhan
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min, // jangan expand penuh
+                    children: [
+                      Text(
+                        s.nameArabic,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_forward_ios, size: 18),
+                    ],
                   ),
                 ),
                 onTap: () {

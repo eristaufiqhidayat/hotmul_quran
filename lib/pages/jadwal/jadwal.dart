@@ -25,6 +25,8 @@ class _jadwalPageState extends State<jadwalPage> {
   List<dynamic> anggota = [];
   bool isLoading = false;
   TextEditingController searchController = TextEditingController();
+  var anggota_id;
+  var group_user;
 
   Future<void> fetchData({int page = 1, String? search}) async {
     if (!mounted) return;
@@ -61,10 +63,22 @@ class _jadwalPageState extends State<jadwalPage> {
     setState(() => isLoading = false);
   }
 
+  Future<void> _loadAnggotaId() async {
+    anggota_id = await getAnggota_id();
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _loadGroupUser() async {
+    group_user = await getGroup_id();
+    if (mounted) setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
     fetchData();
+    _loadAnggotaId();
+    _loadGroupUser();
   }
 
   @override

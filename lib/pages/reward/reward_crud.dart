@@ -10,16 +10,16 @@ import 'package:hotmul_quran/widget/custom_textfile.dart';
 import 'package:hotmul_quran/widget/datetimepicker.dart';
 import 'package:http/http.dart' as http;
 
-class EditDonasiPage extends StatefulWidget {
+class EditRewardPage extends StatefulWidget {
   final Map<String, dynamic> anggota;
 
-  const EditDonasiPage({super.key, required this.anggota});
+  const EditRewardPage({super.key, required this.anggota});
 
   @override
-  State<EditDonasiPage> createState() => _EditDonasiPageState();
+  State<EditRewardPage> createState() => _EditRewardPageState();
 }
 
-class _EditDonasiPageState extends State<EditDonasiPage> {
+class _EditRewardPageState extends State<EditRewardPage> {
   late TextEditingController id;
   late TextEditingController rp;
   late TextEditingController tanggal;
@@ -157,7 +157,7 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
 
   Future<void> saveDelete() async {
     final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/donasi/${id.text}");
+    final url = Uri.parse("${GlobalConst.url}/api/v1/reward/${id.text}");
 
     final payload = {"id": id.text};
 
@@ -191,7 +191,7 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
     }
 
     final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/donasi/${id.text}");
+    final url = Uri.parse("${GlobalConst.url}/api/v1/reward/${id.text}");
 
     final payload = {
       "user_id": selectedUserId,
@@ -229,7 +229,7 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
     }
 
     final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/donasi/");
+    final url = Uri.parse("${GlobalConst.url}/api/v1/reward/");
 
     final payload = {
       "user_id": selectedUserId,
@@ -262,7 +262,7 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
   Widget build(BuildContext context) {
     //int? selectedUserId;
     return Scaffold(
-      appBar: PrimaryAppBar(title: "Edit Donasi"),
+      appBar: PrimaryAppBar(title: "Edit Reward"),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
