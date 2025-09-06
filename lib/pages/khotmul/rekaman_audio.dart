@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/service/token_services.dart';
+import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:http/http.dart' as http;
 import 'package:record/record.dart';
 // ignore: depend_on_referenced_packages
@@ -245,6 +246,7 @@ class _RecorderPageState extends State<RecorderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: AppDrawer(),
       appBar: AppBar(title: const Text("Voice Recorder")),
       body: Center(
         child: Column(

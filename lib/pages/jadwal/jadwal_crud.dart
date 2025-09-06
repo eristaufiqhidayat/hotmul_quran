@@ -8,6 +8,7 @@ import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/custom_textfile.dart';
 import 'package:hotmul_quran/widget/datetimepicker.dart';
+import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:http/http.dart' as http;
 
 class EditjadwalPage extends StatefulWidget {
@@ -268,6 +269,7 @@ class _EditjadwalPageState extends State<EditjadwalPage> {
   Widget build(BuildContext context) {
     //int? selectedUserId;
     return Scaffold(
+      endDrawer: AppDrawer(),
       appBar: PrimaryAppBar(title: "Edit jadwal"),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

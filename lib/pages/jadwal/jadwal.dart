@@ -5,6 +5,7 @@ import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/jadwal/jadwal_crud.dart';
 //import 'package:hotmul_quran/pages/login.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
+import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/widget/pagination.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
@@ -84,6 +85,7 @@ class _jadwalPageState extends State<jadwalPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: AppDrawer(),
       appBar: PrimaryAppBar(title: "jadwal"),
       body: Column(
         children: [

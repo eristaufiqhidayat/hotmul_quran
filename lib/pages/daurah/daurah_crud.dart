@@ -7,6 +7,7 @@ import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/custom_textfile.dart';
+import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:http/http.dart' as http;
 
 class EditDaurahPage extends StatefulWidget {
@@ -121,6 +122,7 @@ class _EditDaurahPageState extends State<EditDaurahPage> {
     //print(statusAnggota);
 
     return Scaffold(
+      endDrawer: AppDrawer(),
       appBar: PrimaryAppBar(title: "Edit Anggota"),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

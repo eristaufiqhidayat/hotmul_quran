@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/anggota/anggota_crud.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
+import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
 import 'package:http/http.dart' as http;
@@ -101,6 +102,7 @@ class _AnggotaPageState extends State<AnggotaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: AppDrawer(),
       appBar: PrimaryAppBar(title: "Anggota"),
       body: Column(
         children: [

@@ -5,6 +5,7 @@ import 'package:hotmul_quran/pages/donasi/donasi.dart';
 import 'package:hotmul_quran/pages/jadwal/jadwal.dart';
 import 'package:hotmul_quran/pages/khatam/khatam.dart';
 import 'package:hotmul_quran/pages/khotmul/khotmul.dart';
+import 'package:hotmul_quran/pages/report/report.dart';
 import 'package:hotmul_quran/pages/reward/reward.dart';
 //import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
 
@@ -71,9 +72,10 @@ void onMenuClick(BuildContext context, String title) {
       );
       break;
     case 'Laporan':
-      ScaffoldMessenger.of(
+      Navigator.push(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Menu Laporan diklik")));
+        MaterialPageRoute(builder: (context) => ReportMain()),
+      );
       break;
     default:
       ScaffoldMessenger.of(
@@ -106,6 +108,12 @@ void onMenuClick2(BuildContext context, String title) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => RewardPage()),
+      );
+      break;
+    case 'Laporan':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ReportMain()),
       );
       break;
     default:
