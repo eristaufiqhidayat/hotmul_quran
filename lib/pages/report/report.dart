@@ -18,15 +18,24 @@ class _ReportMainState extends State<ReportMain> {
         appBar: AppBar(
           backgroundColor: Colors.green.shade700,
           title: const Text('Laporan', style: TextStyle(color: Colors.white)),
-          bottom: const TabBar(
+          bottom: TabBar(
             indicatorColor: Colors.white, // garis bawah putih
             labelColor: Colors.white, // teks tab aktif putih
             unselectedLabelColor:
                 Colors.white70, // teks tab non-aktif putih transparan
             tabs: [
-              Tab(icon: Icon(Icons.home), text: "Home"),
-              Tab(icon: Icon(Icons.school), text: "Courses"),
-              Tab(icon: Icon(Icons.settings), text: "Settings"),
+              Tab(
+                icon: Icon(Icons.summarize, color: Colors.red[100]),
+                text: "Sum",
+              ),
+              const Tab(
+                icon: Icon(Icons.add_chart, color: Colors.lightBlue),
+                text: "Graph",
+              ),
+              const Tab(
+                icon: Icon(Icons.trending_up, color: Colors.amberAccent),
+                text: "trend",
+              ),
             ],
           ),
         ),

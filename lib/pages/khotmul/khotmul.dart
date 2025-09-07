@@ -6,6 +6,7 @@ import 'package:hotmul_quran/pages/khotmul/khotmul_crud.dart';
 import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
+import 'package:hotmul_quran/widget/listquran_perjuz.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
 import 'package:http/http.dart' as http;
@@ -219,7 +220,8 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            RecorderPage(khotmulId: item['id']),
+                                            JuzAyahPage(juzNumber: item["juz"]),
+                                        //RecorderPage(khotmulId: item['id']),
                                       ),
                                     );
 

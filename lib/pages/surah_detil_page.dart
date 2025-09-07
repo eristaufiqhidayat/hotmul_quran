@@ -62,7 +62,6 @@ class _SurahDetailPageState extends State<SurahDetailPage> {
           "audio": ayatArab[i]['audio'],
         });
       }
-
       setState(() {
         verses = hasil;
         loading = false;
