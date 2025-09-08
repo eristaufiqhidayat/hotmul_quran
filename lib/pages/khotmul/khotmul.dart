@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
+import 'package:hotmul_quran/pages/donasi/donasi.dart';
 import 'package:hotmul_quran/pages/khotmul/khotmul_crud.dart';
 //import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
@@ -257,13 +258,19 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                       ); // refresh data
                                     }
                                   } else if (value == 'donasi') {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          "Add Donasi ${item['name']}",
-                                        ),
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DonasiPage(),
+                                        //RecorderPage(khotmulId: item['id']),
                                       ),
                                     );
+
+                                    if (result == true) {
+                                      await fetchData(
+                                        page: currentPage,
+                                      ); // refresh data
+                                    }
                                   }
                                 },
 
