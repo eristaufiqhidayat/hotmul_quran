@@ -1,6 +1,6 @@
 ```mermaid
 
-flowchart LR
+flowchart TD
     Anggota -->|Input Data Donasi| Flutter[Flutter App]
     Flutter -->|Request JSON + Token| API[Laravel API]
     API -->|Query| DB[(MySQL Database)]

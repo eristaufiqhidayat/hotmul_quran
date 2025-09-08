@@ -257,20 +257,6 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                         page: currentPage,
                                       ); // refresh data
                                     }
-                                  } else if (value == 'donasi') {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => DonasiPage(),
-                                        //RecorderPage(khotmulId: item['id']),
-                                      ),
-                                    );
-
-                                    if (result == true) {
-                                      await fetchData(
-                                        page: currentPage,
-                                      ); // refresh data
-                                    }
                                   }
                                 },
 
@@ -285,20 +271,6 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                         ),
                                         SizedBox(width: 8),
                                         Text("Add Khatam"),
-                                      ],
-                                    ),
-                                  ),
-                                  const PopupMenuDivider(),
-                                  const PopupMenuItem(
-                                    value: 'donasi',
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.account_balance_wallet,
-                                          color: Colors.purple,
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text("Add Donasi"),
                                       ],
                                     ),
                                   ),

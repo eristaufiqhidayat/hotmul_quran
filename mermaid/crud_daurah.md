@@ -1,5 +1,5 @@
 ```mermaid
-flowchart LR
+flowchart TD
     Admin -->|Tambah/Edit Daurah| Flutter
     Flutter -->|POST/PUT| API
     API -->|INSERT/UPDATE| DB[(MySQL)]
