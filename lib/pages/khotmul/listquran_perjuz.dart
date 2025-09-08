@@ -316,7 +316,7 @@ class _JuzAyahPageState extends State<JuzAyahPage> {
                       final ayah = ayahs[index];
                       final ayahNumber = ayah['number'];
                       final isRead = readAyahs.contains(ayahNumber);
-                      final isMarked = markedAyahs.contains(ayahNumber);
+                      //final isMarked = markedAyahs.contains(ayahNumber);
 
                       return Card(
                         color: Colors.green[50],
