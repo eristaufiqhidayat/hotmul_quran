@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 
 import 'package:hotmul_quran/service/token_services.dart';
-import 'package:hotmul_quran/pages/prevModel/modelMenu.dart';
+import 'package:hotmul_quran/model/modelMenu.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});

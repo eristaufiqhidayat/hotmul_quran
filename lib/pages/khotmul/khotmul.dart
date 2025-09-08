@@ -6,7 +6,7 @@ import 'package:hotmul_quran/pages/khotmul/khotmul_crud.dart';
 import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
-import 'package:hotmul_quran/widget/listquran_perjuz.dart';
+import 'package:hotmul_quran/pages/khotmul/listquran_perjuz.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
 import 'package:http/http.dart' as http;
@@ -162,7 +162,9 @@ class _KhotmulPageState extends State<KhotmulPage> {
                       final item = anggota[index];
                       MaterialColor warna;
                       IconData button;
-                      item['status'] == "" || item['status'] == null
+                      item['status'] == "" ||
+                              item['status'] == null ||
+                              item['status'] == "send_no"
                           ? {warna = Colors.red, button = Icons.close}
                           : {warna = Colors.green, button = Icons.check};
                       return ListTile(
@@ -202,7 +204,29 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Icon(button, color: warna),
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: LinearGradient(
+                                      colors: warna == Colors.green
+                                          ? [Colors.greenAccent, Colors.green]
+                                          : [Colors.redAccent, Colors.red],
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: warna.withOpacity(0.6),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    button,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
                               ],
                             ),
                           ],
@@ -219,8 +243,10 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                     final result = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            JuzAyahPage(juzNumber: item["juz"]),
+                                        builder: (context) => JuzAyahPage(
+                                          juzNumber: item["juz"],
+                                          khotmulId: item['id'],
+                                        ),
                                         //RecorderPage(khotmulId: item['id']),
                                       ),
                                     );
@@ -271,7 +297,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                   ),
                                 ],
                               )
-                            : Icon(Icons.more_vert, color: Colors.red),
+                            : Icon(Icons.more_vert, color: Colors.white),
                       );
                     },
                     separatorBuilder: (context, index) =>
