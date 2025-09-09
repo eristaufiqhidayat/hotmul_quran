@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
-import 'package:hotmul_quran/pages/donasi/donasi.dart';
+//import 'package:hotmul_quran/pages/donasi/donasi.dart';
 import 'package:hotmul_quran/pages/khotmul/khotmul_crud.dart';
 //import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
 import 'package:hotmul_quran/widget/appbar.dart';

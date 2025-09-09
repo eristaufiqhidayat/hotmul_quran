@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/pages/register.dart';
 
 class KhotmilQuranPage extends StatelessWidget {
   const KhotmilQuranPage({super.key});
@@ -131,7 +132,12 @@ class KhotmilQuranPage extends StatelessWidget {
                   Center(
                     child: ElevatedButton(
                       onPressed: () {
-                        // Aksi ketika tombol ditekan
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterPage(),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(
