@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
+import 'package:hotmul_quran/pages/register.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:http/http.dart' as http;
@@ -144,6 +145,17 @@ class _LoginPageState extends State<LoginPage> {
                   child: _loading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text("Login"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const RegisterPage(),
+                      ),
+                    );
+                  },
+                  child: Text('Register'),
                 ),
               ],
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hotmul_quran/pages/dashboard.dart';
 import 'package:hotmul_quran/pages/homepage.dart';
 import 'package:hotmul_quran/pages/login.dart';
+import 'package:hotmul_quran/pages/register.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 
 class MenuDrawer {
@@ -65,6 +66,12 @@ class _AppDrawerState extends State<AppDrawer> {
           MaterialPageRoute(builder: (context) => const Dashboard()),
         );
         break;
+      case 'Register':
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const RegisterPage()),
+        );
+        break;
       default:
         ScaffoldMessenger.of(
           context,
@@ -79,10 +86,12 @@ class _AppDrawerState extends State<AppDrawer> {
         ? [
             MenuDrawer('Home Page', Icons.person),
             MenuDrawer('Dashboard', Icons.dashboard),
+            MenuDrawer('Register', Icons.dashboard),
             MenuDrawer('Logout', Icons.logout),
           ]
         : [
             MenuDrawer('Home Page', Icons.person),
+            MenuDrawer('Register', Icons.dashboard),
             MenuDrawer('Login', Icons.login),
           ];
 
