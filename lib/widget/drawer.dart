@@ -86,12 +86,12 @@ class _AppDrawerState extends State<AppDrawer> {
         ? [
             MenuDrawer('Home Page', Icons.person),
             MenuDrawer('Dashboard', Icons.dashboard),
-            MenuDrawer('Register', Icons.dashboard),
+            MenuDrawer('Register', Icons.app_registration),
             MenuDrawer('Logout', Icons.logout),
           ]
         : [
             MenuDrawer('Home Page', Icons.person),
-            MenuDrawer('Register', Icons.dashboard),
+            MenuDrawer('Register', Icons.app_registration),
             MenuDrawer('Login', Icons.login),
           ];
 

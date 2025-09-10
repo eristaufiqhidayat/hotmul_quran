@@ -1,10 +1,9 @@
 // ignore_for_file: deprecated_member_use, sort_child_properties_last
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart'; // <--- Tambahkan Google Fonts
 import 'package:hotmul_quran/const/global_const.dart';
-//import 'package:hotmul_quran/pages/donasi/donasi.dart';
 import 'package:hotmul_quran/pages/khotmul/khotmul_crud.dart';
-//import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/pages/khotmul/listquran_perjuz.dart';
@@ -45,14 +44,12 @@ class _KhotmulPageState extends State<KhotmulPage> {
     final url = Uri.parse(
       "${GlobalConst.url}/api/v1/khotmul?group_id=$daurah_id&page=$page&search=${search ?? ''}",
     );
-    // print(
-    //   "${GlobalConst.url}/api/v1/khotmul?group_id=$daurah_id&page=$page&search=${search ?? ''}",
-    // );
+
     final response = await http.get(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-    //print("Khotmul ${response.body}");
+
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       setState(() {
@@ -81,13 +78,11 @@ class _KhotmulPageState extends State<KhotmulPage> {
 
   Future<void> _loadGroupId() async {
     group_id = await getGroup_id();
-
     if (mounted) setState(() {});
   }
 
   Future<void> _loadDaurahId() async {
     daurah_id = await getDaurah_id();
-
     if (mounted) setState(() {});
   }
 
@@ -103,15 +98,26 @@ class _KhotmulPageState extends State<KhotmulPage> {
             onTap: () => fetchData(page: i),
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 4),
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: i == currentPage ? Colors.blue : Colors.white,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.grey),
+                color: i == currentPage ? Colors.green : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+                boxShadow: [
+                  if (i == currentPage)
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.4),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                ],
               ),
               child: Text(
                 "$i",
-                style: TextStyle(
+                style: GoogleFonts.poppins(
+                  fontWeight: i == currentPage
+                      ? FontWeight.bold
+                      : FontWeight.normal,
                   color: i == currentPage ? Colors.white : Colors.black,
                 ),
               ),
@@ -119,7 +125,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
           ),
         );
       } else if (i == currentPage - 3 || i == currentPage + 3) {
-        pages.add(const Text("..."));
+        pages.add(Text("...", style: GoogleFonts.poppins()));
       }
     }
 
@@ -129,10 +135,12 @@ class _KhotmulPageState extends State<KhotmulPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green.shade50, // 🌿 Background lembut
       endDrawer: AppDrawer(),
       appBar: PrimaryAppBar(title: "Khotmul Quran"),
       body: Column(
         children: [
+          const SizedBox(height: 8),
           // Tombol Refresh + Add
           ActionButtons(
             onRefresh: () => fetchData(page: currentPage),
@@ -147,17 +155,20 @@ class _KhotmulPageState extends State<KhotmulPage> {
               });
             },
           ),
-          SearchFieldWidget(
-            controller: searchController,
-            onSubmitted: (value) => fetchData(page: 1, search: value),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: SearchFieldWidget(
+              controller: searchController,
+              onSubmitted: (value) => fetchData(page: 1, search: value),
+            ),
           ),
-          const SizedBox(height: 10),
 
           // List Data
           Expanded(
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.separated(
+                    padding: const EdgeInsets.all(12),
                     itemCount: anggota.length,
                     itemBuilder: (context, index) {
                       final item = anggota[index];
@@ -168,124 +179,141 @@ class _KhotmulPageState extends State<KhotmulPage> {
                               item['status'] == "send_no"
                           ? {warna = Colors.red, button = Icons.close}
                           : {warna = Colors.green, button = Icons.check};
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: warna,
-                          child: Text(
-                            item['juz'] != null ? item['juz'].toString() : '-',
-                            style: const TextStyle(color: Colors.white),
-                          ),
+
+                      return Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        title: Text(
-                          "Juz ${item['juz'] ?? ''}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: anggota_id == item['anggota_id'].toString()
-                                ? Colors.blue
-                                : Colors.black,
-                          ),
-                        ),
-                        subtitle: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Nama : ${item['name'] ?? '-'}\nGroup : ${item['group_id'] ?? '-'}\nPeriode : ${item['periode'] ?? '-'}\n",
-                              style: TextStyle(
-                                color: warna,
+                        elevation: 3,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.all(12),
+                          leading: CircleAvatar(
+                            radius: 20,
+                            backgroundColor: warna,
+                            child: Text(
+                              item['juz'] != null
+                                  ? item['juz'].toString()
+                                  : '-',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            Row(
-                              children: [
-                                Text(
-                                  "Status ",
-                                  style: TextStyle(
-                                    color: warna,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: LinearGradient(
-                                      colors: warna == Colors.green
-                                          ? [Colors.greenAccent, Colors.green]
-                                          : [Colors.redAccent, Colors.red],
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: warna.withOpacity(0.6),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Icon(
-                                    button,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                ),
-                              ],
+                          ),
+                          title: Text(
+                            "Juz ${item['juz'] ?? ''}",
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: anggota_id == item['anggota_id'].toString()
+                                  ? Colors.green
+                                  : Colors.black87,
                             ),
-                          ],
-                        ),
-
-                        trailing: anggota_id == item['anggota_id'].toString()
-                            ? PopupMenuButton<String>(
-                                icon: const Icon(
-                                  Icons.more_vert,
-                                  color: Colors.blue,
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Nama : ${item['name'] ?? '-'}\nGroup : ${item['group_id'] ?? '-'}\nPeriode : ${item['periode'] ?? '-'}",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  color: Colors.grey.shade700,
                                 ),
-                                onSelected: (value) async {
-                                  if (value == 'khatam') {
-                                    final result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => JuzAyahPage(
-                                          juzNumber: item["juz"],
-                                          khotmulId: item['id'],
-                                        ),
-                                        //RecorderPage(khotmulId: item['id']),
+                              ),
+                              const SizedBox(height: 6),
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 6,
+                                children: [
+                                  Text(
+                                    warna == Colors.green
+                                        ? "Status : Sudah Khatam"
+                                        : "Status : Belum Khatam",
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w600,
+                                      color: warna,
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(left: 6),
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: warna == Colors.green
+                                            ? [Colors.greenAccent, Colors.green]
+                                            : [Colors.redAccent, Colors.red],
                                       ),
-                                    );
-
-                                    if (result == true) {
-                                      await fetchData(
-                                        page: currentPage,
-                                      ); // refresh data
-                                    }
-                                  }
-                                },
-
-                                itemBuilder: (context) => [
-                                  const PopupMenuItem(
-                                    value: 'khatam',
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.record_voice_over,
-                                          color: Colors.blue,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: warna.withOpacity(0.6),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 3),
                                         ),
-                                        SizedBox(width: 8),
-                                        Text("Add Khatam"),
                                       ],
+                                    ),
+                                    child: Icon(
+                                      button,
+                                      color: Colors.white,
+                                      size: 15,
                                     ),
                                   ),
                                 ],
-                              )
-                            : Icon(Icons.more_vert, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          trailing: anggota_id == item['anggota_id'].toString()
+                              ? PopupMenuButton<String>(
+                                  icon: const Icon(
+                                    Icons.more_vert,
+                                    color: Colors.green,
+                                  ),
+                                  onSelected: (value) async {
+                                    if (value == 'khatam') {
+                                      final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => JuzAyahPage(
+                                            juzNumber: item["juz"],
+                                            khotmulId: item['id'],
+                                          ),
+                                        ),
+                                      );
+                                      if (result == true) {
+                                        await fetchData(page: currentPage);
+                                      }
+                                    }
+                                  },
+                                  itemBuilder: (context) => [
+                                    const PopupMenuItem(
+                                      value: 'khatam',
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.record_voice_over,
+                                            color: Colors.green,
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text("Add Khatam"),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : const SizedBox.shrink(),
+                        ),
                       );
                     },
                     separatorBuilder: (context, index) =>
-                        const Divider(color: Colors.grey, height: 1),
+                        const SizedBox(height: 8),
                   ),
           ),
 
           // Pagination
-          Padding(padding: const EdgeInsets.all(8.0), child: buildPagination()),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: buildPagination(),
+          ),
         ],
       ),
     );
