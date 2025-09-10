@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/pages/messege/inbox_icon.dart';
+import 'package:hotmul_quran/pages/messege/inbox_messege.dart';
 
 import 'package:hotmul_quran/widget/drawer.dart';
 
@@ -41,10 +43,21 @@ class _DashboardState extends State<Dashboard> {
     final onClick = groupId == 1
         ? onMenuClick
         : onMenuClick2; // pilih handlernya
-
+    int unreadCount = 3;
     return Scaffold(
       drawer: AppDrawer(),
       appBar: AppBar(
+        actions: [
+          InboxIcon(
+            unreadCount: unreadCount,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => InboxPage(userId: 2002)),
+              );
+            },
+          ),
+        ],
         iconTheme: const IconThemeData(color: Colors.white),
         title: Row(
           children: [
