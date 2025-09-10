@@ -6,6 +6,7 @@ import 'package:hotmul_quran/pages/register.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dashboard.dart'; // Import halaman homepage
 
@@ -20,6 +21,25 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _loading = false;
+
+  Future<void> _loadEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? savedEmail = prefs.getString('username');
+    String? savedPassword = prefs.getString('password');
+
+    if (savedEmail != null) {
+      setState(() {
+        _emailController.text = savedEmail;
+        _passwordController.text = savedPassword!; // isi ke textfield
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEmail(); // ambil dari pref saat pertama kali
+  }
 
   Future<void> login() async {
     setState(() => _loading = true);
@@ -44,6 +64,7 @@ class _LoginPageState extends State<LoginPage> {
         data['anggota_id'].toString(),
         data['group_id'].toString(),
         data['daurah_id'].toString(),
+        _passwordController.text,
       );
       Navigator.pushReplacement(
         context,

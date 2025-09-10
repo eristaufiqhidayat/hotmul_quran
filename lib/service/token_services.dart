@@ -19,6 +19,7 @@ Future<void> saveToken(
   String anggota_id,
   String group_id,
   String daurah_id,
+  String password,
 ) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString('access_token', token);
@@ -28,12 +29,24 @@ Future<void> saveToken(
   await prefs.setString('anggota_id', anggota_id);
   await prefs.setString('group_id', group_id);
   await prefs.setString('daurah_id', daurah_id);
+  await prefs.setString('username', email);
+  await prefs.setString('password', password);
   //print("refresh token disimpan: $refresh_token");
 }
 
 Future<String?> getToken() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getString('access_token'); // null kalau belum ada
+}
+
+Future<String?> getUsername() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('username'); // null kalau belum ada
+}
+
+Future<String?> getPassword() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('password'); // null kalau belum ada
 }
 
 Future<void> removeToken() async {
