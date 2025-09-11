@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/model/messege_model.dart';
-import 'package:hotmul_quran/pages/messege/form_send.dart';
+// import 'package:hotmul_quran/pages/messege/form_send.dart';
 
 class MessageDetailPage extends StatelessWidget {
   final MessageUser messageUser;
