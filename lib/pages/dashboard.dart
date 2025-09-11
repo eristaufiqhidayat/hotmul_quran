@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/pages/messege/inbox_icon.dart';
 import 'package:hotmul_quran/pages/messege/inbox_messege.dart';
-
+import 'package:hotmul_quran/model/messege_model.dart';
+import 'package:hotmul_quran/service/messege_service.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 
 import 'package:hotmul_quran/service/token_services.dart';
@@ -17,43 +18,77 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   int? groupId; // nilai dari local
   bool isLoading = true;
-
+  var user_id;
+  var countUnread;
+  // ignore: unused_field
+  late Future<List<MessageUser>> _inboxFuture;
   @override
   void initState() {
     super.initState();
     _loadGroupId();
+    _user_id();
+    //_inboxFuture = MessageService().getInbox(user_id);
   }
 
   Future<void> _loadGroupId() async {
-    final idString = await getGroup_id(); // fungsi dari token_services.dart
+    final idString = await getGroup_id();
+    //print(idString); // fungsi dari token_services.dart
     setState(() {
       groupId = int.tryParse(idString ?? "0"); // kalau null → 0
       isLoading = false;
     });
   }
 
+  Future<void> _user_id() async {
+    final idString = await getUser_id();
+    user_id = int.tryParse(idString ?? "0"); // ✅ conv
+    final unread = await getUnredCount(user_id);
+    print("Unread count $unread");
+    // tunggu hasilnya
+    setState(() {
+      countUnread = unread; // simpan sebagai int
+    });
+    MessageService().getInbox(user_id).then((inboxList) {
+      for (var msg in inboxList) {
+        print("Message ID: ${msg.id}, is_read: ${msg.isRead}");
+      }
+      setState(() {
+        _inboxFuture = Future.value(inboxList);
+      });
+    });
+  }
+
+  Future<int> getUnredCount(int user_id) async {
+    final count = await MessageService().getcountUnread(user_id);
+    return count; // harus int
+  }
+
+  @override
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    // kasih default value 0 kalau null
+    final gId = groupId ?? 0;
+
     // pilih menu berdasarkan groupId
-    final items = groupId == 1 ? menuItems : menuItems2;
-    final onClick = groupId == 1
-        ? onMenuClick
-        : onMenuClick2; // pilih handlernya
-    int unreadCount = 3;
+    final items = gId == 1 ? menuItems : menuItems2;
+    final onClick = gId == 1 ? onMenuClick : onMenuClick2;
+
     return Scaffold(
       drawer: AppDrawer(),
       appBar: AppBar(
         actions: [
           InboxIcon(
-            unreadCount: unreadCount,
+            unreadCount: countUnread ?? 0, // ✅ default kalau null
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => InboxPage(userId: 2002)),
+                MaterialPageRoute(
+                  builder: (_) => InboxPage(userId: user_id ?? 0),
+                ), // ✅ default kalau null
               );
             },
           ),

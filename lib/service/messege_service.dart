@@ -30,7 +30,7 @@ class MessageService {
   Future<List<MessageUser>> getInbox(int userId) async {
     final token = await getValidAccessToken();
     final response = await http.get(
-      Uri.parse("$baseUrl/messages/inbox/16"),
+      Uri.parse("$baseUrl/messages/inbox/${userId}"),
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
 
@@ -39,6 +39,27 @@ class MessageService {
       return data.map((json) => MessageUser.fromJson(json)).toList();
     } else {
       throw Exception("Failed to load inbox service");
+    }
+  }
+
+  Future<int> getcountUnread(int userId) async {
+    final token = await getValidAccessToken();
+    final response = await http.get(
+      Uri.parse("$baseUrl/messages/countUnread/${userId}"),
+      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+    );
+    print("User ID ${userId}");
+    print(response.body);
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+
+      final count = result['unread_count'];
+      if (count == null) {
+        return 0; // default kalau tidak ada field count
+      }
+      return count as int;
+    } else {
+      throw Exception("Failed to load unread count");
     }
   }
 }
