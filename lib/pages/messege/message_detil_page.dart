@@ -12,39 +12,87 @@ class MessageDetailPage extends StatelessWidget {
     final msg = messageUser.message;
 
     return Scaffold(
+      backgroundColor: Colors.green.shade50,
       appBar: AppBar(
         title: const Text("Message Detail"),
         backgroundColor: Colors.green.shade900,
+        actions: [
+          IconButton(
+            tooltip: "Reply",
+            icon: const Icon(Icons.reply),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SendMessagePage(senderId: msg.senderId),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            tooltip: "Forward",
+            icon: const Icon(Icons.forward),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SendMessagePage(senderId: 0),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "From: ${msg.sender?.name ?? 'Unknown'}",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 10),
-            Text(msg.content, style: const TextStyle(fontSize: 14)),
-            const Spacer(),
-            Text(
-              msg.createdAt != null ? "Sent: ${msg.createdAt}" : "",
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SendMessagePage(senderId: 16),
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "From: ${msg.sender?.name ?? 'Unknown'}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.black87,
                   ),
-                );
-              },
-              icon: Icon(Icons.message_sharp),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  msg.content,
+                  style: const TextStyle(fontSize: 15, color: Colors.black87),
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Text(
+                    msg.createdAt != null ? "📅 Sent: ${msg.createdAt}" : "",
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: Colors.green.shade800,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SendMessagePage(senderId: msg.senderId),
+            ),
+          );
+        },
+        icon: const Icon(Icons.reply),
+        label: const Text("Reply"),
       ),
     );
   }

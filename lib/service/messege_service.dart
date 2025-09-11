@@ -13,9 +13,13 @@ class MessageService {
     int? targetId,
     required String content,
   }) async {
+    final token = await getValidAccessToken();
     final response = await http.post(
       Uri.parse("$baseUrl/messages/send"),
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
       body: jsonEncode({
         "sender_id": senderId,
         "target_type": targetType,
@@ -23,7 +27,7 @@ class MessageService {
         "content": content,
       }),
     );
-
+    print(response.body);
     return response.statusCode == 200;
   }
 
