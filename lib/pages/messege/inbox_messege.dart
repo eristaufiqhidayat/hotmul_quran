@@ -13,6 +13,7 @@ class InboxPage extends StatefulWidget {
 
 class _InboxPageState extends State<InboxPage> {
   late Future<List<MessageUser>> _inboxFuture;
+  var msgUser;
 
   @override
   void initState() {
@@ -56,7 +57,7 @@ class _InboxPageState extends State<InboxPage> {
           return ListView.builder(
             itemCount: messages.length,
             itemBuilder: (context, index) {
-              final msgUser = messages[index];
+              msgUser = messages[index];
               final msg = msgUser.message;
 
               return Card(
@@ -93,25 +94,25 @@ class _InboxPageState extends State<InboxPage> {
                     "From: ${msg.sender?.name ?? 'Unknown'}",
                     style: const TextStyle(color: Colors.black54),
                   ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        tooltip: "Reply",
-                        icon: const Icon(Icons.reply, color: Colors.green),
-                        onPressed: () {
-                          // TODO: fungsi reply
-                        },
-                      ),
-                      IconButton(
-                        tooltip: "Forward",
-                        icon: const Icon(Icons.forward, color: Colors.green),
-                        onPressed: () {
-                          // TODO: fungsi forward
-                        },
-                      ),
-                    ],
-                  ),
+                  // trailing: Row(
+                  //   mainAxisSize: MainAxisSize.min,
+                  //   children: [
+                  //     IconButton(
+                  //       tooltip: "Reply",
+                  //       icon: const Icon(Icons.reply, color: Colors.green),
+                  //       onPressed: () {
+                  //         // TODO: fungsi reply
+                  //       },
+                  //     ),
+                  //     IconButton(
+                  //       tooltip: "Forward",
+                  //       icon: const Icon(Icons.forward, color: Colors.green),
+                  //       onPressed: () {
+                  //         // TODO: fungsi forward
+                  //       },
+                  //     ),
+                  //   ],
+                  // ),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -130,14 +131,19 @@ class _InboxPageState extends State<InboxPage> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // TODO: Navigasi ke halaman buat pesan baru
-        },
-        backgroundColor: Colors.green.shade800,
-        icon: const Icon(Icons.create),
-        label: const Text("New Message"),
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) => MessageDetailPage(messageUser: msgUser),
+      //       ),
+      //     );
+      //   },
+      //   backgroundColor: Colors.green.shade800,
+      //   icon: const Icon(Icons.create),
+      //   label: const Text("New Message"),
+      // ),
     );
   }
 }

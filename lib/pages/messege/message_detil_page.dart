@@ -17,30 +17,30 @@ class MessageDetailPage extends StatelessWidget {
         title: const Text("Message Detail"),
         backgroundColor: Colors.green.shade900,
         actions: [
-          IconButton(
-            tooltip: "Reply",
-            icon: const Icon(Icons.reply),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SendMessagePage(senderId: msg.senderId),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            tooltip: "Forward",
-            icon: const Icon(Icons.forward),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SendMessagePage(senderId: 0),
-                ),
-              );
-            },
-          ),
+          // IconButton(
+          //   tooltip: "Reply",
+          //   icon: const Icon(Icons.reply),
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => SendMessagePage(senderId: msg.senderId),
+          //       ),
+          //     );
+          //   },
+          // ),
+          // IconButton(
+          //   tooltip: "Forward",
+          //   icon: const Icon(Icons.forward),
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => SendMessagePage(senderId: 0),
+          //       ),
+          //     );
+          //   },
+          // ),
         ],
       ),
       body: Padding(
@@ -81,19 +81,19 @@ class MessageDetailPage extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Colors.green.shade800,
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => SendMessagePage(senderId: msg.senderId),
-            ),
-          );
-        },
-        icon: const Icon(Icons.reply),
-        label: const Text("Reply"),
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   backgroundColor: Colors.green.shade800,
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) => SendMessagePage(senderId: msg.senderId),
+      //       ),
+      //     );
+      //   },
+      //   icon: const Icon(Icons.reply),
+      //   label: const Text("Reply"),
+      // ),
     );
   }
 }
