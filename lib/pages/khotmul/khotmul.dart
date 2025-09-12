@@ -203,7 +203,10 @@ class _KhotmulPageState extends State<KhotmulPage> {
                           title: Text(
                             "Juz ${item['juz'] ?? ''}",
                             style: GoogleFonts.poppins(
-                              fontSize: 16,
+                              fontSize:
+                                  anggota_id == item['anggota_id'].toString()
+                                  ? 20
+                                  : 16,
                               fontWeight: FontWeight.w600,
                               color: anggota_id == item['anggota_id'].toString()
                                   ? Colors.green
@@ -213,12 +216,109 @@ class _KhotmulPageState extends State<KhotmulPage> {
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                "Nama : ${item['name'] ?? '-'}\nGroup : ${item['group_id'] ?? '-'}\nPeriode : ${item['periode'] ?? '-'}",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  color: Colors.grey.shade700,
-                                ),
+                              Column(
+                                children: [
+                                  Table(
+                                    columnWidths: const {
+                                      0: FlexColumnWidth(
+                                        2,
+                                      ), // Lebar kolom label
+                                      1: FixedColumnWidth(
+                                        20,
+                                      ), // Lebar kolom tanda :
+                                      2: FlexColumnWidth(
+                                        3,
+                                      ), // Lebar kolom value
+                                    },
+                                    children: [
+                                      TableRow(
+                                        children: [
+                                          Text(
+                                            "Nama",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 13,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          Text(
+                                            ":",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 13,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          anggota_id ==
+                                                  item['anggota_id'].toString()
+                                              ? Text(
+                                                  "${item['name'] ?? '-'}",
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 20,
+                                                    color: Colors.green,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                )
+                                              : Text(
+                                                  "${item['name'] ?? '-'}",
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 13,
+                                                    color: Colors.black87,
+                                                  ),
+                                                ),
+                                        ],
+                                      ),
+                                      TableRow(
+                                        children: [
+                                          Text(
+                                            "Group",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 13,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          Text(
+                                            ":",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 13,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          Text(
+                                            "${item['group_id'] ?? '-'}",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 13,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      TableRow(
+                                        children: [
+                                          Text(
+                                            "Periode",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 13,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          Text(
+                                            ":",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 13,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          Text(
+                                            "${item['periode'] ?? '-'}",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 13,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 6),
                               Wrap(
