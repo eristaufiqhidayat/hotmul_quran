@@ -9,6 +9,8 @@ class VerticalDataTable extends StatelessWidget {
   final int lastPage;
   final int rowsPerPage;
 
+  final bool isLoading; // ✅ tambahkan
+
   final VoidCallback? onRefresh;
   final VoidCallback? onNew;
   final Function(int page) onPageChanged;
@@ -29,6 +31,7 @@ class VerticalDataTable extends StatelessWidget {
     required this.currentPage,
     required this.lastPage,
     this.rowsPerPage = 10,
+    this.isLoading = false, // ✅ default false
     this.onRefresh,
     this.onNew,
     required this.onPageChanged,
@@ -79,7 +82,7 @@ class VerticalDataTable extends StatelessWidget {
             ),
           ],
         ),
-
+        const SizedBox(height: 8),
         // Search bar
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -105,74 +108,80 @@ class VerticalDataTable extends StatelessWidget {
           ),
         ),
 
+        const SizedBox(height: 8),
+
         // Daftar data (vertical layout)
         Expanded(
-          child: ListView.builder(
-            itemCount: data.length,
-            itemBuilder: (context, rowIndex) {
-              final row = data[rowIndex];
-              final isAlt = rowIndex % 2 == 1;
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                  itemCount: data.length,
+                  itemBuilder: (context, rowIndex) {
+                    final row = data[rowIndex];
+                    final isAlt = rowIndex % 2 == 1;
 
-              return Card(
-                color: isAlt ? alternateRowColor : rowColor,
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: List.generate(headers.length, (colIndex) {
-                      final header = headers[colIndex];
-                      final field = fields[colIndex];
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Row(
+                    return Card(
+                      color: isAlt ? alternateRowColor : rowColor,
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 120,
-                              padding: const EdgeInsets.all(6),
-                              color: headerColor.withOpacity(0.1),
-                              child: Text(
-                                header,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: headerColor,
-                                ),
+                          children: List.generate(headers.length, (colIndex) {
+                            final header = headers[colIndex];
+                            final field = fields[colIndex];
+
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 120,
+                                    padding: const EdgeInsets.all(6),
+                                    color: headerColor.withOpacity(0.1),
+                                    child: Text(
+                                      header,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: headerColor,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: field == "action"
+                                        ? Row(
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.edit,
+                                                  color: Colors.blue,
+                                                ),
+                                                onPressed: () =>
+                                                    onEdit?.call(row),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.delete,
+                                                  color: Colors.red,
+                                                ),
+                                                onPressed: () =>
+                                                    onDelete?.call(row),
+                                              ),
+                                            ],
+                                          )
+                                        : Text("${row[field] ?? ''}"),
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: field == "action"
-                                  ? Row(
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.edit,
-                                            color: Colors.blue,
-                                          ),
-                                          onPressed: () => onEdit?.call(row),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.delete,
-                                            color: Colors.red,
-                                          ),
-                                          onPressed: () => onDelete?.call(row),
-                                        ),
-                                      ],
-                                    )
-                                  : Text("${row[field] ?? ''}"),
-                            ),
-                          ],
+                            );
+                          }),
                         ),
-                      );
-                    }),
-                  ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ),
 
         // Pagination kontrol

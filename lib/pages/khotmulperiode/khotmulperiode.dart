@@ -5,7 +5,7 @@ import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/khotmulperiode/khotmulperiode_crud.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
-import 'package:hotmul_quran/widget/table2.dart';
+import 'package:hotmul_quran/widget/tableVertikal.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:hotmul_quran/service/token_services.dart';
@@ -72,34 +72,33 @@ class _KhotmulPeriodePageState extends State<KhotmulPeriodePage> {
       appBar: PrimaryAppBar(title: "Khotmulperiode Quran"),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : VerticalDataTable(
-                onRefresh: fetchData,
-                onSearch: (value) => fetchData(page: 1, search: value),
-                onNew: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditKhotmulperiodePage(anggota: {}),
-                    ),
-                  ).then((updated) {
-                    if (updated == true) fetchData(page: currentPage);
-                  });
-                },
-                data: anggota.cast<Map<String, dynamic>>(),
-                headers: ["ID", "Periode", "Group ID", "Action"],
-                fields: ["id", "periode", "group_id", "action"],
-                rowsPerPage: 10,
-                currentPage: currentPage,
-                lastPage: lastPage, // ⬅️ penting
-                onPageChanged: (page) => fetchData(page: page),
-                headerColor: Colors.green,
-                rowColor: Colors.white,
-                alternateRowColor: Colors.grey.shade100,
-                onEdit: (row) => print("Edit row: $row"),
-                onDelete: (row) => print("Delete row: $row"),
+        child: VerticalDataTable(
+          isLoading: isLoading,
+          onRefresh: fetchData,
+          onSearch: (value) => fetchData(page: 1, search: value),
+          onNew: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditKhotmulperiodePage(anggota: {}),
               ),
+            ).then((updated) {
+              if (updated == true) fetchData(page: currentPage);
+            });
+          },
+          data: anggota.cast<Map<String, dynamic>>(),
+          headers: ["ID", "Periode", "Group ID", "Action"],
+          fields: ["id", "periode", "group_id", "action"],
+          rowsPerPage: 10,
+          currentPage: currentPage,
+          lastPage: lastPage, // ⬅️ penting
+          onPageChanged: (page) => fetchData(page: page),
+          headerColor: Colors.green,
+          rowColor: Colors.white,
+          alternateRowColor: Colors.grey.shade100,
+          onEdit: (row) => print("Edit row: $row"),
+          onDelete: (row) => print("Delete row: $row"),
+        ),
       ),
     );
   }
