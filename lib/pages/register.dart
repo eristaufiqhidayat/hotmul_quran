@@ -38,7 +38,7 @@ class _RegisterPageState extends State<RegisterPage> {
           "password": _passwordController.text,
         },
       );
-      print(response.body);
+      //print(response.body);
       if (response.statusCode == 201) {
         if (mounted) {
           ScaffoldMessenger.of(

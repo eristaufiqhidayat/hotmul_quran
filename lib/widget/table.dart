@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class PaginatedTable extends StatefulWidget {
   final List<Map<String, dynamic>> data;
-  final List<String> headers;
+  final List<String> headers; // Teks header
+  final List<String> fields; // Key JSON untuk data
   final int rowsPerPage;
   final int currentPage;
   final void Function(int page) onPageChanged;
@@ -10,16 +11,23 @@ class PaginatedTable extends StatefulWidget {
   final Color rowColor;
   final Color? alternateRowColor;
 
+  // Tambahan event untuk action
+  final void Function(Map<String, dynamic> rowData)? onEdit;
+  final void Function(Map<String, dynamic> rowData)? onDelete;
+
   const PaginatedTable({
     super.key,
     required this.data,
     required this.headers,
+    required this.fields,
     this.rowsPerPage = 10,
     this.currentPage = 1,
     required this.onPageChanged,
     this.headerColor = Colors.blue,
     this.rowColor = Colors.white,
     this.alternateRowColor,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -29,11 +37,9 @@ class PaginatedTable extends StatefulWidget {
 class _PaginatedTableState extends State<PaginatedTable> {
   @override
   Widget build(BuildContext context) {
-    // Deteksi ukuran layar
     final screenWidth = MediaQuery.of(context).size.width;
     final isTablet = screenWidth > 600;
 
-    // Hitung data yang tampil
     final start = (widget.currentPage - 1) * widget.rowsPerPage;
     final end = (start + widget.rowsPerPage) > widget.data.length
         ? widget.data.length
@@ -80,14 +86,40 @@ class _PaginatedTableState extends State<PaginatedTable> {
                           ? widget.rowColor
                           : (widget.alternateRowColor ?? widget.rowColor),
                     ),
-                    children: widget.headers.map((h) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "${visibleData[i][h] ?? ''}",
-                          style: TextStyle(fontSize: isTablet ? 16 : 13),
-                        ),
-                      );
+                    children: widget.fields.map((h) {
+                      final rowData = visibleData[i];
+                      if (h == "action") {
+                        return Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.blue,
+                                ),
+                                onPressed: () => widget.onEdit?.call(rowData),
+                              ),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                                onPressed: () => widget.onDelete?.call(rowData),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "${rowData[h] ?? ''}",
+                            style: TextStyle(fontSize: isTablet ? 16 : 13),
+                          ),
+                        );
+                      }
                     }).toList(),
                   ),
               ],

@@ -5,6 +5,7 @@ import 'package:hotmul_quran/pages/donasi/donasi.dart';
 import 'package:hotmul_quran/pages/jadwal/jadwal.dart';
 import 'package:hotmul_quran/pages/khatam/khatam.dart';
 import 'package:hotmul_quran/pages/khotmul/khotmul.dart';
+import 'package:hotmul_quran/pages/khotmulperiode/khotmulperiode.dart';
 import 'package:hotmul_quran/pages/report/report.dart';
 import 'package:hotmul_quran/pages/reward/reward.dart';
 //import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
@@ -76,6 +77,12 @@ void onMenuClick(BuildContext context, String title) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => ReportMain()),
+      );
+      break;
+    case 'Khotmul Periode':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => KhotmulPeriodePage()),
       );
       break;
     default:
