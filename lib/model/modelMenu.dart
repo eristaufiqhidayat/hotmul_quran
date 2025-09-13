@@ -22,6 +22,7 @@ final List<MenuItem> menuItems = [
   MenuItem('Khatam', Icons.check_circle),
   MenuItem('Donasi', Icons.credit_card),
   MenuItem('Jadwal Khatam', Icons.calendar_today),
+  MenuItem('Khotmul Periode', Icons.crisis_alert_outlined),
   MenuItem('Reward', Icons.card_giftcard),
   MenuItem('Laporan', Icons.pie_chart),
 ];
