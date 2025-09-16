@@ -21,7 +21,7 @@ class _MainPageState extends State<MainPage> {
     const SurahListPage(),
     const SurahDetailPage(number: 1, name: 'Al-Fatihah'),
     const DoaApp(),
-    const ProfilePage(),
+    //const ProfilePage(),
   ];
 
   @override
@@ -53,10 +53,10 @@ class _MainPageState extends State<MainPage> {
             icon: Icon(Icons.pan_tool_alt_outlined),
             label: 'Do\'a',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profile',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.person_outline),
+          //   label: 'Profile',
+          // ),
         ],
       ),
     );

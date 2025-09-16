@@ -29,7 +29,8 @@ class _KhotmulPageState extends State<KhotmulPage> {
   var anggota_id;
   var group_id;
   var daurah_id;
-  Future<void> fetchDataGroup({int page = 1, String? search}) async {
+
+  Future<void> fetchData({int page = 1, String? search}) async {
     if (!mounted) return;
     setState(() => isLoading = true);
 
@@ -61,47 +62,13 @@ class _KhotmulPageState extends State<KhotmulPage> {
     setState(() => isLoading = false);
   }
 
-  Future<void> fetchData({int page = 1, String? search}) async {
-    if (!mounted) return;
-    setState(() => isLoading = true);
-
-    final token = await getValidAccessToken();
-
-    if (token == null) {
-      await logout();
-      return;
-    }
-
-    final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/khotmul/anggota/$anggota_id",
-    );
-    final response = await http.get(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-    );
-    print(response.body);
-    if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-      final List<dynamic> dataList = (result['data'] as List<dynamic>?) ?? [];
-      setState(() {
-        anggota = dataList;
-      });
-    }
-
-    setState(() => isLoading = false);
-  }
-
   @override
   void initState() {
     super.initState();
-    _initData();
-  }
-
-  Future<void> _initData() async {
-    await _loadAnggotaId();
-    await _loadGroupId();
-    await _loadDaurahId();
-    await fetchData();
+    fetchData();
+    _loadAnggotaId();
+    _loadGroupId();
+    _loadDaurahId();
   }
 
   Future<void> _loadAnggotaId() async {
@@ -119,6 +86,52 @@ class _KhotmulPageState extends State<KhotmulPage> {
     if (mounted) setState(() {});
   }
 
+  Widget buildPagination() {
+    List<Widget> pages = [];
+
+    for (int i = 1; i <= lastPage; i++) {
+      if (i == 1 ||
+          i == lastPage ||
+          (i >= currentPage - 2 && i <= currentPage + 2)) {
+        pages.add(
+          InkWell(
+            onTap: () => fetchData(page: i),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: i == currentPage ? Colors.green : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+                boxShadow: [
+                  if (i == currentPage)
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.4),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                ],
+              ),
+              child: Text(
+                "$i",
+                style: GoogleFonts.poppins(
+                  fontWeight: i == currentPage
+                      ? FontWeight.bold
+                      : FontWeight.normal,
+                  color: i == currentPage ? Colors.white : Colors.black,
+                ),
+              ),
+            ),
+          ),
+        );
+      } else if (i == currentPage - 3 || i == currentPage + 3) {
+        pages.add(Text("...", style: GoogleFonts.poppins()));
+      }
+    }
+
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: pages);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,80 +142,21 @@ class _KhotmulPageState extends State<KhotmulPage> {
         children: [
           const SizedBox(height: 8),
           // Tombol Refresh + Add
-          Row(
-            children: [
-              // ActionButtons(
-              //   onRefresh: () => fetchData(page: currentPage),
-              //   onNew: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //         builder: (context) => EditKhotmulPage(anggota: {}),
-              //       ),
-              //     ).then((updated) {
-              //       if (updated == true) fetchData(page: currentPage);
-              //     });
-              //   },
-              // ),
-              SizedBox(width: 8),
-              ElevatedButton.icon(
-                onPressed: fetchData,
-                icon: const Icon(Icons.assignment_ind, color: Colors.white),
-                label: const Text(
-                  "Me",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
+          ActionButtons(
+            onRefresh: () => fetchData(page: currentPage),
+            onNew: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditKhotmulPage(anggota: {}),
                 ),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith<Color>((
-                    Set<MaterialState> states,
-                  ) {
-                    if (states.contains(MaterialState.pressed))
-                      return Colors.red;
-                    if (states.contains(MaterialState.hovered)) {
-                      return Colors.blue.shade900;
-                    }
-                    return Colors.blue.shade900;
-                  }),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  ),
-                ),
-              ),
-              SizedBox(width: 5),
-              ElevatedButton.icon(
-                onPressed: fetchDataGroup,
-                icon: const Icon(Icons.group, color: Colors.white),
-                label: const Text(
-                  "All",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith<Color>((
-                    Set<MaterialState> states,
-                  ) {
-                    if (states.contains(MaterialState.pressed))
-                      return Colors.red;
-                    if (states.contains(MaterialState.hovered)) {
-                      return Colors.blue.shade900;
-                    }
-                    return Colors.blue.shade900;
-                  }),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-                  ),
-                ),
-              ),
-            ],
+              ).then((updated) {
+                if (updated == true) fetchData(page: currentPage);
+              });
+            },
           ),
-
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: SearchFieldWidget(
               controller: searchController,
               onSubmitted: (value) => fetchData(page: 1, search: value),
@@ -453,6 +407,12 @@ class _KhotmulPageState extends State<KhotmulPage> {
                     separatorBuilder: (context, index) =>
                         const SizedBox(height: 8),
                   ),
+          ),
+
+          // Pagination
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: buildPagination(),
           ),
         ],
       ),

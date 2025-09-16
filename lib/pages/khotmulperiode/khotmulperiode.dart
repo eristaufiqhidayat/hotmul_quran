@@ -5,7 +5,7 @@ import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/khotmulperiode/khotmulperiode_crud.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
-import 'package:hotmul_quran/widget/tableVertikal.dart';
+import 'package:hotmul_quran/pages/khotmulperiode/tableVertikalKhotmul.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:hotmul_quran/service/token_services.dart';
@@ -27,6 +27,23 @@ class _KhotmulPeriodePageState extends State<KhotmulPeriodePage> {
   var group_id;
   var daurah_id;
 
+  @override
+  void initState() {
+    super.initState();
+    initLoad();
+  }
+
+  Future<void> initLoad() async {
+    await fetchData();
+    await Daurah_id(); // pastikan daurah_id sudah ada
+  }
+
+  Future<String?> Daurah_id() async {
+    daurah_id = await getDaurah_id();
+    print(daurah_id);
+    return null;
+  }
+
   Future<void> fetchData({int page = 1, String? search}) async {
     if (!mounted) return;
     setState(() => isLoading = true);
@@ -46,6 +63,7 @@ class _KhotmulPeriodePageState extends State<KhotmulPeriodePage> {
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
+    //print(response.body);
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       setState(() {
@@ -58,10 +76,59 @@ class _KhotmulPeriodePageState extends State<KhotmulPeriodePage> {
     setState(() => isLoading = false);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
+  Future<void> fetchSync({int page = 1, String? search}) async {
+    if (!mounted) return;
+    setState(() => isLoading = true);
+
+    final token = await getValidAccessToken();
+
+    if (token == null) {
+      await logout();
+      return;
+    }
+
+    final url = Uri.parse("${GlobalConst.url}/api/v1/khotmulPeriodeSync");
+
+    final response = await http.get(
+      url,
+      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+    );
+    // print(url);
+    // print(response.body);
+    // if (response.statusCode == 200) {
+    //   final result = json.decode(response.body);
+    //   setState(() {
+    //     anggota = result['data'];
+    //     currentPage = result['current_page'];
+    //     lastPage = result['last_page'];
+    //   });
+    // }
+
+    setState(() => isLoading = false);
+  }
+
+  Future<void> periodeCreate({required int daurah_id}) async {
+    if (!mounted) return;
+    setState(() => isLoading = true);
+
+    final token = await getValidAccessToken();
+
+    if (token == null) {
+      await logout();
+      return;
+    }
+
+    final url = Uri.parse(
+      "${GlobalConst.url}/api/v1/khotmulPeriodeCreate?group_id=$daurah_id",
+    );
+
+    final response = await http.get(
+      url,
+      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+    );
+    print(response.body);
+    await fetchData(page: currentPage);
+    setState(() => isLoading = false);
   }
 
   @override
@@ -72,7 +139,7 @@ class _KhotmulPeriodePageState extends State<KhotmulPeriodePage> {
       appBar: PrimaryAppBar(title: "Khotmulperiode Quran"),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: VerticalDataTable(
+        child: VerticalDataTableKhotmul(
           isLoading: isLoading,
           onRefresh: fetchData,
           onSearch: (value) => fetchData(page: 1, search: value),
@@ -86,9 +153,24 @@ class _KhotmulPeriodePageState extends State<KhotmulPeriodePage> {
               if (updated == true) fetchData(page: currentPage);
             });
           },
+          onSync: fetchSync,
           data: anggota.cast<Map<String, dynamic>>(),
-          headers: ["ID", "Periode", "Group ID", "Action"],
-          fields: ["id", "periode", "group_id", "action"],
+          headers: [
+            "Daurah ID",
+            "Daurah Name",
+            "Jumlah Anggota",
+            "Periode Terakhir",
+            "Tanggal Periode",
+            "",
+          ],
+          fields: [
+            "group_id",
+            "group_name",
+            "jumlah_anggota",
+            "periode_terakhir",
+            "tanggal_terakhir",
+            "action",
+          ],
           rowsPerPage: 10,
           currentPage: currentPage,
           lastPage: lastPage, // ⬅️ penting
@@ -97,7 +179,9 @@ class _KhotmulPeriodePageState extends State<KhotmulPeriodePage> {
           rowColor: Colors.white,
           alternateRowColor: Colors.grey.shade100,
           onEdit: (row) => print("Edit row: $row"),
-          onDelete: (row) => print("Delete row: $row"),
+          onDelete: (row) {
+            periodeCreate(daurah_id: row['group_id']);
+          },
         ),
       ),
     );

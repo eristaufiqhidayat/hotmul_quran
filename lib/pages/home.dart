@@ -18,7 +18,7 @@ class KhotmilQuranPage extends StatelessWidget {
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               title: const Text(
-                'Khotmil Quran',
+                'Khotmul Quran',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -51,13 +51,13 @@ class KhotmilQuranPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle('Apa itu Khotmil Quran?'),
+                  _buildSectionTitle('Apa itu Khotmul Quran?'),
                   const SizedBox(height: 12),
                   _buildParagraph(
-                    'Khotmil Quran (juga dieja Khatam Quran) adalah istilah untuk kegiatan menyelesaikan pembacaan Al-Qur\'an dari awal hingga akhir, yakni dari Surah Al-Fatihah sampai Surah An-Nas, secara berurutan. Kegiatan ini dilakukan untuk memperkuat hubungan dengan Al-Qur\'an, menumbuhkan kecintaan kepada Al-Qur\'an, dan juga sebagai bentuk ibadah dan doa bersama.',
+                    'Khotmul Quran (juga dieja Khatam Quran) adalah istilah untuk kegiatan menyelesaikan pembacaan Al-Qur\'an dari awal hingga akhir, yakni dari Surah Al-Fatihah sampai Surah An-Nas, secara berurutan. Kegiatan ini dilakukan untuk memperkuat hubungan dengan Al-Qur\'an, menumbuhkan kecintaan kepada Al-Qur\'an, dan juga sebagai bentuk ibadah dan doa bersama.',
                   ),
                   const SizedBox(height: 24),
-                  _buildSectionTitle('Tujuan Khotmil Quran'),
+                  _buildSectionTitle('Tujuan Khotmul Quran'),
                   const SizedBox(height: 12),
                   _buildBulletPoint(
                     'Meningkatkan kecintaan pada Al-Qur\'an:',
