@@ -3,11 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart'; // <--- Tambahkan Google Fonts
 import 'package:hotmul_quran/const/global_const.dart';
-import 'package:hotmul_quran/pages/khotmul/khotmul_crud.dart';
+//import 'package:hotmul_quran/pages/khotmul/khotmul_crud.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/pages/khotmul/listquran_perjuz.dart';
-import 'package:hotmul_quran/widget/refreshNew.dart';
+//import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
