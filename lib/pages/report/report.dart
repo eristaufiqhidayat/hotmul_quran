@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
+import 'package:hotmul_quran/widget/graph_daurah.dart';
 
 class ReportMain extends StatefulWidget {
   const ReportMain({super.key});
@@ -47,12 +48,7 @@ class _ReportMainState extends State<ReportMain> {
                 style: TextStyle(color: Colors.black), // biar konten kebaca
               ),
             ),
-            Center(
-              child: Text(
-                "Halaman Courses",
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
+            Center(child: DaurahScreen()),
             Center(
               child: Text(
                 "Halaman Settings",

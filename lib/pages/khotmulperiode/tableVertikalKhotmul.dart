@@ -92,23 +92,23 @@ class VerticalDataTableKhotmul extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 2),
-            ElevatedButton.icon(
-              onPressed: onNew,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade900,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
-                ),
-              ),
-              icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text(
-                "New",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+            // ElevatedButton.icon(
+            //   onPressed: onNew,
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: Colors.blue.shade900,
+            //     shape: const RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.zero,
+            //     ),
+            //   ),
+            //   icon: const Icon(Icons.add, color: Colors.white),
+            //   label: const Text(
+            //     "New",
+            //     style: TextStyle(
+            //       color: Colors.white,
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            // ),
           ],
         ),
         const SizedBox(height: 8),

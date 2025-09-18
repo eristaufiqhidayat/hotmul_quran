@@ -46,6 +46,20 @@ class MessageService {
     }
   }
 
+  Future<void> updateStatus(int id) async {
+    final token = await getValidAccessToken();
+    final response = await http.get(
+      Uri.parse("$baseUrl/messages/updateStatus>id=${id}"),
+      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+    );
+
+    if (response.statusCode == 200) {
+      print(response.body);
+    } else {
+      throw Exception("Failed to load inbox service");
+    }
+  }
+
   Future<int> getcountUnread(int userId) async {
     final token = await getValidAccessToken();
     final response = await http.get(

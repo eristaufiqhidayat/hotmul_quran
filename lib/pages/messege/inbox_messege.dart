@@ -59,7 +59,7 @@ class _InboxPageState extends State<InboxPage> {
             itemBuilder: (context, index) {
               msgUser = messages[index];
               final msg = msgUser.message;
-
+              //print(msg);
               return Card(
                 color: Colors.white,
                 elevation: 3,

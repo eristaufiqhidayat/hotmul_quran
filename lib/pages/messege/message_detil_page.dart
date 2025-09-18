@@ -1,15 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/model/messege_model.dart';
+import 'package:hotmul_quran/const/global_const.dart';
+import 'package:hotmul_quran/service/token_services.dart';
+import 'package:http/http.dart' as http;
 // import 'package:hotmul_quran/pages/messege/form_send.dart';
 
-class MessageDetailPage extends StatelessWidget {
+class MessageDetailPage extends StatefulWidget {
   final MessageUser messageUser;
+  final String baseUrl = "${GlobalConst.url}/api/v1";
 
   const MessageDetailPage({super.key, required this.messageUser});
 
   @override
+  State<MessageDetailPage> createState() => _MessageDetailPageState();
+}
+
+class _MessageDetailPageState extends State<MessageDetailPage> {
+  bool _isLoading = false;
+  bool _statusUpdated = false;
+
+  Future<void> updateStatus(int id) async {
+    if (_statusUpdated) return; // Hindari update berulang
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final token = await getValidAccessToken();
+      // Perbaiki URL yang salah (menggunakan > bukan ?)
+      final response = await http.get(
+        Uri.parse("${widget.baseUrl}/messages/updateStatus/$id"),
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+      print("${widget.baseUrl}/messages/updateStatus/$id");
+      print(response.body);
+      if (response.statusCode == 200) {
+        print(response.body);
+        setState(() {
+          _statusUpdated = true;
+        });
+      } else {
+        throw Exception("Failed to update message status");
+      }
+    } catch (e) {
+      print("Error updating status: $e");
+      // Bisa ditambahkan snackbar untuk menampilkan error ke user
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to update message status")),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Update status pesan saat halaman pertama kali dibuka
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      updateStatus(widget.messageUser.id);
+    });
+  }
+
+  void dispose() {
+    if (_statusUpdated) {
+      Navigator.pop(context, true); // kirim hasil ke halaman sebelumnya
+    } else {
+      Navigator.pop(context, false);
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final msg = messageUser.message;
+    final msg = widget.messageUser.message;
 
     return Scaffold(
       backgroundColor: Colors.green.shade50,
@@ -17,6 +87,18 @@ class MessageDetailPage extends StatelessWidget {
         title: const Text("Message Detail"),
         backgroundColor: Colors.green.shade900,
         actions: [
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              ),
+            ),
           // IconButton(
           //   tooltip: "Reply",
           //   icon: const Icon(Icons.reply),
@@ -64,11 +146,18 @@ class MessageDetailPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  msg.content,
-                  style: const TextStyle(fontSize: 15, color: Colors.black87),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Text(
+                      msg.content,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
                 ),
-                const Spacer(),
+                const SizedBox(height: 10),
                 Align(
                   alignment: Alignment.bottomRight,
                   child: Text(

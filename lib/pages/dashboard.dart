@@ -27,6 +27,7 @@ class _DashboardState extends State<Dashboard> {
     super.initState();
     _loadGroupId();
     _user_id();
+
     //_inboxFuture = MessageService().getInbox(user_id);
   }
 
@@ -83,13 +84,25 @@ class _DashboardState extends State<Dashboard> {
         actions: [
           InboxIcon(
             unreadCount: countUnread ?? 0, // ✅ default kalau null
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => InboxPage(userId: user_id ?? 0),
-                ), // ✅ default kalau null
+                  builder: (context) => InboxPage(userId: user_id ?? 0),
+                ),
               );
+              if (result == true) {
+                setState(() {
+                  // panggil lagi API / refresh state dashboard
+                  countUnread();
+                });
+              }
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (_) => InboxPage(userId: user_id ?? 0),
+              //   ), // ✅ default kalau null
+              // );
             },
           ),
         ],
