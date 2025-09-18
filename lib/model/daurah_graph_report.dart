@@ -18,14 +18,14 @@ class DaurahData {
 
   factory DaurahData.fromJson(Map<String, dynamic> json) {
     return DaurahData(
-      id: json['group_id'].toString() ?? '',
+      id: json['group_id'].toString(),
       title: json['group_name'] ?? 'No Title',
       participants: json['jumlah_anggota'] ?? 0,
       startDate: DateTime.parse(
         json['start_date'] ?? DateTime.now().toString(),
       ),
       endDate: DateTime.parse(json['end_date'] ?? DateTime.now().toString()),
-      location: json['jumlah_periode'].toString() ?? 'Unknown Location',
+      location: json['jumlah_periode'].toString(),
     );
   }
 }
