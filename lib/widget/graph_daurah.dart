@@ -28,7 +28,7 @@ class _DaurahScreenState extends State<DaurahScreen> {
   Future<void> _fetchDaurahData() async {
     try {
       final data = await _apiService.getDaurahData();
-      //print(data);
+
       setState(() {
         _daurahList = data;
         _isLoading = false;
@@ -120,10 +120,9 @@ class _DaurahScreenState extends State<DaurahScreen> {
   Widget _buildDataTable() {
     return DataTable(
       columns: const [
-        DataColumn(label: Text('Title')),
-        DataColumn(label: Text('Participants')),
-        DataColumn(label: Text('Location')),
-        DataColumn(label: Text('Date')),
+        DataColumn(label: Text('Daurah')),
+        DataColumn(label: Text('Angota')),
+        DataColumn(label: Text('Periode')),
       ],
       rows: _daurahList.map((daurah) {
         //print(daurah.participants.toString());
@@ -132,11 +131,6 @@ class _DaurahScreenState extends State<DaurahScreen> {
             DataCell(Text(daurah.title)),
             DataCell(Text(daurah.participants.toString())),
             DataCell(Text(daurah.location)),
-            DataCell(
-              Text(
-                '${daurah.startDate.day}/${daurah.startDate.month}/${daurah.startDate.year}',
-              ),
-            ),
           ],
         );
       }).toList(),

@@ -10,7 +10,6 @@ class DaurahFlChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //print(daurahList);
     return BarChart(
       BarChartData(
         alignment: BarChartAlignment.spaceAround,
@@ -49,9 +48,9 @@ class DaurahFlChart extends StatelessWidget {
                     child: RotatedBox(
                       quarterTurns: 3,
                       child: Text(
-                        "${daurahList[index].title}",
+                        "D $index",
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 8,
                           fontWeight: FontWeight.bold,
                         ),
                         overflow: TextOverflow.ellipsis,

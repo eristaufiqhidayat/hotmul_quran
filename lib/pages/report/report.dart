@@ -25,13 +25,13 @@ class _ReportMainState extends State<ReportMain> {
             unselectedLabelColor:
                 Colors.white70, // teks tab non-aktif putih transparan
             tabs: [
-              Tab(
-                icon: Icon(Icons.summarize, color: Colors.red[100]),
-                text: "Sum",
-              ),
               const Tab(
                 icon: Icon(Icons.add_chart, color: Colors.lightBlue),
                 text: "Graph",
+              ),
+              Tab(
+                icon: Icon(Icons.summarize, color: Colors.red[100]),
+                text: "Sum",
               ),
               const Tab(
                 icon: Icon(Icons.trending_up, color: Colors.amberAccent),
@@ -42,13 +42,14 @@ class _ReportMainState extends State<ReportMain> {
         ),
         body: const TabBarView(
           children: [
+            Center(child: DaurahScreen()),
             Center(
               child: Text(
                 "Halaman Home",
                 style: TextStyle(color: Colors.black), // biar konten kebaca
               ),
             ),
-            Center(child: DaurahScreen()),
+
             Center(
               child: Text(
                 "Halaman Settings",
