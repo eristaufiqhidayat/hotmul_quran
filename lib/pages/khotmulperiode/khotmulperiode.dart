@@ -87,12 +87,12 @@ class _KhotmulPeriodePageState extends State<KhotmulPeriodePage> {
       return;
     }
 
-    final url = Uri.parse("${GlobalConst.url}/api/v1/khotmulPeriodeSync");
+    //  final url = Uri.parse("${GlobalConst.url}/api/v1/khotmulPeriodeSync");
 
-    final response = await http.get(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-    );
+    // final response = await http.get(
+    //   url,
+    //   headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+    // );
     // print(url);
     // print(response.body);
     // if (response.statusCode == 200) {
