@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/pages/doa.dart';
 import 'package:hotmul_quran/pages/home.dart';
-import 'package:hotmul_quran/pages/profile.dart';
+//import 'package:hotmul_quran/pages/profile.dart';
 import 'package:hotmul_quran/pages/surah_list.dart';
 import 'package:hotmul_quran/pages/surah_detil_page.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
