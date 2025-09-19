@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/widget/graph_daurah.dart';
+import 'package:hotmul_quran/widget/juz_stats.widget.dart';
+import 'package:hotmul_quran/widget/khotmul_stats_widget.dart';
 
 class ReportMain extends StatefulWidget {
   const ReportMain({super.key});
@@ -43,19 +45,8 @@ class _ReportMainState extends State<ReportMain> {
         body: const TabBarView(
           children: [
             Center(child: DaurahScreen()),
-            Center(
-              child: Text(
-                "Halaman Home",
-                style: TextStyle(color: Colors.black), // biar konten kebaca
-              ),
-            ),
-
-            Center(
-              child: Text(
-                "Halaman Settings",
-                style: TextStyle(color: Colors.black),
-              ),
-            ),
+            Center(child: KhotmulStatsWidget()),
+            Center(child: JuzStatsWidget()),
           ],
         ),
       ),
