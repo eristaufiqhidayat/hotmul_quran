@@ -63,7 +63,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
         "group_name": "Daurah ${widget.anggota['group_id']}",
       };
     }
-    print(daurah);
+    //print(daurah);
     selectedUser = {
       "id": widget.anggota['group_id'],
       "name": widget.anggota['group_name'] ?? "Tidak diketahui",
@@ -112,7 +112,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       "name": nameController.text,
       "group_id": daurah?["group_id"].toString(), // dari dropdown
     };
-    print("Save edit $payload");
+    //print("Save edit $payload");
     final response = await http.put(
       url,
       headers: {
@@ -122,7 +122,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       },
       body: jsonEncode(payload), // jadi JSON
     );
-    print(response.body);
+    //print(response.body);
     if (!mounted) return;
 
     if (response.statusCode == 200) {
@@ -180,7 +180,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       "name": nameController.text,
       "group_id": widget.daurah_id.toString(),
     };
-    print("Add Anggota $payload");
+    //print("Add Anggota $payload");
     final response = await http.post(
       url,
       headers: {
@@ -190,7 +190,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       },
       body: jsonEncode(payload), // jadi JSON
     );
-    print(response.statusCode);
+    //print(response.statusCode);
     if (response.statusCode == 201) {
       Navigator.pop(context, true);
     } else {

@@ -63,7 +63,7 @@ class _EditDaurahPageState extends State<EditDaurahPage> {
     final url = Uri.parse("${GlobalConst.url}/api/v1/daurah/${group_id.text}");
 
     final payload = {"group_id": group_id.text, "group_name": group_name.text};
-    print(payload);
+    //print(payload);
     // ignore: unused_local_variable
     final response = await http.put(
       url,

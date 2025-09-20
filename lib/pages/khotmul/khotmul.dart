@@ -7,11 +7,13 @@ import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/pages/khotmul/listquran_perjuz.dart';
+import 'package:hotmul_quran/widget/progress_bar_khotmul.dart';
 //import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:hotmul_quran/service/token_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class KhotmulPage extends StatefulWidget {
   const KhotmulPage({super.key});
@@ -26,9 +28,15 @@ class _KhotmulPageState extends State<KhotmulPage> {
   List<dynamic> anggota = [];
   bool isLoading = false;
   TextEditingController searchController = TextEditingController();
+
+  var juzNumber = 1;
+  int totalAyah = 20; // nanti bisa diganti sesuai data asli per juz
+  Set<int> readAyahs = {};
+
   var anggota_id;
   var group_id;
   var daurah_id;
+
   Future<void> fetchDataGroup({int page = 1, String? search}) async {
     if (!mounted) return;
     setState(() => isLoading = true);
@@ -73,13 +81,16 @@ class _KhotmulPageState extends State<KhotmulPage> {
     }
 
     final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/khotmul/anggota/$anggota_id",
+      "${GlobalConst.url}/api/v1/khotmul/anggota/$anggota_id?group_id=$daurah_id",
     );
+    // print(
+    //   "${GlobalConst.url}/api/v1/khotmul/anggota/$anggota_id?group_id=$daurah_id",
+    // );
     final response = await http.get(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-    print(response.body);
+    //print("Khotmul ${response.body}");
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       final List<dynamic> dataList = (result['data'] as List<dynamic>?) ?? [];
@@ -117,6 +128,19 @@ class _KhotmulPageState extends State<KhotmulPage> {
   Future<void> _loadDaurahId() async {
     daurah_id = await getDaurah_id();
     if (mounted) setState(() {});
+  }
+
+  Future<void> loadReadAyahs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getStringList('readAyahs_${juzNumber}') ?? [];
+    setState(() {
+      readAyahs = saved.map((e) => int.parse(e)).toSet();
+    });
+  }
+
+  double get progress {
+    if (totalAyah == 0) return 0;
+    return readAyahs.length / totalAyah;
   }
 
   @override
@@ -226,228 +250,253 @@ class _KhotmulPageState extends State<KhotmulPage> {
                           ? {warna = Colors.red, button = Icons.close}
                           : {warna = Colors.green, button = Icons.check};
 
-                      return Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 3,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(12),
-                          leading: CircleAvatar(
-                            radius: 20,
-                            backgroundColor: warna,
-                            child: Text(
-                              item['juz'] != null
-                                  ? item['juz'].toString()
-                                  : '-',
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                      return Column(
+                        children: [
+                          Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 3,
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(12),
+                              leading: CircleAvatar(
+                                radius: 20,
+                                backgroundColor: warna,
+                                child: Text(
+                                  item['juz'] != null
+                                      ? item['juz'].toString()
+                                      : '-',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          title: Text(
-                            "Juz ${item['juz'] ?? ''}",
-                            style: GoogleFonts.poppins(
-                              fontSize:
-                                  anggota_id == item['anggota_id'].toString()
-                                  ? 20
-                                  : 16,
-                              fontWeight: FontWeight.w600,
-                              color: anggota_id == item['anggota_id'].toString()
-                                  ? Colors.green
-                                  : Colors.black87,
-                            ),
-                          ),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Column(
+                              title: Text(
+                                "Juz ${item['juz'] ?? ''}",
+                                style: GoogleFonts.poppins(
+                                  fontSize:
+                                      anggota_id ==
+                                          item['anggota_id'].toString()
+                                      ? 20
+                                      : 16,
+                                  fontWeight: FontWeight.w600,
+                                  color:
+                                      anggota_id ==
+                                          item['anggota_id'].toString()
+                                      ? Colors.green
+                                      : Colors.black87,
+                                ),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Table(
-                                    columnWidths: const {
-                                      0: FlexColumnWidth(
-                                        2,
-                                      ), // Lebar kolom label
-                                      1: FixedColumnWidth(
-                                        20,
-                                      ), // Lebar kolom tanda :
-                                      2: FlexColumnWidth(
-                                        3,
-                                      ), // Lebar kolom value
-                                    },
+                                  Column(
                                     children: [
-                                      TableRow(
+                                      Table(
+                                        columnWidths: const {
+                                          0: FlexColumnWidth(
+                                            2,
+                                          ), // Lebar kolom label
+                                          1: FixedColumnWidth(
+                                            20,
+                                          ), // Lebar kolom tanda :
+                                          2: FlexColumnWidth(
+                                            3,
+                                          ), // Lebar kolom value
+                                        },
                                         children: [
-                                          Text(
-                                            "Nama",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          Text(
-                                            ":",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          anggota_id ==
-                                                  item['anggota_id'].toString()
-                                              ? Text(
-                                                  "${item['name'] ?? '-'}",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 20,
-                                                    color: Colors.green,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                )
-                                              : Text(
-                                                  "${item['name'] ?? '-'}",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 13,
-                                                    color: Colors.black87,
-                                                  ),
+                                          TableRow(
+                                            children: [
+                                              Text(
+                                                "Nama",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 13,
+                                                  color: Colors.black87,
                                                 ),
-                                        ],
-                                      ),
-                                      TableRow(
-                                        children: [
-                                          Text(
-                                            "Group",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              color: Colors.black87,
-                                            ),
+                                              ),
+                                              Text(
+                                                ":",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 13,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                              anggota_id ==
+                                                      item['anggota_id']
+                                                          .toString()
+                                                  ? Text(
+                                                      "${item['name'] ?? '-'}",
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                            fontSize: 20,
+                                                            color: Colors.green,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                    )
+                                                  : Text(
+                                                      "${item['name'] ?? '-'}",
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                            fontSize: 13,
+                                                            color:
+                                                                Colors.black87,
+                                                          ),
+                                                    ),
+                                            ],
                                           ),
-                                          Text(
-                                            ":",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              color: Colors.black87,
-                                            ),
+                                          TableRow(
+                                            children: [
+                                              Text(
+                                                "Group",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 13,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                              Text(
+                                                ":",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 13,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                              Text(
+                                                "${item['group_id'] ?? '-'}",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 13,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                          Text(
-                                            "${item['group_id'] ?? '-'}",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      TableRow(
-                                        children: [
-                                          Text(
-                                            "Periode",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          Text(
-                                            ":",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                          Text(
-                                            "${item['periode'] ?? '-'}",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 13,
-                                              color: Colors.black87,
-                                            ),
+                                          TableRow(
+                                            children: [
+                                              Text(
+                                                "Periode",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 13,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                              Text(
+                                                ":",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 13,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                              Text(
+                                                "${item['periode'] ?? '-'}",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 13,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
+                                  const SizedBox(height: 6),
+                                  Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    spacing: 6,
+                                    children: [
+                                      Text(
+                                        warna == Colors.green
+                                            ? "Status : Sudah Khatam"
+                                            : "Status : Belum Khatam",
+                                        style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w600,
+                                          color: warna,
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.only(left: 6),
+                                        padding: const EdgeInsets.all(6),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: LinearGradient(
+                                            colors: warna == Colors.green
+                                                ? [
+                                                    Colors.greenAccent,
+                                                    Colors.green,
+                                                  ]
+                                                : [
+                                                    Colors.redAccent,
+                                                    Colors.red,
+                                                  ],
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: warna.withOpacity(0.6),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Icon(
+                                          button,
+                                          color: Colors.white,
+                                          size: 15,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
-                              const SizedBox(height: 6),
-                              Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                spacing: 6,
-                                children: [
-                                  Text(
-                                    warna == Colors.green
-                                        ? "Status : Sudah Khatam"
-                                        : "Status : Belum Khatam",
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w600,
-                                      color: warna,
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(left: 6),
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: warna == Colors.green
-                                            ? [Colors.greenAccent, Colors.green]
-                                            : [Colors.redAccent, Colors.red],
+                              trailing:
+                                  anggota_id == item['anggota_id'].toString()
+                                  ? PopupMenuButton<String>(
+                                      icon: const Icon(
+                                        Icons.more_vert,
+                                        color: Colors.green,
                                       ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: warna.withOpacity(0.6),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 3),
+                                      onSelected: (value) async {
+                                        if (value == 'khatam') {
+                                          final result = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => JuzAyahPage(
+                                                juzNumber: item["juz"],
+                                                khotmulId: item['id'],
+                                              ),
+                                            ),
+                                          );
+                                          if (result == true) {
+                                            await fetchData(page: currentPage);
+                                          }
+                                        }
+                                      },
+                                      itemBuilder: (context) => [
+                                        const PopupMenuItem(
+                                          value: 'khatam',
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.record_voice_over,
+                                                color: Colors.green,
+                                              ),
+                                              SizedBox(width: 8),
+                                              Text("Add Khatam"),
+                                            ],
+                                          ),
                                         ),
                                       ],
-                                    ),
-                                    child: Icon(
-                                      button,
-                                      color: Colors.white,
-                                      size: 15,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                    )
+                                  : const SizedBox.shrink(),
+                            ),
                           ),
-                          trailing: anggota_id == item['anggota_id'].toString()
-                              ? PopupMenuButton<String>(
-                                  icon: const Icon(
-                                    Icons.more_vert,
-                                    color: Colors.green,
-                                  ),
-                                  onSelected: (value) async {
-                                    if (value == 'khatam') {
-                                      final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => JuzAyahPage(
-                                            juzNumber: item["juz"],
-                                            khotmulId: item['id'],
-                                          ),
-                                        ),
-                                      );
-                                      if (result == true) {
-                                        await fetchData(page: currentPage);
-                                      }
-                                    }
-                                  },
-                                  itemBuilder: (context) => [
-                                    const PopupMenuItem(
-                                      value: 'khatam',
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.record_voice_over,
-                                            color: Colors.green,
-                                          ),
-                                          SizedBox(width: 8),
-                                          Text("Add Khatam"),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : const SizedBox.shrink(),
-                        ),
+                          ProgressBarKhotmul(
+                            progress: progress,
+                            total: totalAyah,
+                            done: readAyahs.length,
+                          ),
+                        ],
                       );
                     },
                     separatorBuilder: (context, index) =>

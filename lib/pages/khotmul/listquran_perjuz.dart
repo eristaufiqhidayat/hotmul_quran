@@ -49,6 +49,22 @@ class _JuzAyahPageState extends State<JuzAyahPage> {
     });
   }
 
+  void checkSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Mendapatkan semua keys yang tersimpan
+    final allKeys = prefs.getKeys();
+
+    print('Jumlah data: ${allKeys.length}');
+    print('Keys yang tersimpan: $allKeys');
+
+    // Menampilkan detail setiap key dan valuenya
+    for (var key in allKeys) {
+      final value = prefs.get(key);
+      print('Key: $key, Value: $value, Type: ${value.runtimeType}');
+    }
+  }
+
   Future<void> _loadDaurahId() async {
     daurah_id = await getDaurah_id();
     //print(daurah_id);
@@ -255,6 +271,7 @@ class _JuzAyahPageState extends State<JuzAyahPage> {
   }
 
   void toggleReadAyah(int ayahNumber) async {
+    checkSharedPreferences();
     setState(() {
       if (readAyahs.contains(ayahNumber)) {
         readAyahs.remove(ayahNumber);

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/main.dart';
 import 'package:hotmul_quran/pages/homepage.dart';
+import 'package:hotmul_quran/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:http/http.dart' as http;
@@ -184,7 +185,7 @@ Future<void> logout() async {
   await prefs.remove("daurah_id");
   // misalnya arahkan ke halaman login
   navigatorKey.currentState?.pushAndRemoveUntil(
-    MaterialPageRoute(builder: (_) => QuranApp()),
+    MaterialPageRoute(builder: (_) => LoginPage()),
     (route) => false,
   );
 }

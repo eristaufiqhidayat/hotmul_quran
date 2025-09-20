@@ -208,7 +208,7 @@ class _EditKhatamPageState extends State<EditKhatamPage> {
       "keterangan": keterangan.text,
       "tanggal": tanggal.text,
     };
-    print(payload);
+    //print(payload);
     final response = await http.put(
       url,
       headers: {
@@ -218,7 +218,7 @@ class _EditKhatamPageState extends State<EditKhatamPage> {
       },
       body: jsonEncode(payload),
     );
-    print(response.body);
+    //print(response.body);
     //debugPrint('saveEdit resp: ${response.statusCode} ${response.body}');
     if (!mounted) return;
     if (response.statusCode == 200) {

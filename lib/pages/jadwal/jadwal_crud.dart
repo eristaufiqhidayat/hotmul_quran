@@ -203,7 +203,7 @@ class _EditjadwalPageState extends State<EditjadwalPage> {
       "waktu": waktu.text,
       "alamat": alamat.text,
     };
-    print(payload);
+    //print(payload);
     final response = await http.put(
       url,
       headers: {
@@ -213,7 +213,7 @@ class _EditjadwalPageState extends State<EditjadwalPage> {
       },
       body: jsonEncode(payload),
     );
-    print(response.body);
+    //print(response.body);
     //debugPrint('saveEdit resp: ${response.statusCode} ${response.body}');
     if (!mounted) return;
     if (response.statusCode == 200) {
