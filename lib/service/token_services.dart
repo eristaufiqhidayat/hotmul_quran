@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/main.dart';
-import 'package:hotmul_quran/pages/homepage.dart';
+//import 'package:hotmul_quran/pages/homepage.dart';
 import 'package:hotmul_quran/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
