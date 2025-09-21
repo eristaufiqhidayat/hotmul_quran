@@ -16,6 +16,7 @@ flowchart TD
     DB --> P4
     DB --> P5
     DB --> P6
+    DB --> P3
     
     %% Menggunakan subgraph untuk memposisikan DB di bawah
     subgraph BottomSection [ ]
