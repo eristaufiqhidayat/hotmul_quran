@@ -4,12 +4,14 @@ class ProgressBarKhotmul extends StatelessWidget {
   final double progress; // 0.0 - 1.0
   final int total;
   final int done;
+  final String status;
 
   const ProgressBarKhotmul({
     super.key,
     required this.progress,
     required this.total,
     required this.done,
+    required this.status,
   });
 
   @override
@@ -40,14 +42,20 @@ class ProgressBarKhotmul extends StatelessWidget {
               value: progress,
               minHeight: 12,
               backgroundColor: Colors.grey.shade300,
-              color: Colors.green,
+              color: this.status == "send_voice" ? Colors.green : Colors.red,
               borderRadius: BorderRadius.circular(6),
             ),
 
             const SizedBox(height: 6),
 
             // Persentase
-            Text("${(progress * 100).toStringAsFixed(1)}% selesai"),
+            this.status == "send_voice"
+                ? Text(
+                    "${(progress * 100).toStringAsFixed(1)}% selesai dan sudah lapor",
+                  )
+                : Text(
+                    "${(progress * 100).toStringAsFixed(1)}% selesai dan belum lapor",
+                  ),
           ],
         ),
       ),

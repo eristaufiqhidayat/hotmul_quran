@@ -67,6 +67,7 @@ class _LoginPageState extends State<LoginPage> {
         data['daurah_id'].toString(),
         _passwordController.text,
         data['user_id'].toString(),
+        data['juz'].toString(),
       );
       Navigator.pushReplacement(
         context,

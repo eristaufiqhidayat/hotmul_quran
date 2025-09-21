@@ -97,7 +97,7 @@ class _JuzAyahPageState extends State<JuzAyahPage> {
       final result = json.decode(response.body);
       setState(() {
         status = result['data'];
-        cekStat();
+        //cekStat();
       });
     }
 
@@ -131,6 +131,7 @@ class _JuzAyahPageState extends State<JuzAyahPage> {
   }
 
   Future<void> updateStatus() async {
+    print("Batal Lapor $batalLapor");
     final token = await getToken();
     final url = Uri.parse(
       "${GlobalConst.url}/api/v1/khotmul/updateStatus/${widget.khotmulId.toString()}",
@@ -156,10 +157,10 @@ class _JuzAyahPageState extends State<JuzAyahPage> {
     //print(response.body);
     if (!mounted) return;
     if (response.statusCode == 200) {
-      //Navigator.pop(context, true);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Sukses upload data")));
+      Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(
         context,
@@ -240,7 +241,7 @@ class _JuzAyahPageState extends State<JuzAyahPage> {
       ).showSnackBar(const SnackBar(content: Text("Cek All Read")));
     } else {
       batalLapor == true;
-      updateStatus();
+      //updateStatus();
     }
   }
 
@@ -289,7 +290,7 @@ class _JuzAyahPageState extends State<JuzAyahPage> {
       setState(() {
         batalLapor = true;
         print(batalLapor);
-        updateStatus();
+        //updateStatus();
       });
     }
   }
@@ -321,10 +322,15 @@ class _JuzAyahPageState extends State<JuzAyahPage> {
           : Column(
               children: [
                 SendCheckButtons(
+                  onClose: () {
+                    batalLapor = true;
+                    updateStatus();
+                  },
                   onSend: updateStatus,
                   onCheckAll: toggleAllAyahs,
                   allChecked: readAyahs.length == ayahs.length,
                 ),
+
                 const Divider(height: 1),
                 Expanded(
                   child: ListView.builder(
