@@ -9,6 +9,7 @@ flowchart TD
     P2 --> P5[Jadwal]
     P2 --> P6[Reward]
     P2 --> P3((Khotmul))
+    P2 --> P7[Daurah]
     P2 --> |Read Message|M[Message]
     
     %% Dashboard Feedback 
@@ -17,6 +18,8 @@ flowchart TD
     P4-->DB
     P5-->DB
     P6-->DB
+    P7-->DB
+    DB --> P7
     DB --> P4
     DB --> P5
     DB --> P6
