@@ -1,7 +1,7 @@
  ```mermaid
 flowchart TD
     User([User/Anggota]) -->|Login & Token| P1((Autentikasi))
-    User --> |No Login| Home((Homepage)) 
+    User --> |No Login| H((Homepage)) 
     P1 -->|Valid Token + anggota_id| P2((Dashboaard))
 
     %% Menu di Dashboard
@@ -10,6 +10,7 @@ flowchart TD
     P2 --> P6((Reward))
     P2 --> P3((Khotmul))
     P3 --> |Setor|DB[(Data Base)]
+    H --> R[Register]
     
     %% Dashboard Feedback 
     DB --> P4
