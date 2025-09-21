@@ -31,6 +31,7 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const CircleAvatar(
               backgroundImage: AssetImage('assets/logo.png'),
@@ -44,7 +45,7 @@ class _MainPageState extends State<MainPage> {
                   Text(
                     "MAJELIS KHOTMUL QUR'AN",
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -52,7 +53,7 @@ class _MainPageState extends State<MainPage> {
                   Text(
                     "PUSAKA ILAHI",
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),

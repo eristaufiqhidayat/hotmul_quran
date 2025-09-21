@@ -1,7 +1,7 @@
  ```mermaid
 flowchart TD
     User([User/Anggota]) -->|Login & Token| P1((Autentikasi))
-    P1 -->|Valid Token + anggota_id| P2((KhotmulPage))
+    P1 -->|Valid Token + anggota_id| P2((Dashboaard))
 
     %% Data Flow
     P2 -->|Fetch Data by group_id, daurah_id| DB[(Tabel Khotmul)]

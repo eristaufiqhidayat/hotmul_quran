@@ -121,7 +121,7 @@ class _DashboardState extends State<Dashboard> {
                   Text(
                     "MAJELIS KHOTMUL QUR'AN",
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -129,7 +129,7 @@ class _DashboardState extends State<Dashboard> {
                   Text(
                     "PUSAKA ILAHI",
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
