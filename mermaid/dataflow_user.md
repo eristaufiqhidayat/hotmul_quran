@@ -8,11 +8,14 @@ flowchart TD
     P2 --> P4((Donasi))
     P2 --> P5((Jadwal))
     P2 --> P6((Reward))
-    P2 --> P3((Khotmul))
+    P2 --> P3[Khotmul]
+    P2 --> |Read Message|M[Message]
     P3 --> |Setor|DB[(A P I Database)]
     H --> R[Register]
     
     %% Dashboard Feedback 
+    M --> |Create|DB
+    DB --> M
     DB --> P4
     DB --> P5
     DB --> P6
