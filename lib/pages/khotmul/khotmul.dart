@@ -1,14 +1,12 @@
-// ignore_for_file: deprecated_member_use, sort_child_properties_last
+// ignore_for_file: deprecated_member_use, sort_child_properties_last, non_constant_identifier_names, prefer_typing_uninitialized_variables, unnecessary_brace_in_string_interps, curly_braces_in_flow_control_structures
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart'; // <--- Tambahkan Google Fonts
 import 'package:hotmul_quran/const/global_const.dart';
-//import 'package:hotmul_quran/pages/khotmul/khotmul_crud.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/pages/khotmul/listquran_perjuz.dart';
 import 'package:hotmul_quran/widget/progress_bar_khotmul.dart';
-//import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -183,9 +181,9 @@ class _KhotmulPageState extends State<KhotmulPage> {
 
   double get progress {
     if (totalAyah == null || totalAyah!.jumlahAyat == 0) return 0;
-    print(
-      "Total ayah ${totalAyah!.jumlahAyat} total juz yang di baca ${readAyahs.length} ",
-    );
+    // print(
+    //   "Total ayah ${totalAyah!.jumlahAyat} total juz yang di baca ${readAyahs.length} ",
+    // );
     //print(readAyahs);
     return readAyahs.length / (totalAyah!.jumlahAyat + 1);
   }
@@ -207,19 +205,6 @@ class _KhotmulPageState extends State<KhotmulPage> {
             // Tombol Refresh + Add
             Row(
               children: [
-                // ActionButtons(
-                //   onRefresh: () => fetchData(page: currentPage),
-                //   onNew: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //         builder: (context) => EditKhotmulPage(anggota: {}),
-                //       ),
-                //     ).then((updated) {
-                //       if (updated == true) fetchData(page: currentPage);
-                //     });
-                //   },
-                // ),
                 SizedBox(width: 8),
                 ElevatedButton.icon(
                   onPressed: _initData,
@@ -300,6 +285,8 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                 item['status'] == null ||
                                 item['status'] == "send_no"
                             ? {warna = Colors.red, button = Icons.close}
+                            : item['status'] == "send_voice"
+                            ? {warna = Colors.amber, button = Icons.check}
                             : {warna = Colors.green, button = Icons.check};
 
                         return Column(
@@ -461,9 +448,11 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                       spacing: 6,
                                       children: [
                                         Text(
-                                          warna == Colors.green
-                                              ? "Status : Sudah Khatam"
-                                              : "Status : Belum Khatam",
+                                          warna == Colors.amber
+                                              ? "Status : Sudah Khatam Belum DiApprove "
+                                              : warna == Colors.green
+                                              ? "Status :Sudah Khatam"
+                                              : "Status :Belum Khatam",
                                           style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w600,
                                             color: warna,
@@ -482,6 +471,8 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                                       Colors.greenAccent,
                                                       Colors.green,
                                                     ]
+                                                  : warna == Colors.amber
+                                                  ? [Colors.amber, Colors.amber]
                                                   : [
                                                       Colors.redAccent,
                                                       Colors.red,
@@ -552,7 +543,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                 ? ProgressBarKhotmul(
                                     status: item['status'],
                                     progress: progress,
-                                    total: (totalAyah!.jumlahAyat + 1) ?? 0,
+                                    total: (totalAyah!.jumlahAyat + 1),
                                     done: readAyahs.length,
                                   )
                                 : SizedBox(),

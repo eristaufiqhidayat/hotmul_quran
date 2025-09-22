@@ -63,13 +63,13 @@ class _KhotmulPeriodePageState extends State<KhotmulPeriodePage> {
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-    //print(response.body);
+    print(response.body);
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       setState(() {
-        anggota = result['data'];
-        currentPage = result['current_page'];
-        lastPage = result['last_page'];
+        anggota = (result['data'] as List?) ?? [];
+        currentPage = result['current_page'] ?? 1;
+        lastPage = result['last_page'] ?? 1;
       });
     }
 
@@ -87,22 +87,23 @@ class _KhotmulPeriodePageState extends State<KhotmulPeriodePage> {
       return;
     }
 
-    //  final url = Uri.parse("${GlobalConst.url}/api/v1/khotmulPeriodeSync");
+    final url = Uri.parse("${GlobalConst.url}/api/v1/khotmulPeriodeSync");
 
-    // final response = await http.get(
-    //   url,
-    //   headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-    // );
-    // print(url);
-    // print(response.body);
-    // if (response.statusCode == 200) {
-    //   final result = json.decode(response.body);
-    //   setState(() {
-    //     anggota = result['data'];
-    //     currentPage = result['current_page'];
-    //     lastPage = result['last_page'];
-    //   });
-    // }
+    final response = await http.get(
+      url,
+      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+    );
+    print(url);
+    print(response.body);
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      setState(() {
+        anggota = (result['data'] as List?) ?? [];
+        currentPage = result['current_page'] ?? 1;
+        lastPage = result['last_page'] ?? 1;
+        fetchData(page: currentPage, search: "");
+      });
+    }
 
     setState(() => isLoading = false);
   }
@@ -167,8 +168,8 @@ class _KhotmulPeriodePageState extends State<KhotmulPeriodePage> {
             "group_id",
             "group_name",
             "jumlah_anggota",
-            "periode_terakhir",
-            "tanggal_terakhir",
+            "periode",
+            "tanggal",
             "action",
           ],
           rowsPerPage: 10,

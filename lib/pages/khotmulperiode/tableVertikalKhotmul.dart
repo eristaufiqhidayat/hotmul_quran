@@ -203,7 +203,10 @@ class VerticalDataTableKhotmul extends StatelessWidget {
                                           )
                                         : Text(
                                             field == "tanggal_terakhir"
-                                                ? "${DateFormat('dd-MM-yyyy').format(DateTime.parse(row[field]))} s/d ${DateFormat('dd-MM-yyyy').format(DateTime.parse(row[field]).add(const Duration(days: 14)))}"
+                                                ? (row[field] != null
+                                                      ? "${DateFormat('dd-MM-yyyy').format(DateTime.parse(row[field]))} "
+                                                            "s/d ${DateFormat('dd-MM-yyyy').format(DateTime.parse(row[field]).add(const Duration(days: 14)))}"
+                                                      : "-")
                                                 : "${row[field] ?? ''}",
                                           ),
                                   ),

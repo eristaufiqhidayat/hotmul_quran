@@ -42,7 +42,11 @@ class ProgressBarKhotmul extends StatelessWidget {
               value: progress,
               minHeight: 12,
               backgroundColor: Colors.grey.shade300,
-              color: this.status == "send_voice" ? Colors.green : Colors.red,
+              color: status == "send_no" || status == ""
+                  ? Colors.red
+                  : status == "send_voice"
+                  ? Colors.amber
+                  : Colors.green,
               borderRadius: BorderRadius.circular(6),
             ),
 
