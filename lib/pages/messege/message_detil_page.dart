@@ -69,11 +69,18 @@ class _MessageDetailPageState extends State<MessageDetailPage> {
   }
 
   void dispose() {
-    if (_statusUpdated) {
-      Navigator.pop(context, true); // kirim hasil ke halaman sebelumnya
-    } else {
-      Navigator.pop(context, false);
-    }
+    // if (_statusUpdated) {
+    //   if (!mounted) {
+    //     Navigator.pop(context, true); // kirim hasil ke halaman sebelumnya
+    //   }
+    // } else {
+    //   if (mounted) {
+    //     Navigator.pop(context, false);
+    //   }
+    // }
+    // if (_statusUpdated) {
+    //   Navigator.pop(context, true);
+    // }
     super.dispose();
   }
 
@@ -84,8 +91,17 @@ class _MessageDetailPageState extends State<MessageDetailPage> {
     return Scaffold(
       backgroundColor: Colors.green.shade50,
       appBar: AppBar(
-        title: const Text("Message Detail"),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          "Message Detail",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         backgroundColor: Colors.green.shade900,
+
         actions: [
           if (_isLoading)
             const Padding(

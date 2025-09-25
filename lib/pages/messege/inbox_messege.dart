@@ -26,9 +26,16 @@ class _InboxPageState extends State<InboxPage> {
     return Scaffold(
       backgroundColor: Colors.green.shade50,
       appBar: AppBar(
-        title: const Text("Inbox"),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          "Inbox",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
         backgroundColor: Colors.green.shade900,
-        centerTitle: true,
       ),
       body: FutureBuilder<List<MessageUser>>(
         future: _inboxFuture,

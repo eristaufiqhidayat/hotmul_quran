@@ -43,20 +43,25 @@ class _DashboardState extends State<Dashboard> {
   Future<void> _user_id() async {
     final idString = await getUser_id();
     user_id = int.tryParse(idString ?? "0"); // ✅ conv
-    final unread = await getUnredCount(user_id);
-    //print("Unread count $unread");
-    // tunggu hasilnya
-    setState(() {
-      countUnread = unread; // simpan sebagai int
-    });
-    MessageService().getInbox(user_id).then((inboxList) {
-      //for (var msg in inboxList) {
-      //print("Message ID: ${msg.id}, is_read: ${msg.isRead}");
-      //}
-      setState(() {
-        _inboxFuture = Future.value(inboxList);
-      });
-    });
+    try {
+      final unread = await getUnredCount(user_id);
+      if (mounted) {
+        setState(() {
+          countUnread = unread; // simpan sebagai int
+        });
+        MessageService().getInbox(user_id).then((inboxList) {
+          setState(() {
+            _inboxFuture = Future.value(inboxList);
+          });
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          // Handle error state
+        });
+      }
+    }
   }
 
   Future<int> getUnredCount(int user_id) async {
