@@ -194,30 +194,30 @@ class _AnggotaPageState extends State<AnggotaPage> {
                               ),
                             ),
 
-                            const PopupMenuDivider(),
-                            const PopupMenuItem(
-                              value: 'khatam',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.check_circle, color: Colors.green),
-                                  SizedBox(width: 8),
-                                  Text("Add Khatam"),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'donasi',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.account_balance_wallet,
-                                    color: Colors.purple,
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text("Add Donasi"),
-                                ],
-                              ),
-                            ),
+                            //const PopupMenuDivider(),
+                            // const PopupMenuItem(
+                            //   value: 'khatam',
+                            //   child: Row(
+                            //     children: [
+                            //       Icon(Icons.check_circle, color: Colors.green),
+                            //       SizedBox(width: 8),
+                            //       Text("Add Khatam"),
+                            //     ],
+                            //   ),
+                            // ),
+                            // const PopupMenuItem(
+                            //   value: 'donasi',
+                            //   child: Row(
+                            //     children: [
+                            //       Icon(
+                            //         Icons.account_balance_wallet,
+                            //         color: Colors.purple,
+                            //       ),
+                            //       SizedBox(width: 8),
+                            //       Text("Add Donasi"),
+                            //     ],
+                            //   ),
+                            // ),
                           ],
                         ),
                       );

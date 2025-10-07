@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 class GroupUserDropdown extends StatefulWidget {
   final void Function(Map<String, dynamic>?)? onChanged; // callback ke parent
-  final Map<String, dynamic>? value; // default selected value
+  final int? value; // default selected value
 
   const GroupUserDropdown({super.key, this.onChanged, this.value});
 
@@ -16,12 +16,13 @@ class GroupUserDropdown extends StatefulWidget {
 
 class _GroupUserDropdownState extends State<GroupUserDropdown> {
   List<Map<String, dynamic>> groupUsers = [];
-  Map<String, dynamic>? selectedUser;
+  int? selectedUser;
 
   @override
   void initState() {
     super.initState();
     selectedUser = widget.value; // set default value kalau ada
+    print("Widget initial value:  ${widget.value}");
     fetchGroupUsers();
   }
 
@@ -48,17 +49,7 @@ class _GroupUserDropdownState extends State<GroupUserDropdown> {
 
       setState(() {
         groupUsers = users;
-
-        // jika default value ada, sesuaikan dengan list yang baru dimuat
-        if (widget.value != null) {
-          try {
-            selectedUser = groupUsers.firstWhere(
-              (g) => g["id"] == widget.value!["id"],
-            );
-          } catch (e) {
-            selectedUser = null; // jika tidak ditemukan
-          }
-        }
+        //print("Widget Selected users:  $selectedUser");
       });
 
       //debugPrint("Users loaded: $groupUsers");
@@ -82,7 +73,7 @@ class _GroupUserDropdownState extends State<GroupUserDropdown> {
                 ),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<Map<String, dynamic>>(
+              DropdownButtonFormField<int>(
                 decoration: const InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
@@ -93,12 +84,12 @@ class _GroupUserDropdownState extends State<GroupUserDropdown> {
                   "Silakan pilih group user",
                   style: TextStyle(color: Colors.grey),
                 ),
-                value: selectedUser,
+                value: widget.value,
                 dropdownColor: Colors.white,
                 isExpanded: true,
                 items: groupUsers.map((user) {
-                  return DropdownMenuItem<Map<String, dynamic>>(
-                    value: user,
+                  return DropdownMenuItem<int>(
+                    value: user["id"], // ✅ hanya kirim user id
                     child: Text(user["name"] ?? "No Name"),
                   );
                 }).toList(),
@@ -106,10 +97,11 @@ class _GroupUserDropdownState extends State<GroupUserDropdown> {
                   setState(() {
                     selectedUser = value;
                   });
-                  widget.onChanged?.call(value); // kirim value ke parent
-                  debugPrint(
-                    "Selected user: ${value?["id"]} - ${value?["name"]}",
+                  final selectedMap = groupUsers.firstWhere(
+                    (g) => g["id"] == value,
+                    orElse: () => {},
                   );
+                  widget.onChanged?.call(selectedMap); // kirim value ke parent
                 },
               ),
             ],

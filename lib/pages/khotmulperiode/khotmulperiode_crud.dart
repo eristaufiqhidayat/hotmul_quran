@@ -260,11 +260,19 @@ class _EditKhotmulperiodePageState extends State<EditKhotmulperiodePage> {
                   children: [
                     const SizedBox(height: 8),
                     GroupUserDropdown(
-                      value: selectedUser, // default value
+                      value: selectedUser?["id"], // pass only the ID
                       onChanged: (value) {
-                        setState(() => selectedUser = value);
+                        setState(
+                          () => selectedUser = {
+                            "id": value,
+                            "name": groupUsers.firstWhere(
+                              (g) => g["id"] == value,
+                              orElse: () => {"name": "Tidak diketahui"},
+                            )["name"],
+                          },
+                        );
                         debugPrint(
-                          "Parent menerima: ${value?["id"]} - ${value?["name"]}",
+                          "Parent menerima: $value - ${selectedUser?["name"]}",
                         );
                       },
                     ),

@@ -46,6 +46,7 @@ class _KhatamPageState extends State<KhatamPage> {
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
+    //print(response.body);
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
 
@@ -57,6 +58,36 @@ class _KhatamPageState extends State<KhatamPage> {
     }
 
     setState(() => isLoading = false);
+  }
+
+  Future<void> approveData({int? id}) async {
+    final token = await getToken();
+    final url = Uri.parse("${GlobalConst.url}/api/v1/khotmul/updateStatus/$id");
+    print("${GlobalConst.url}/api/v1/khotmul/updateStatus/$id");
+    var payload = {"status": "send_approve"};
+
+    print(payload);
+    final response = await http.post(
+      url,
+      headers: {
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json", // penting
+      },
+      body: jsonEncode(payload), // jadi JSON
+    );
+    //print(response.body);
+    if (!mounted) return;
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Approved")));
+      //Navigator.pop(context, true);
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Gagal Approved")));
+    }
   }
 
   @override
@@ -106,8 +137,29 @@ class _KhatamPageState extends State<KhatamPage> {
       endDrawer: AppDrawer(),
       appBar: PrimaryAppBar(title: "Khatam"),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Tombol Refresh + Add
+          const SizedBox(width: 50),
+
+          // ElevatedButton(
+          //   onPressed: () {},
+          //   child: const Icon(Icons.refresh, color: Colors.white),
+          //   style: ButtonStyle(
+          //     backgroundColor: MaterialStateProperty.resolveWith<Color>((
+          //       Set<MaterialState> states,
+          //     ) {
+          //       if (states.contains(MaterialState.pressed)) return Colors.red;
+          //       if (states.contains(MaterialState.hovered)) {
+          //         return Colors.blue.shade900;
+          //       }
+          //       return Colors.blue.shade900;
+          //     }),
+          //     shape: MaterialStateProperty.all(
+          //       RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          //     ),
+          //   ),
+          // ),
           ActionButtons(
             onRefresh: () => fetchData(page: currentPage),
             onNew: () {
@@ -125,7 +177,6 @@ class _KhatamPageState extends State<KhatamPage> {
             controller: searchController,
             onSubmitted: (value) => fetchData(page: 1, search: value),
           ),
-
           const SizedBox(height: 10),
           // List Data
           Expanded(
@@ -137,7 +188,7 @@ class _KhatamPageState extends State<KhatamPage> {
                       final item = anggota[index];
                       return ListTile(
                         title: Text(
-                          item['group_name'].toString(),
+                          item['name'].toString(),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -146,14 +197,10 @@ class _KhatamPageState extends State<KhatamPage> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Jumlah Khatam: ${item['jumlah_khatam']}"),
-                            Text(
-                              "Jumlah membadalkan: ${item['jumlah_membadalkan']}",
-                            ),
-                            Text(
-                              "Jumlah tidak baca: ${item['jumlah_tidak_baca']}",
-                            ),
-                            Text("Keterangan : ${item['keterangan']}"),
+                            Text("Group id: ${item['group_id']}"),
+                            Text("Period id: ${item['periode']}"),
+                            Text("Tanggal: ${item['tanggal']}"),
+                            Text("Juz: ${item['juz']}"),
                           ],
                         ),
                         isThreeLine: true,
@@ -174,6 +221,12 @@ class _KhatamPageState extends State<KhatamPage> {
                                   ); // refresh list kalau ada update
                                 }
                               });
+                            } else {
+                              if (value == 'approve') {
+                                approveData(id: item['id']).then((_) {
+                                  fetchData(page: currentPage);
+                                });
+                              }
                             }
                           },
                           itemBuilder: (context) => [
@@ -184,6 +237,16 @@ class _KhatamPageState extends State<KhatamPage> {
                                   Icon(Icons.edit, color: Colors.blue),
                                   SizedBox(width: 8),
                                   Text("Update"),
+                                ],
+                              ),
+                            ),
+                            const PopupMenuItem(
+                              value: 'approve',
+                              child: Row(
+                                children: [
+                                  Icon(Icons.approval, color: Colors.blue),
+                                  SizedBox(width: 8),
+                                  Text("Approve"),
                                 ],
                               ),
                             ),

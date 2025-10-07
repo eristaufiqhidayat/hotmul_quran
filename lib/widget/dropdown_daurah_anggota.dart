@@ -22,8 +22,8 @@ class _daurahDropdownState extends State<daurahDropdown> {
   @override
   void initState() {
     super.initState();
-    selectedGroupId = widget.value; // set default value kalau ada
-    print("Default Daurah: $selectedUser");
+    selectedGroupId = widget.value ?? 2; // set default value kalau ada
+    //print("Default Daurah: $selectedUser");
     fetchGroupUsers();
   }
 
@@ -45,6 +45,10 @@ class _daurahDropdownState extends State<daurahDropdown> {
 
       setState(() {
         groupUsers = List<Map<String, dynamic>>.from(data);
+        if (selectedGroupId != null &&
+            !groupUsers.any((user) => user["group_id"] == selectedGroupId)) {
+          selectedGroupId = null;
+        }
       });
     }
   }
@@ -57,44 +61,81 @@ class _daurahDropdownState extends State<daurahDropdown> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "Pilih Group User",
+                "Pilih Group User ",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
-              DropdownButtonFormField<int>(
-                decoration: const InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(12), // Oval shape
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(16),
-                hint: const Text(
-                  "Silakan pilih Daurah",
-                  style: TextStyle(color: Colors.grey),
+                child: DropdownButtonFormField<int>(
+                  decoration: InputDecoration(
+                    labelText: 'Pilih Daurah',
+                    prefixIcon: Icon(Icons.group, color: Colors.blueAccent),
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    border: InputBorder.none, // Remove default border
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.blueAccent),
+                    ),
+                    focusedBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  hint: const Padding(
+                    padding: EdgeInsets.only(left: 4.0),
+                    child: Text(
+                      "Silakan pilih Daurah",
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                  ),
+                  value: selectedGroupId, // ✅ sekarang cocok
+                  dropdownColor: Colors.white,
+                  isExpanded: true,
+                  icon: const Padding(
+                    padding: EdgeInsets.only(right: 12.0),
+                    child: Icon(
+                      Icons.arrow_drop_down,
+                      color: Colors.grey,
+                      size: 24,
+                    ),
+                  ),
+                  items: groupUsers.map((user) {
+                    return DropdownMenuItem<int>(
+                      value: user["group_id"], // ✅ hanya kirim group_id
+                      child: Text(user["group_name"] ?? "No Name"),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedGroupId = value;
+                    });
+                    // ambil map lengkap berdasarkan group_id
+                    final selectedMap = groupUsers.firstWhere(
+                      (g) => g["group_id"] == value,
+                      orElse: () => {},
+                    );
+                    widget.onChanged?.call(selectedMap);
+                  },
                 ),
-                value: selectedGroupId, // ✅ sekarang cocok
-                dropdownColor: Colors.white,
-                isExpanded: true,
-                items: groupUsers.map((user) {
-                  return DropdownMenuItem<int>(
-                    value: user["group_id"], // ✅ hanya kirim group_id
-                    child: Text(user["group_name"] ?? "No Name"),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedGroupId = value;
-                  });
-                  // ambil map lengkap berdasarkan group_id
-                  final selectedMap = groupUsers.firstWhere(
-                    (g) => g["group_id"] == value,
-                    orElse: () => {},
-                  );
-                  widget.onChanged?.call(selectedMap);
-                },
               ),
             ],
           );

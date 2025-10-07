@@ -260,7 +260,7 @@ class _EditKhotmulPageState extends State<EditKhotmulPage> {
                   children: [
                     const SizedBox(height: 8),
                     GroupUserDropdown(
-                      value: selectedUser, // default value
+                      value: selectedUser?["id"], // pass only the user id
                       onChanged: (value) {
                         setState(() => selectedUser = value);
                         debugPrint(

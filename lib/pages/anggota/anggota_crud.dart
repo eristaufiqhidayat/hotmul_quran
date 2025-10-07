@@ -32,12 +32,14 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
   Map<String, dynamic> statusAnggota = {};
   late MaterialColor warnaUserPanel;
   List<Map<String, dynamic>> groupUsers = [];
-  Map<String, dynamic>? selectedUser;
+  int? selectedUser;
   Map<String, dynamic>? daurah;
+  String? group_id;
 
   @override
   void initState() {
     super.initState();
+    _initData();
     //print(widget.anggota);
     nameController = TextEditingController(text: widget.anggota['name']);
     idController = TextEditingController(
@@ -64,10 +66,40 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       };
     }
     //print(daurah);
-    selectedUser = {
-      "id": widget.anggota['group_id'],
-      "name": widget.anggota['group_name'] ?? "Tidak diketahui",
-    };
+  }
+
+  Future<void> checkGroup({String? anggota_id}) async {
+    if (!mounted) return;
+
+    final token = await getValidAccessToken();
+
+    if (token == null) {
+      await logout();
+      return;
+    }
+
+    final url = Uri.parse(
+      "${GlobalConst.url}/api/v1/cekAnggota?anggota_id=$anggota_id",
+    );
+    //print("${GlobalConst.url}/api/v1/cekAnggota?anggota_id=$anggota_id");
+    final response = await http.post(
+      url,
+      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+    );
+    //print("Group id ${response.body}");
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      int groupId = result['data']['group_id'];
+      //group_id = groupId.toString();
+      setState(() {
+        selectedUser = groupId;
+      });
+    }
+  }
+
+  Future<void> _initData() async {
+    checkGroup(anggota_id: widget.anggota['user_id']?.toString());
+    //print("Group id dari token: $group_id");
   }
 
   Future<void> saveDelete() async {
@@ -151,7 +183,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       "email": userName.text,
       "password": userPass.text,
     };
-    //print(payload);
+    print("add user anggota $payload");
     //print(token);
     final response = await http.post(
       url,
@@ -180,7 +212,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       "name": nameController.text,
       "group_id": widget.daurah_id.toString(),
     };
-    //print("Add Anggota $payload");
+    print("Add Anggota $payload");
     final response = await http.post(
       url,
       headers: {
@@ -190,7 +222,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       },
       body: jsonEncode(payload), // jadi JSON
     );
-    //print(response.statusCode);
+
     if (response.statusCode == 201) {
       Navigator.pop(context, true);
     } else {
@@ -206,15 +238,15 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
     final url = Uri.parse(
       "${GlobalConst.url}/api/v1/updateUser/${statusAnggota["user_id"]}",
     );
-
+    print("${GlobalConst.url}/api/v1/updateUser/${statusAnggota["user_id"]}");
     final payload = {
-      "group_id": selectedUser?["id"].toString(),
+      "group_id": selectedUser,
       "anggota_id": idController.text,
       "name": nameController.text,
       "email": userName.text,
       "password": userPass.text,
     };
-    //print("updateUserAnggota ${payload}");
+    print("updateUserAnggota ${payload}");
     //print(token);
     if (!mounted) return;
     final response = await http.put(
@@ -257,7 +289,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
 
   @override
   Widget build(BuildContext context) {
-    //print(selectedUser);
+    //print("Selected user = $selectedUser");
     if (statusAnggota.isEmpty) {
       warnaUserPanel = Colors.red;
       userName.text = "";
@@ -297,12 +329,12 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                   );
                 },
               ),
-              CustomTextField(
-                controller: groupController,
-                label: "Daurah ID",
-                icon: Icons.group,
-                keyboardType: TextInputType.number,
-              ),
+              // CustomTextField(
+              //   controller: groupController,
+              //   label: "Daurah ID",
+              //   icon: Icons.group,
+              //   keyboardType: TextInputType.number,
+              // ),
               const SizedBox(height: 24),
               Container(
                 decoration: BoxDecoration(
@@ -316,13 +348,14 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 8),
+
                       GroupUserDropdown(
                         value: selectedUser, // default value
                         onChanged: (value) {
-                          setState(() => selectedUser = value);
-                          debugPrint(
-                            "Parent menerima: ${value?["id"]} - ${value?["name"]}",
-                          );
+                          setState(() => selectedUser = value?['id'] as int?);
+                          // debugPrint(
+                          //   "Parent menerima: ${value?["id"]} - ${value?["name"]}",
+                          // );
                         },
                       ),
                       const SizedBox(height: 8),
