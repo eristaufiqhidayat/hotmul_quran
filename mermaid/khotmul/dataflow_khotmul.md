@@ -13,11 +13,11 @@ flowchart TD
     
     %% Status berwarna
     P3 --> |Add Khatam ALL| STATUSKUNING((Status: Kuning))
-    STATUSKUNING:::kuning --> DB[(Database)]
+    STATUSKUNING:::kuning --> DB[(Database API Server)]
     
     %% Dashboard Feedback 
 
-    DB --> |Approv dari admin| STATUSHIJAU((Status: Hijau))
+    DB -.-> |Approv dari admin| STATUSHIJAU((Status: Hijau))
     STATUSHIJAU:::hijau --> P3
     %% Menggunakan subgraph untuk memposisikan DB di bawah
     subgraph BottomSection [ ]
@@ -28,6 +28,7 @@ flowchart TD
     classDef kuning fill:#fff176,stroke:#fbc02d,stroke-width:2px,color:#000,font-weight:bold;
     classDef hijau fill:#6CF527,stroke:#fbc02d,stroke-width:2px,color:#000,font-weight:bold;
     classDef grey fill:#808080,stroke:#fbc02d,stroke-width:2px,color:#000,font-weight:bold;
+    linkStyle 9 stroke:#4CAF50,stroke-width:5px,stroke-dasharray:5 5;
 
 
  
