@@ -2,7 +2,9 @@
 flowchart TD
     User([User/Anggota]) -->|Login & Token| P1((Autentikasi))
     User --> |No Login| Home((Homepage)) 
+    
     P1 -->|Valid Token + anggota_id| P2((Dashboard))
+    
 
     %% Menu di Dashboard
 
