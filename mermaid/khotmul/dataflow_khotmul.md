@@ -12,12 +12,12 @@ flowchart TD
     P2 --> P6(Jadwal Khatam):::grey 
     
     %% Status berwarna
-    P3 --> |Add Khatam ALL| STATUSKUNING((Status: Kuning))
+    P3 --> |Add Khatam ALL| STATUSKUNING((Status: send_voice))
     STATUSKUNING:::kuning --> DB[(Database API Server)]
     
     %% Dashboard Feedback 
 
-    DB -.-> |Approv dari admin| STATUSHIJAU((Status: Hijau))
+    DB -.-> |Approv dari admin| STATUSHIJAU((Status: send_approve))
     STATUSHIJAU:::hijau --> P3
     %% Menggunakan subgraph untuk memposisikan DB di bawah
     subgraph BottomSection [ ]

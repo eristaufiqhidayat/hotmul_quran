@@ -16,11 +16,11 @@ flowchart TD
     P2 --> P10(Laporan):::grey 
     
     %% Status berwarna
-    P5 --> |Fetch Data| DB[(Database API Server)]
+    P5 --> |Fetch Data send_voice| DB[(Database API Server)]
     
     %% Dashboard Feedback 
 
-    DB --> |Approve| STATUSHIJAU((Status: Hijau))
+    DB --> |Approve| STATUSHIJAU((Status: send_approve))
     STATUSHIJAU:::hijau --> P5
     %% Menggunakan subgraph untuk memposisikan DB di bawah
     subgraph BottomSection [ ]
