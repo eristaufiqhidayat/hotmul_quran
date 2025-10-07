@@ -5,20 +5,20 @@ flowchart TD
     P1 -->|Valid Token + anggota_id| P2((Dashboard))
 
     %% Menu di Dashboard
-    P2 --> P4(Donasi)
-    P2 --> P5(Jadwal)
-    P2 --> P6(Reward)
+
     P2 --> P3(Khotmul)
+    P2 --> P4(Donasi):::grey 
+    P2 --> P5(Reward):::grey 
+    P2 --> P6(Jadwal Khatam):::grey 
     
     %% Status berwarna
     P3 --> |Add Khatam ALL| STATUSKUNING((Status: Kuning))
-    STATUSKUNING:::kuning --> |Menunggu Approval Admin Status: Hijau| DB[(Database)]
+    STATUSKUNING:::kuning --> DB[(Database)]
     
     %% Dashboard Feedback 
-    P4--> |Add Donasi|DB
-    DB --> P5
-    DB --> P6
-    
+
+    DB --> |Approv dari admin| STATUSHIJAU((Status: Hijau))
+    STATUSHIJAU:::hijau --> P3
     %% Menggunakan subgraph untuk memposisikan DB di bawah
     subgraph BottomSection [ ]
         DB
@@ -26,6 +26,8 @@ flowchart TD
 
     %% STYLE DEFINITIONS
     classDef kuning fill:#fff176,stroke:#fbc02d,stroke-width:2px,color:#000,font-weight:bold;
+    classDef hijau fill:#6CF527,stroke:#fbc02d,stroke-width:2px,color:#000,font-weight:bold;
+    classDef grey fill:#808080,stroke:#fbc02d,stroke-width:2px,color:#000,font-weight:bold;
 
 
  
