@@ -1,7 +1,7 @@
 name: hotmul_quran
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ^3.8.1
@@ -20,11 +20,12 @@ dependencies:
   # firebase_auth: ^5.3.1
   # firebase_core: ^3.6.0
   google_sign_in: ^6.2.1
-  google_fonts: ^6.2.1
+  # google_fonts: 6.2.1
   flutter_animate: ^4.5.2
   fl_chart: ^0.66.0
   package_info_plus: ^9.0.0
   url_launcher: ^6.3.2
+  provider: ^6.1.5+1
   
 dev_dependencies:
   flutter_native_splash: ^2.4.0

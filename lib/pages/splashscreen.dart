@@ -23,6 +23,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
     _controller!.forward();
 
     Future.delayed(Duration(seconds: 3), () {
+      if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/homepage');
     });
   }

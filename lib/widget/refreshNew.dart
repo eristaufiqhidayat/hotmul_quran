@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 class ActionButtons extends StatelessWidget {
   final VoidCallback onRefresh;
   final VoidCallback onNew;
+  final bool newButton;
 
   const ActionButtons({
     super.key,
     required this.onRefresh,
     required this.onNew,
+    this.newButton = true,
   });
 
   @override
@@ -37,31 +39,33 @@ class ActionButtons extends StatelessWidget {
             ),
           ),
           SizedBox(width: 2),
-          ElevatedButton.icon(
-            onPressed: onNew,
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text(
-              "New",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+          if (newButton == true) ...{
+            ElevatedButton.icon(
+              onPressed: onNew,
+              icon: const Icon(Icons.add, color: Colors.white),
+              label: const Text(
+                "New",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.resolveWith<Color>((
-                Set<MaterialState> states,
-              ) {
-                if (states.contains(MaterialState.pressed)) return Colors.red;
-                if (states.contains(MaterialState.hovered)) {
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith<Color>((
+                  Set<MaterialState> states,
+                ) {
+                  if (states.contains(MaterialState.pressed)) return Colors.red;
+                  if (states.contains(MaterialState.hovered)) {
+                    return Colors.blue.shade900;
+                  }
                   return Colors.blue.shade900;
-                }
-                return Colors.blue.shade900;
-              }),
-              shape: WidgetStateProperty.all(
-                RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                }),
+                shape: WidgetStateProperty.all(
+                  RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                ),
               ),
             ),
-          ),
+          },
         ],
       ),
     );

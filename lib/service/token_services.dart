@@ -12,6 +12,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:http/http.dart' as http;
 
+Future<void> clearToken() async {
+  final prefs = await SharedPreferences.getInstance();
+
+  await prefs.remove('token');
+  await prefs.remove('refresh_token');
+  await prefs.remove('name');
+  await prefs.remove('email');
+  await prefs.remove('anggota_id');
+  await prefs.remove('group_id');
+  await prefs.remove('daurah_id');
+  await prefs.remove('password');
+  await prefs.remove('user_id');
+  await prefs.remove('juz');
+}
+
 Future<void> saveToken(
   String token,
   String refresh_token,
@@ -92,14 +107,15 @@ Future<bool> isTokenExpired(String token) async {
   try {
     final payload = await _parseJwt(token);
     final exp = payload['exp'];
+    print(payload);
     //final exp = 1000;
     if (exp == null) return true;
 
     final expiry = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
 
-    //final now = DateTime.now();
-    //Duration remaining = expiry.difference(now);
-    //print(remaining);
+    final now = DateTime.now();
+    // Duration remaining = expiry.difference(now);
+    // print(remaining);
     return DateTime.now().isAfter(expiry);
   } catch (e) {
     return true;
@@ -137,22 +153,26 @@ Future<String?> getValidAccessToken() async {
   String? accessToken = prefs.getString("access_token");
   //String? refreshToken = prefs.getString("refresh_token");
   //print("Access Token: $accessToken");
-  //print("${GlobalConst.url}/api/v1/refresh");
+
+  // print("${GlobalConst.url}/api/v1/refresh");
+  // print("Access Token: $accessToken");
+
   if (accessToken == null) return null;
 
-  bool expired = await isTokenExpired(accessToken);
+  bool expired = await isTokenExpired(accessToken!);
+  //print("Token expired: $expired");
 
   if (expired) {
     // langsung pakai accessToken lama untuk refresh
-    final newToken = await refreshAccessToken(accessToken);
+    // final newToken = await refreshAccessToken(accessToken);
 
-    if (newToken != null) {
-      await prefs.setString("access_token", newToken);
-      return newToken;
-    } else {
-      await logout();
-      return null;
-    }
+    // if (newToken != null) {
+    //   await prefs.setString("access_token", newToken);
+    //   return newToken;
+    // } else {
+    //   await logout();
+    //   return null;
+    // }
   }
   return accessToken;
 }
@@ -182,6 +202,7 @@ Future<String?> refreshAccessToken(String oldAccessToken) async {
 
 /// Logout user
 Future<void> logout() async {
+  final oldAccessToken = await getToken();
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove("access_token");
   await prefs.remove("refresh_token");
@@ -191,6 +212,14 @@ Future<void> logout() async {
   await prefs.remove("group_id");
   await prefs.remove("daurah_id");
   // misalnya arahkan ke halaman login
+  final response = await http.post(
+    Uri.parse("${GlobalConst.url}/api/logout"),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $oldAccessToken",
+    },
+  );
+  print("Logout response: ${response.statusCode} - ${response.body}");
   navigatorKey.currentState?.pushAndRemoveUntil(
     MaterialPageRoute(builder: (_) => LoginPage()),
     (route) => false,

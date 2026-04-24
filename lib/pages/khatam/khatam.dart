@@ -161,6 +161,7 @@ class _KhatamPageState extends State<KhatamPage> {
           //   ),
           // ),
           ActionButtons(
+            newButton: false,
             onRefresh: () => fetchData(page: currentPage),
             onNew: () {
               Navigator.push(
@@ -230,16 +231,16 @@ class _KhatamPageState extends State<KhatamPage> {
                             }
                           },
                           itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'edit',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit, color: Colors.blue),
-                                  SizedBox(width: 8),
-                                  Text("Update"),
-                                ],
-                              ),
-                            ),
+                            // const PopupMenuItem(
+                            //   value: 'edit',
+                            //   child: Row(
+                            //     children: [
+                            //       Icon(Icons.edit, color: Colors.blue),
+                            //       SizedBox(width: 8),
+                            //       Text("Update"),
+                            //     ],
+                            //   ),
+                            // ),
                             const PopupMenuItem(
                               value: 'approve',
                               child: Row(

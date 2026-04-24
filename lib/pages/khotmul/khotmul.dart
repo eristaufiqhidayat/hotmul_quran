@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use, sort_child_properties_last, non_constant_identifier_names, prefer_typing_uninitialized_variables, unnecessary_brace_in_string_interps, curly_braces_in_flow_control_structures
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart'; // <--- Tambahkan Google Fonts
+// import 'package:google_fonts/google_fonts.dart'; // <--- Tambahkan Google Fonts
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
@@ -26,6 +26,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
   int lastPage = 1;
   List<dynamic> anggota = [];
   bool isLoading = false;
+  bool isGroup = false;
   TextEditingController searchController = TextEditingController();
 
   var juzNumber;
@@ -64,6 +65,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
         anggota = result['data'];
         currentPage = result['current_page'];
         lastPage = result['last_page'];
+        isGroup = true;
       });
     }
 
@@ -128,6 +130,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
       final List<dynamic> dataList = (result['data'] as List<dynamic>?) ?? [];
       setState(() {
         anggota = dataList;
+        isGroup = false;
       });
     }
 
@@ -271,289 +274,419 @@ class _KhotmulPageState extends State<KhotmulPage> {
             ),
 
             // List Data
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.separated(
-                      padding: const EdgeInsets.all(12),
+            isGroup == true
+                ? Expanded(
+                    child: ListView.separated(
+                      shrinkWrap: true,
                       itemCount: anggota.length,
                       itemBuilder: (context, index) {
-                        final item = anggota[index];
                         MaterialColor warna;
                         IconData button;
-                        item['status'] == "" ||
-                                item['status'] == null ||
-                                item['status'] == "send_no"
-                            ? {warna = Colors.red, button = Icons.close}
-                            : item['status'] == "send_voice"
-                            ? {warna = Colors.amber, button = Icons.check}
-                            : {warna = Colors.green, button = Icons.check};
+                        final item = anggota[index];
 
-                        return Column(
-                          children: [
-                            Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                        // Tentukan warna & ikon berdasarkan status
+                        if (item['status'] == "" ||
+                            item['status'] == null ||
+                            item['status'] == "send_no") {
+                          warna = Colors.red;
+                          button = Icons.close;
+                        } else if (item['status'] == "send_voice") {
+                          warna = Colors.amber;
+                          button = Icons.check;
+                        } else {
+                          warna = Colors.green;
+                          button = Icons.check;
+                        }
+
+                        final bool isSelected =
+                            anggota_id == item['anggota_id'].toString();
+
+                        return Container(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Colors.green.shade50
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                blurRadius: 3,
+                                offset: const Offset(0, 2),
                               ),
-                              elevation: 3,
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.all(12),
-                                leading: CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: warna,
-                                  child: Text(
-                                    item['juz'] != null
-                                        ? item['juz'].toString()
-                                        : '-',
-                                    style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 18,
+                                backgroundColor: warna.shade100,
+                                child: Icon(
+                                  button,
+                                  color: warna.shade700,
+                                  size: 18,
                                 ),
-                                title: Text(
-                                  "Juz ${item['juz'] ?? ''}",
-                                  style: GoogleFonts.poppins(
-                                    fontSize:
-                                        anggota_id ==
-                                            item['anggota_id'].toString()
-                                        ? 20
-                                        : 16,
-                                    fontWeight: FontWeight.w600,
-                                    color:
-                                        anggota_id ==
-                                            item['anggota_id'].toString()
-                                        ? Colors.green
-                                        : Colors.black87,
-                                  ),
-                                ),
-                                subtitle: Column(
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Column(
-                                      children: [
-                                        Table(
-                                          columnWidths: const {
-                                            0: FlexColumnWidth(
-                                              2,
-                                            ), // Lebar kolom label
-                                            1: FixedColumnWidth(
-                                              20,
-                                            ), // Lebar kolom tanda :
-                                            2: FlexColumnWidth(
-                                              3,
-                                            ), // Lebar kolom value
-                                          },
-                                          children: [
-                                            TableRow(
-                                              children: [
-                                                Text(
-                                                  "Nama",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 13,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  ":",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 13,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                                anggota_id ==
-                                                        item['anggota_id']
-                                                            .toString()
-                                                    ? Text(
-                                                        "${item['name'] ?? '-'}",
-                                                        style:
-                                                            GoogleFonts.poppins(
-                                                              fontSize: 20,
-                                                              color:
-                                                                  Colors.green,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                      )
-                                                    : Text(
-                                                        "${item['name'] ?? '-'}",
-                                                        style:
-                                                            GoogleFonts.poppins(
-                                                              fontSize: 13,
-                                                              color: Colors
-                                                                  .black87,
-                                                            ),
-                                                      ),
-                                              ],
-                                            ),
-                                            TableRow(
-                                              children: [
-                                                Text(
-                                                  "Group",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 13,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  ":",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 13,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "${item['group_id'] ?? '-'}",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 13,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            TableRow(
-                                              children: [
-                                                Text(
-                                                  "Periode",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 13,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  ":",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 13,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "${item['periode'] ?? '-'}",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 13,
-                                                    color: Colors.black87,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                    Text(
+                                      item['name'] ?? '-',
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: isSelected ? 18 : 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: isSelected
+                                            ? Colors.green.shade800
+                                            : Colors.black87,
+                                      ),
                                     ),
-                                    const SizedBox(height: 6),
-                                    Wrap(
-                                      crossAxisAlignment:
-                                          WrapCrossAlignment.center,
-                                      spacing: 6,
-                                      children: [
-                                        Text(
-                                          warna == Colors.amber
-                                              ? "Status : Sudah Khatam Belum DiApprove "
-                                              : warna == Colors.green
-                                              ? "Status :Sudah Khatam"
-                                              : "Status :Belum Khatam",
-                                          style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w600,
-                                            color: warna,
-                                          ),
-                                        ),
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                            left: 6,
-                                          ),
-                                          padding: const EdgeInsets.all(6),
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            gradient: LinearGradient(
-                                              colors: warna == Colors.green
-                                                  ? [
-                                                      Colors.greenAccent,
-                                                      Colors.green,
-                                                    ]
-                                                  : warna == Colors.amber
-                                                  ? [Colors.amber, Colors.amber]
-                                                  : [
-                                                      Colors.redAccent,
-                                                      Colors.red,
-                                                    ],
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: warna.withOpacity(0.6),
-                                                blurRadius: 8,
-                                                offset: const Offset(0, 3),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Icon(
-                                            button,
-                                            color: Colors.white,
-                                            size: 15,
-                                          ),
-                                        ),
-                                      ],
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      "Juz ${item['juz'] ?? '-'}",
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 14,
+                                        color: Colors.grey[600],
+                                      ),
                                     ),
                                   ],
                                 ),
-                                trailing:
-                                    anggota_id == item['anggota_id'].toString()
-                                    ? PopupMenuButton<String>(
-                                        icon: const Icon(
-                                          Icons.more_vert,
-                                          color: Colors.green,
-                                        ),
-                                        onSelected: (value) async {
-                                          if (value == 'khatam') {
-                                            final result = await Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    JuzAyahPage(
-                                                      juzNumber: item["juz"],
-                                                      khotmulId: item['id'],
-                                                    ),
-                                              ),
-                                            );
-                                            if (result == true) {
-                                              _initData();
-                                            }
-                                          }
-                                        },
-                                        itemBuilder: (context) => [
-                                          const PopupMenuItem(
-                                            value: 'khatam',
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.record_voice_over,
-                                                  color: Colors.green,
-                                                ),
-                                                SizedBox(width: 8),
-                                                Text("Add Khatam"),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    : const SizedBox.shrink(),
                               ),
-                            ),
-                            isAnggota == true
-                                ? ProgressBarKhotmul(
-                                    status: item['status'],
-                                    progress: progress,
-                                    total: (totalAyah!.jumlahAyat + 1),
-                                    done: readAyahs.length,
-                                  )
-                                : SizedBox(),
-                          ],
+                            ],
+                          ),
                         );
                       },
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 8),
+                      separatorBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Divider(height: 1, color: Colors.grey.shade300),
+                      ),
                     ),
-            ),
+                  )
+                : Expanded(
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : ListView.separated(
+                            padding: const EdgeInsets.all(12),
+                            itemCount: anggota.length,
+                            itemBuilder: (context, index) {
+                              final item = anggota[index];
+                              MaterialColor warna;
+                              IconData button;
+                              item['status'] == "" ||
+                                      item['status'] == null ||
+                                      item['status'] == "send_no"
+                                  ? {warna = Colors.red, button = Icons.close}
+                                  : item['status'] == "send_voice"
+                                  ? {warna = Colors.amber, button = Icons.check}
+                                  : {
+                                      warna = Colors.green,
+                                      button = Icons.check,
+                                    };
+
+                              return Column(
+                                children: [
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    elevation: 3,
+                                    child: ListTile(
+                                      contentPadding: const EdgeInsets.all(12),
+                                      leading: CircleAvatar(
+                                        radius: 20,
+                                        backgroundColor: warna,
+                                        child: Text(
+                                          item['juz'] != null
+                                              ? item['juz'].toString()
+                                              : '-',
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      title: Text(
+                                        "Juz ${item['juz'] ?? ''}",
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontSize:
+                                              anggota_id ==
+                                                  item['anggota_id'].toString()
+                                              ? 20
+                                              : 16,
+                                          fontWeight: FontWeight.w600,
+                                          color:
+                                              anggota_id ==
+                                                  item['anggota_id'].toString()
+                                              ? Colors.green
+                                              : Colors.black87,
+                                        ),
+                                      ),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Column(
+                                            children: [
+                                              Table(
+                                                columnWidths: const {
+                                                  0: FlexColumnWidth(
+                                                    2,
+                                                  ), // Lebar kolom label
+                                                  1: FixedColumnWidth(
+                                                    20,
+                                                  ), // Lebar kolom tanda :
+                                                  2: FlexColumnWidth(
+                                                    3,
+                                                  ), // Lebar kolom value
+                                                },
+                                                children: [
+                                                  TableRow(
+                                                    children: [
+                                                      Text(
+                                                        "Nama",
+                                                        style: TextStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize: 13,
+                                                          color: Colors.black87,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        ":",
+                                                        style: TextStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize: 13,
+                                                          color: Colors.black87,
+                                                        ),
+                                                      ),
+                                                      anggota_id ==
+                                                              item['anggota_id']
+                                                                  .toString()
+                                                          ? Text(
+                                                              "${item['name'] ?? '-'}",
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                fontSize: 20,
+                                                                color: Colors
+                                                                    .green,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                              ),
+                                                            )
+                                                          : Text(
+                                                              "${item['name'] ?? '-'}",
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                fontSize: 13,
+                                                                color: Colors
+                                                                    .black87,
+                                                              ),
+                                                            ),
+                                                    ],
+                                                  ),
+                                                  TableRow(
+                                                    children: [
+                                                      Text(
+                                                        "Group",
+                                                        style: TextStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize: 13,
+                                                          color: Colors.black87,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        ":",
+                                                        style: TextStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize: 13,
+                                                          color: Colors.black87,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "${item['group_id'] ?? '-'}",
+                                                        style: TextStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize: 13,
+                                                          color: Colors.black87,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  TableRow(
+                                                    children: [
+                                                      Text(
+                                                        "Periode",
+                                                        style: TextStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize: 13,
+                                                          color: Colors.black87,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        ":",
+                                                        style: TextStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize: 13,
+                                                          color: Colors.black87,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "${item['periode'] ?? '-'}",
+                                                        style: TextStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize: 13,
+                                                          color: Colors.black87,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Wrap(
+                                            crossAxisAlignment:
+                                                WrapCrossAlignment.center,
+                                            spacing: 6,
+                                            children: [
+                                              Text(
+                                                warna == Colors.amber
+                                                    ? "Status : Sudah Khatam Belum DiApprove "
+                                                    : warna == Colors.green
+                                                    ? "Status :Sudah Khatam"
+                                                    : "Status :Belum Khatam",
+                                                style: TextStyle(
+                                                  fontFamily: 'Poppins',
+                                                  fontWeight: FontWeight.w600,
+                                                  color: warna,
+                                                ),
+                                              ),
+                                              Container(
+                                                margin: const EdgeInsets.only(
+                                                  left: 6,
+                                                ),
+                                                padding: const EdgeInsets.all(
+                                                  6,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  gradient: LinearGradient(
+                                                    colors:
+                                                        warna == Colors.green
+                                                        ? [
+                                                            Colors.greenAccent,
+                                                            Colors.green,
+                                                          ]
+                                                        : warna == Colors.amber
+                                                        ? [
+                                                            Colors.amber,
+                                                            Colors.amber,
+                                                          ]
+                                                        : [
+                                                            Colors.redAccent,
+                                                            Colors.red,
+                                                          ],
+                                                  ),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: warna.withOpacity(
+                                                        0.6,
+                                                      ),
+                                                      blurRadius: 8,
+                                                      offset: const Offset(
+                                                        0,
+                                                        3,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Icon(
+                                                  button,
+                                                  color: Colors.white,
+                                                  size: 15,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      trailing:
+                                          anggota_id ==
+                                              item['anggota_id'].toString()
+                                          ? PopupMenuButton<String>(
+                                              icon: const Icon(
+                                                Icons.more_vert,
+                                                color: Colors.green,
+                                              ),
+                                              onSelected: (value) async {
+                                                if (value == 'khatam') {
+                                                  final result =
+                                                      await Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              JuzAyahPage(
+                                                                juzNumber:
+                                                                    item["juz"],
+                                                                khotmulId:
+                                                                    item['id'],
+                                                              ),
+                                                        ),
+                                                      );
+                                                  if (result == true) {
+                                                    _initData();
+                                                  }
+                                                }
+                                              },
+                                              itemBuilder: (context) => [
+                                                const PopupMenuItem(
+                                                  value: 'khatam',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.record_voice_over,
+                                                        color: Colors.green,
+                                                      ),
+                                                      SizedBox(width: 8),
+                                                      Text("Add Khatam"),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ),
+                                  ),
+                                  isAnggota == true
+                                      ? ProgressBarKhotmul(
+                                          status: item['status'],
+                                          progress: progress,
+                                          total: (totalAyah!.jumlahAyat + 1),
+                                          done: readAyahs.length,
+                                        )
+                                      : SizedBox(),
+                                ],
+                              );
+                            },
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 8),
+                          ),
+                  ),
           ],
         ),
       ),

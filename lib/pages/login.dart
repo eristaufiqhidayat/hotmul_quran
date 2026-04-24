@@ -3,9 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/register.dart';
+import 'package:hotmul_quran/providers/auth_provider.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dashboard.dart'; // Import halaman homepage
@@ -42,42 +44,22 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> login() async {
-    setState(() => _loading = true);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
 
-    final response = await http.post(
-      Uri.parse("${GlobalConst.url}/api/v1/login"), // Ganti dengan API kamu
-      body: {
-        "email": _emailController.text,
-        "password": _passwordController.text,
-      },
+    final success = await auth.login(
+      email: _emailController.text,
+      password: _passwordController.text,
     );
 
-    setState(() => _loading = false);
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      //print(data);
-      await saveToken(
-        data['access_token'],
-        data['refresh_token'],
-        data['name'],
-        data['email'],
-        data['anggota_id'].toString(),
-        data['group_id'].toString(),
-        data['daurah_id'].toString(),
-        _passwordController.text,
-        data['user_id'].toString(),
-        data['juz'].toString(),
-      );
+    if (success) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Dashboard()),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        //const SnackBar(content: Text("Login gagal, periksa kembali")),
-        SnackBar(content: Text("${response.body}")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(auth.error ?? "Login gagal")));
     }
   }
 

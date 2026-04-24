@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use, sort_child_properties_last
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart'; // <--- Tambahkan Google Fonts
+// import 'package:google_fonts/google_fonts.dart'; // <--- Tambahkan Google Fonts
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/khotmul/khotmul_crud.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
@@ -114,7 +114,8 @@ class _KhotmulPageState extends State<KhotmulPage> {
               ),
               child: Text(
                 "$i",
-                style: GoogleFonts.poppins(
+                style: TextStyle(
+                  fontFamily: 'Poppins',
                   fontWeight: i == currentPage
                       ? FontWeight.bold
                       : FontWeight.normal,
@@ -125,7 +126,7 @@ class _KhotmulPageState extends State<KhotmulPage> {
           ),
         );
       } else if (i == currentPage - 3 || i == currentPage + 3) {
-        pages.add(Text("...", style: GoogleFonts.poppins()));
+        pages.add(Text("...", style: TextStyle(fontFamily: 'Poppins')));
       }
     }
 
@@ -194,7 +195,8 @@ class _KhotmulPageState extends State<KhotmulPage> {
                               item['juz'] != null
                                   ? item['juz'].toString()
                                   : '-',
-                              style: GoogleFonts.poppins(
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -202,7 +204,8 @@ class _KhotmulPageState extends State<KhotmulPage> {
                           ),
                           title: Text(
                             "Juz ${item['juz'] ?? ''}",
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
                               fontSize:
                                   anggota_id == item['anggota_id'].toString()
                                   ? 20
@@ -235,14 +238,16 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                         children: [
                                           Text(
                                             "Nama",
-                                            style: GoogleFonts.poppins(
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
                                               fontSize: 13,
                                               color: Colors.black87,
                                             ),
                                           ),
                                           Text(
                                             ":",
-                                            style: GoogleFonts.poppins(
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
                                               fontSize: 13,
                                               color: Colors.black87,
                                             ),
@@ -251,7 +256,8 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                                   item['anggota_id'].toString()
                                               ? Text(
                                                   "${item['name'] ?? '-'}",
-                                                  style: GoogleFonts.poppins(
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
                                                     fontSize: 20,
                                                     color: Colors.green,
                                                     fontWeight: FontWeight.w600,
@@ -259,7 +265,8 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                                 )
                                               : Text(
                                                   "${item['name'] ?? '-'}",
-                                                  style: GoogleFonts.poppins(
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
                                                     fontSize: 13,
                                                     color: Colors.black87,
                                                   ),
@@ -270,21 +277,24 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                         children: [
                                           Text(
                                             "Group",
-                                            style: GoogleFonts.poppins(
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
                                               fontSize: 13,
                                               color: Colors.black87,
                                             ),
                                           ),
                                           Text(
                                             ":",
-                                            style: GoogleFonts.poppins(
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
                                               fontSize: 13,
                                               color: Colors.black87,
                                             ),
                                           ),
                                           Text(
                                             "${item['group_id'] ?? '-'}",
-                                            style: GoogleFonts.poppins(
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
                                               fontSize: 13,
                                               color: Colors.black87,
                                             ),
@@ -295,21 +305,24 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                         children: [
                                           Text(
                                             "Periode",
-                                            style: GoogleFonts.poppins(
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
                                               fontSize: 13,
                                               color: Colors.black87,
                                             ),
                                           ),
                                           Text(
                                             ":",
-                                            style: GoogleFonts.poppins(
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
                                               fontSize: 13,
                                               color: Colors.black87,
                                             ),
                                           ),
                                           Text(
                                             "${item['periode'] ?? '-'}",
-                                            style: GoogleFonts.poppins(
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
                                               fontSize: 13,
                                               color: Colors.black87,
                                             ),
@@ -329,7 +342,8 @@ class _KhotmulPageState extends State<KhotmulPage> {
                                     warna == Colors.green
                                         ? "Status : Sudah Khatam"
                                         : "Status : Belum Khatam",
-                                    style: GoogleFonts.poppins(
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w600,
                                       color: warna,
                                     ),

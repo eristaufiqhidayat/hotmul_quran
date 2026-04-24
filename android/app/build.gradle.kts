@@ -12,12 +12,14 @@ android {
     ndkVersion = "27.0.12077973"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        // Target Java 17 (latest LTS). Use toVersion(17) for compatibility across Gradle versions.
+        sourceCompatibility = JavaVersion.toVersion(17)
+        targetCompatibility = JavaVersion.toVersion(17)
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        // Kotlin jvmTarget should match the Java target. Set to "17" for Java 17.
+        jvmTarget = JavaVersion.toVersion(17).toString()
     }
 
     defaultConfig {

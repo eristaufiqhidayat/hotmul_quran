@@ -1,35 +1,68 @@
 import 'package:flutter/material.dart';
-import 'package:hotmul_quran/pages/homepage.dart';
+import 'package:provider/provider.dart';
+
+import 'package:hotmul_quran/providers/auth_provider.dart';
+import 'package:hotmul_quran/service/token_services.dart';
+
 import 'package:hotmul_quran/pages/splashscreen.dart';
-import 'pages/login.dart';
-import 'pages/dashboard.dart';
+import 'package:hotmul_quran/pages/login.dart';
+import 'package:hotmul_quran/pages/dashboard.dart';
+import 'package:hotmul_quran/pages/homepage.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  // 🔐 cek login
+  Future<bool> checkLogin() async {
+    final token = await getToken();
+    return token != null && token.isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      navigatorKey: navigatorKey,
-      title: 'Hotmul Quran',
-      theme: ThemeData(primarySwatch: Colors.green),
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        navigatorKey: navigatorKey,
+        title: 'Hotmul Quran',
+        theme: ThemeData(
+          primarySwatch: Colors.green,
+          fontFamily: 'Poppins', // kalau pakai font lokal
+        ),
 
-      // ✅ Gunakan route
-      initialRoute: '/',
-      routes: {
-        '/': (context) => AnimatedSplashScreen(),
-        '/login': (context) => LoginPage(),
-        '/dashboard': (context) => Dashboard(),
-        '/homepage': (context) => QuranApp(),
-      },
+        home: FutureBuilder<bool>(
+          future: checkLogin(),
+          builder: (context, snapshot) {
+            // ⏳ loading awal
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return AnimatedSplashScreen();
+            }
+
+            // ✅ kalau sudah login
+            if (snapshot.data == true) {
+              return const Dashboard();
+            }
+
+            // ❌ kalau belum login
+            return const LoginPage();
+          },
+        ),
+
+        routes: {
+          '/login': (context) => const LoginPage(),
+          '/dashboard': (context) => const Dashboard(),
+          '/homepage': (context) => const QuranApp(),
+        },
+      ),
     );
   }
 }

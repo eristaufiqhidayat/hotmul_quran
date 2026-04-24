@@ -94,15 +94,15 @@ class _AboutScreenState extends State<AboutScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          'Aplikasi yang dibuat dengan Flutter',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.green[600],
-            fontStyle: FontStyle.italic,
-          ),
-          textAlign: TextAlign.center,
-        ),
+        // Text(
+        //   'Aplikasi yang dibuat dengan Flutter',
+        //   style: TextStyle(
+        //     fontSize: 16,
+        //     color: Colors.green[600],
+        //     fontStyle: FontStyle.italic,
+        //   ),
+        //   textAlign: TextAlign.center,
+        // ),
       ],
     );
   }
@@ -147,7 +147,7 @@ class _AboutScreenState extends State<AboutScreen> {
           const SizedBox(height: 16),
           _buildInfoItem('Versi Aplikasi', _packageInfo.version),
           _buildInfoItem('Build Number', _packageInfo.buildNumber),
-          _buildInfoItem('Package Name', _packageInfo.packageName),
+          // _buildInfoItem('Package Name', _packageInfo.packageName),
         ],
       ),
     );
@@ -218,7 +218,7 @@ class _AboutScreenState extends State<AboutScreen> {
           const SizedBox(height: 16),
           _buildDeveloperItem('Nama', 'Arafah Creative'),
           _buildDeveloperItem('Email', 'eris@lembaharafah.com'),
-          _buildDeveloperItem('Website', 'creative.lembaharafah.com'),
+          _buildDeveloperItem('Website', 'https://creative.lembaharafah.com'),
         ],
       ),
     );
@@ -296,7 +296,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 Icons.language_rounded,
                 'Website',
                 Colors.green[600]!,
-                () => _launchUrl('https://lembaharafah.com'),
+                () => _launchUrl('https://creative.lembaharafah.com'),
               ),
               _buildSocialButton(
                 Icons.share_rounded,
