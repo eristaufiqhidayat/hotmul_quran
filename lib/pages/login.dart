@@ -1,15 +1,11 @@
 // ignore_for_file: use_build_context_synchronously, unnecessary_string_interpolations
 
 import 'package:flutter/material.dart';
-import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/register.dart';
 import 'package:hotmul_quran/providers/auth_provider.dart';
-import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import 'dashboard.dart'; // Import halaman homepage
 
 class LoginPage extends StatefulWidget {
@@ -32,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
     if (savedEmail != null) {
       setState(() {
         _emailController.text = savedEmail;
-        _passwordController.text = savedPassword!; // isi ke textfield
+        _passwordController.text = savedPassword ?? ''; // isi ke textfield
       });
     }
   }
@@ -41,6 +37,22 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _loadEmail(); // ambil dari pref saat pertama kali
+    Future.microtask(() {
+      _checkLoginStatus(); // ✅ tambahkan ini
+    });
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+
+    await auth.checkAuth();
+
+    if (auth.isAuthenticated) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => Dashboard()),
+      );
+    }
   }
 
   Future<void> login() async {
@@ -50,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
       email: _emailController.text,
       password: _passwordController.text,
     );
-
+    print("Login success: $success");
     if (success) {
       Navigator.pushReplacement(
         context,

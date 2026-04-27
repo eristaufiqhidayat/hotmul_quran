@@ -35,7 +35,7 @@ class _AppDrawerState extends State<AppDrawer> {
     final n = await getUser();
     final e = await getEmail();
     final g = await getGroup_id();
-    final a = await getAnggota_id();
+    final a = await getUser_id();
 
     setState(() {
       name = n ?? '';

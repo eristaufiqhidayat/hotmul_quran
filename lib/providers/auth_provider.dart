@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:hotmul_quran/service/api_client.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 
@@ -10,6 +10,8 @@ class AuthProvider with ChangeNotifier {
 
   bool get loading => _loading;
   String? get error => _error;
+  bool get isAuthenticated => _isAuthenticated;
+  bool _isAuthenticated = false;
 
   void _setLoading(bool value) {
     _loading = value;
@@ -26,43 +28,95 @@ class AuthProvider with ChangeNotifier {
     _setError(null);
 
     try {
-      final response = await http.post(
-        Uri.parse("${GlobalConst.url}/api/login"),
-        headers: {"Accept": "application/json"},
+      final response = await ApiClient.post(
+        "${GlobalConst.url}/api/v1/login",
         body: {"email": email, "password": password},
       );
 
-      if (response.statusCode == 200) {
-        final result = json.decode(response.body);
+      print("Login response: ${response.statusCode}");
+      print(response.body);
 
-        final data = result['data'];
-        final user = data['user'];
-
-        await saveToken(
-          data['token'],
-          "",
-          user['name'] ?? '',
-          user['email'] ?? '',
-          user['anggota_id']?.toString() ?? '',
-          user['group_id']?.toString() ?? '',
-          "",
-          password,
-          user['id']?.toString() ?? '',
-          "",
-        );
-
-        _setLoading(false);
-        return true;
-      } else {
-        _setError("Login gagal");
+      /// ❌ kalau bukan 200 → gagal
+      if (response.statusCode != 200) {
+        _setError("Login gagal (${response.statusCode})");
         _setLoading(false);
         return false;
       }
+
+      final result = json.decode(response.body);
+
+      /// ✅ VALIDASI TOKEN (INI KUNCI)
+      if (result['access_token'] == null) {
+        _setError("Token tidak ditemukan");
+        _setLoading(false);
+        return false;
+      }
+      print(result);
+
+      /// ✅ SIMPAN TOKEN
+      await saveToken(
+        result['access_token'] ?? '',
+        result['user']['refresh_token'] ?? '',
+        result['user']['name'] ?? '',
+        result['user']['email'] ?? '',
+        result['user']['anggota_id']?.toString() ?? '',
+        result['user']['role']?.toString() ?? '',
+        result['user']['daurah_id']?.toString() ?? '',
+        password,
+        result['user']['id']?.toString() ?? '',
+        result['user']['juz']?.toString() ?? '',
+      );
+
+      _setLoading(false);
+      return true;
     } catch (e) {
-      _setError(e.toString());
+      print("Login error: $e");
+      _setError("Terjadi kesalahan");
       _setLoading(false);
       return false;
     }
+  }
+
+  bool _isTokenExpired(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return true;
+
+      final payload = utf8.decode(
+        base64Url.decode(base64Url.normalize(parts[1])),
+      );
+      final data = json.decode(payload);
+
+      final exp = data['exp'];
+      if (exp == null) return true;
+
+      final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+      return now > exp;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  Future<void> checkAuth() async {
+    final token = await getToken();
+
+    if (token == null || token.isEmpty) {
+      _isAuthenticated = false;
+      notifyListeners();
+      return;
+    }
+
+    final expired = _isTokenExpired(token);
+
+    if (expired) {
+      await clearToken();
+      _isAuthenticated = false;
+    } else {
+      _isAuthenticated = true;
+    }
+
+    notifyListeners();
   }
 
   Future<void> logout() async {

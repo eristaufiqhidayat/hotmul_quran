@@ -47,11 +47,14 @@ class _RewardPageState extends State<RewardPage> {
     final url = Uri.parse(
       "${GlobalConst.url}/api/v1/reward?group_user=$group_user&user_id=${anggota_id}&page=$page&search=${search ?? ''}",
     );
+    print(
+      "${GlobalConst.url}/api/v1/reward?group_user=$group_user&user_id=${anggota_id}&page=$page&search=${search ?? ''}",
+    );
     final response = await http.get(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
-    //print(response.body);
+    print(response.body);
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
 
@@ -75,7 +78,8 @@ class _RewardPageState extends State<RewardPage> {
 
   Future<void> _loadAnggotaId() async {
     anggota_id = await getAnggota_id();
-    if (mounted) setState(() {});
+    print("anggota_id di reward: $anggota_id");
+    //if (mounted) setState(() {});
   }
 
   Future<void> _loadGroupUser() async {
@@ -155,7 +159,7 @@ class _RewardPageState extends State<RewardPage> {
                       final item = anggota[index];
                       return ListTile(
                         title: Text(
-                          item['group_name'].toString(),
+                          item['anggota_name'].toString(),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -164,7 +168,13 @@ class _RewardPageState extends State<RewardPage> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(formatCurrency.format(int.parse(item["rp"]))),
+                            Text(
+                              formatCurrency.format(
+                                item["rp"] is int
+                                    ? item["rp"]
+                                    : int.tryParse(item["rp"].toString()) ?? 0,
+                              ),
+                            ),
                             Text("Tanggal: ${item['tanggal']}"),
                           ],
                         ),

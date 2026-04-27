@@ -41,6 +41,9 @@ class _AnggotaPageState extends State<AnggotaPage> {
     final url = Uri.parse(
       "${GlobalConst.url}/api/v1/anggota?page=$page&search=${search ?? ''}",
     );
+    print(
+      "${GlobalConst.url}/api/v1/anggota?page=$page&search=${search ?? ''}",
+    );
     final response = await http.get(
       url,
       headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
@@ -143,7 +146,7 @@ class _AnggotaPageState extends State<AnggotaPage> {
                           ),
                         ),
                         subtitle: Text(
-                          "User id : ${item['user_id']}, Daurah : ${item['group_id']}",
+                          "User id : ${item['user_id']}, Daurah : ${item['daurah_id']}",
                         ),
                         trailing: PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, color: Colors.red),
@@ -189,35 +192,10 @@ class _AnggotaPageState extends State<AnggotaPage> {
                                 children: [
                                   Icon(Icons.edit, color: Colors.blue),
                                   SizedBox(width: 8),
-                                  Text("Update"),
+                                  Text("Update Nih"),
                                 ],
                               ),
                             ),
-
-                            //const PopupMenuDivider(),
-                            // const PopupMenuItem(
-                            //   value: 'khatam',
-                            //   child: Row(
-                            //     children: [
-                            //       Icon(Icons.check_circle, color: Colors.green),
-                            //       SizedBox(width: 8),
-                            //       Text("Add Khatam"),
-                            //     ],
-                            //   ),
-                            // ),
-                            // const PopupMenuItem(
-                            //   value: 'donasi',
-                            //   child: Row(
-                            //     children: [
-                            //       Icon(
-                            //         Icons.account_balance_wallet,
-                            //         color: Colors.purple,
-                            //       ),
-                            //       SizedBox(width: 8),
-                            //       Text("Add Donasi"),
-                            //     ],
-                            //   ),
-                            // ),
                           ],
                         ),
                       );

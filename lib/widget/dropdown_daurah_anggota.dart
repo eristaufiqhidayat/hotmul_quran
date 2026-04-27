@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
-import 'package:hotmul_quran/service/token_services.dart';
-import 'package:http/http.dart' as http;
+
+import '../service/api_client.dart';
 
 class daurahDropdown extends StatefulWidget {
   final void Function(Map<String, dynamic>?)? onChanged; // callback ke parent
@@ -28,28 +28,44 @@ class _daurahDropdownState extends State<daurahDropdown> {
   }
 
   Future<void> fetchGroupUsers() async {
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/daurah");
+    // ignore: unused_local_variable
+    bool isLoading = true;
+    try {
+      final response = await ApiClient.get("${GlobalConst.url}/api/v1/daurah");
+      // print("Response daurah group: ${response.body}");
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
 
-    final response = await http.get(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-    );
+        final data = body is Map<String, dynamic> && body.containsKey("data")
+            ? body["data"]
+            : body;
 
-    if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
+        setState(() {
+          if (data is List) {
+            groupUsers = List<Map<String, dynamic>>.from(data);
+          } else if (data is Map) {
+            groupUsers = [Map<String, dynamic>.from(data)];
+          } else {
+            groupUsers = [];
+          }
 
-      final data = body is Map<String, dynamic> && body.containsKey("data")
-          ? body["data"]
-          : body;
+          // default value
+          if (widget.value != null) {
+            selectedGroupId = widget.value;
+          } else {
+            selectedGroupId = groupUsers.isNotEmpty
+                ? groupUsers.first["daurah_id"]
+                : null;
+          }
 
-      setState(() {
-        groupUsers = List<Map<String, dynamic>>.from(data);
-        if (selectedGroupId != null &&
-            !groupUsers.any((user) => user["group_id"] == selectedGroupId)) {
-          selectedGroupId = null;
-        }
-      });
+          isLoading = false;
+        });
+      } else {
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      print("ERROR DAURAH: $e");
+      setState(() => isLoading = false);
     }
   }
 

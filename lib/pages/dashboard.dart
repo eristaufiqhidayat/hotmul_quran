@@ -16,7 +16,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  int? groupId; // nilai dari local
+  String? groupId; // nilai dari local
   bool isLoading = true;
   var user_id;
   var countUnread;
@@ -35,7 +35,7 @@ class _DashboardState extends State<Dashboard> {
     final idString = await getGroup_id();
     //print(idString); // fungsi dari token_services.dart
     setState(() {
-      groupId = int.tryParse(idString ?? "0"); // kalau null → 0
+      groupId = idString ?? "0"; // kalau null → "0"
       isLoading = false;
     });
   }
@@ -43,25 +43,7 @@ class _DashboardState extends State<Dashboard> {
   Future<void> _user_id() async {
     final idString = await getUser_id();
     user_id = int.tryParse(idString ?? "0"); // ✅ conv
-    try {
-      final unread = await getUnredCount(user_id);
-      if (mounted) {
-        setState(() {
-          countUnread = unread; // simpan sebagai int
-        });
-        MessageService().getInbox(user_id).then((inboxList) {
-          setState(() {
-            _inboxFuture = Future.value(inboxList);
-          });
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          // Handle error state
-        });
-      }
-    }
+    print("user_id di dashboard: $user_id");
   }
 
   Future<int> getUnredCount(int user_id) async {
@@ -77,11 +59,13 @@ class _DashboardState extends State<Dashboard> {
     }
 
     // kasih default value 0 kalau null
-    final gId = groupId ?? 0;
+    final gId = groupId ?? "0";
+    print("groupId di dashboard: $gId");
 
+    // ambil count unread
     // pilih menu berdasarkan groupId
-    final items = gId == 1 ? menuItems : menuItems2;
-    final onClick = gId == 1 ? onMenuClick : onMenuClick2;
+    final items = gId == 'admin' ? menuItems : menuItems2;
+    final onClick = gId == 'admin' ? onMenuClick : onMenuClick2;
 
     return Scaffold(
       drawer: AppDrawer(),

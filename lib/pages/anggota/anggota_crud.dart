@@ -4,14 +4,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
+import 'package:hotmul_quran/service/api_client.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
-import 'package:hotmul_quran/widget/bulletText.dart';
 import 'package:hotmul_quran/widget/custom_textfile.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/widget/dropdown_daurah_anggota.dart';
 import 'package:hotmul_quran/widget/dropdown_groupUser.dart';
-import 'package:http/http.dart' as http;
 
 class EditAnggotaPage extends StatefulWidget {
   final Map<String, dynamic> anggota;
@@ -27,6 +26,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
   late TextEditingController idController;
   late TextEditingController groupController;
   late TextEditingController userName;
+  late TextEditingController email;
   late TextEditingController userPass;
   bool cekDataPro = false;
   Map<String, dynamic> statusAnggota = {};
@@ -35,41 +35,42 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
   int? selectedUser;
   Map<String, dynamic>? daurah;
   String? group_id;
+  bool isChangePassword = false;
 
   @override
   void initState() {
     super.initState();
+    print(widget.anggota['name']);
     _initData();
     //print(widget.anggota);
     nameController = TextEditingController(text: widget.anggota['name']);
     idController = TextEditingController(
-      text: widget.anggota['user_id'] != null
-          ? widget.anggota['user_id'].toString()
-          : "",
+      text: widget.anggota['id'] != null ? widget.anggota['id'].toString() : "",
     );
     groupController = TextEditingController(
-      text: widget.anggota['group_id'].toString(),
+      text: widget.anggota['group_id']?.toString() ?? "",
     );
     userName = TextEditingController(text: widget.anggota['name']);
     userPass = TextEditingController(text: "password");
+    email = TextEditingController(text: widget.anggota['email']);
     cekData(anggota_id: widget.anggota['user_id'] ?? 1);
     //pri
     if (widget.daurah_id != null) {
       daurah = {
-        "group_id": widget.daurah_id,
-        "group_name": "Daurah ${widget.daurah_id}",
+        "daurah_id": widget.daurah_id,
+        "daurah_name": "Daurah ${widget.daurah_id}",
       };
     } else {
       daurah = {
-        "group_id": widget.anggota['group_id'],
-        "group_name": "Daurah ${widget.anggota['group_id']}",
+        "daurah_id": widget.anggota['daurah_id'],
+        "daurah_name": "Daurah ${widget.anggota['daurah_id']}",
       };
     }
     //print(daurah);
   }
 
   Future<void> checkGroup({String? anggota_id}) async {
-    if (!mounted) return;
+    if (!mounted || anggota_id == null) return;
 
     final token = await getValidAccessToken();
 
@@ -78,50 +79,41 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       return;
     }
 
-    final url = Uri.parse(
+    final response = await ApiClient.post(
       "${GlobalConst.url}/api/v1/cekAnggota?anggota_id=$anggota_id",
     );
-    //print("${GlobalConst.url}/api/v1/cekAnggota?anggota_id=$anggota_id");
-    final response = await http.post(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-    );
-    //print("Group id ${response.body}");
+
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
-      int groupId = result['data']['group_id'];
-      //group_id = groupId.toString();
-      setState(() {
-        selectedUser = groupId;
-      });
+
+      final data = result['data'];
+
+      if (data != null && data['group_id'] != null) {
+        setState(() {
+          selectedUser = data['group_id'];
+        });
+      } else {
+        setState(() {
+          selectedUser = null;
+        });
+      }
+    } else {
+      print("Error response: ${response.body}");
     }
   }
 
   Future<void> _initData() async {
-    checkGroup(anggota_id: widget.anggota['user_id']?.toString());
+    final userId = widget.anggota['user_id'];
+
+    if (userId != null) {
+      checkGroup(anggota_id: userId.toString());
+    }
     //print("Group id dari token: $group_id");
   }
 
   Future<void> saveDelete() async {
-    final token = await getToken();
-    final url = Uri.parse(
+    final response = await ApiClient.delete(
       "${GlobalConst.url}/api/v1/anggota/${idController.text}",
-    );
-
-    final payload = {
-      "user_id": idController.text,
-      "name": nameController.text,
-      "group_id": daurah?["group_id"].toString(),
-    };
-
-    final response = await http.delete(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json", // penting
-      },
-      body: jsonEncode(payload), // jadi JSON
     );
 
     if (response.statusCode == 200) {
@@ -134,65 +126,21 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
   }
 
   Future<void> saveEdit() async {
-    final token = await getToken();
-    final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/anggota/${idController.text}",
-    );
-
-    final payload = {
-      "user_id": idController.text,
-      "name": nameController.text,
-      "group_id": daurah?["group_id"].toString(), // dari dropdown
-    };
-    //print("Save edit $payload");
-    final response = await http.put(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json", // penting
-      },
-      body: jsonEncode(payload), // jadi JSON
-    );
-    //print(response.body);
-    if (!mounted) return;
-
-    if (response.statusCode == 200) {
-      Navigator.pop(context, true);
-      if (userName.text.isNotEmpty &&
-          userPass.text.isNotEmpty &&
-          statusAnggota['email'] == null) {
-        addUserAnggota();
-      } else {
-        updateUserAnggota();
-      }
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Gagal update data")));
-    }
+    updateUserAnggota();
   }
 
   Future<void> addUserAnggota() async {
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/addUserAnggota");
-
     final payload = {
       "anggota_id": idController.text,
       "name": nameController.text,
       "email": userName.text,
       "password": userPass.text,
     };
-    print("add user anggota $payload");
+
     //print(token);
-    final response = await http.post(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json", // penting
-      },
-      body: jsonEncode(payload), // jadi JSON
+    final response = await ApiClient.post(
+      "${GlobalConst.url}/api/v1/addUserAnggota",
+      body: payload, // jadi JSON
     );
 
     if (response.statusCode == 200) {
@@ -205,24 +153,16 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
   }
 
   Future<void> addAnggota() async {
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/anggota");
-
     final payload = {
       "name": nameController.text,
-      "group_id": widget.daurah_id.toString(),
+      "daurah_id": widget.daurah_id,
     };
     print("Add Anggota $payload");
-    final response = await http.post(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json", // penting
-      },
-      body: jsonEncode(payload), // jadi JSON
+    final response = await ApiClient.post(
+      "${GlobalConst.url}/api/v1/anggota",
+      body: payload,
     );
-
+    print(response.body);
     if (response.statusCode == 201) {
       Navigator.pop(context, true);
     } else {
@@ -234,30 +174,27 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
 
   Future<void> updateUserAnggota() async {
     if (!mounted) return;
-    final token = await getToken();
-    final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/updateUser/${statusAnggota["user_id"]}",
-    );
-    print("${GlobalConst.url}/api/v1/updateUser/${statusAnggota["user_id"]}");
     final payload = {
       "group_id": selectedUser,
-      "anggota_id": idController.text,
+      "id": idController.text,
       "name": nameController.text,
-      "email": userName.text,
-      "password": userPass.text,
+      "email": email.text,
+      "daurah_id": daurah?["group_id"],
     };
+
+    // hanya kirim password kalau dicentang
+    if (isChangePassword && userPass.text.isNotEmpty) {
+      payload["password"] = userPass.text;
+    }
+
     print("updateUserAnggota ${payload}");
     //print(token);
     if (!mounted) return;
-    final response = await http.put(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json", // penting
-      },
-      body: jsonEncode(payload), // jadi JSON
+    final response = await ApiClient.put(
+      "${GlobalConst.url}/api/v1/updateUser/${idController.text}",
+      body: payload,
     );
+    print(response.body);
     if (!mounted) return;
     if (response.statusCode == 200) {
       Navigator.pop(context, true);
@@ -270,13 +207,8 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
 
   Future<void> cekData({required int anggota_id}) async {
     setState(() => cekDataPro = true);
-    final token = await getToken(); // Ambil token dari SharedPreferences
-    final url = Uri.parse(
+    final response = await ApiClient.post(
       "${GlobalConst.url}/api/v1/cekAnggota?anggota_id=$anggota_id",
-    );
-    final response = await http.post(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
     );
     //print(response.body);
     if (response.statusCode == 200) {
@@ -289,16 +221,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
 
   @override
   Widget build(BuildContext context) {
-    //print("Selected user = $selectedUser");
-    if (statusAnggota.isEmpty) {
-      warnaUserPanel = Colors.red;
-      userName.text = "";
-      userPass.text = "";
-    } else {
-      warnaUserPanel = Colors.blue;
-      userName.text = statusAnggota['email'] ?? "";
-      userPass.text = statusAnggota['password'] ?? "";
-    }
+    warnaUserPanel = Colors.blue;
     return Scaffold(
       endDrawer: AppDrawer(),
       appBar: PrimaryAppBar(title: "Edit Anggota"),
@@ -319,22 +242,16 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                 label: "Nama Lengkap",
                 icon: Icons.person,
               ),
-              const SizedBox(height: 16),
               daurahDropdown(
-                value: daurah?["group_id"] as int?, // default value
+                value: daurah?["daurah_id"] as int?, // default value
                 onChanged: (value) {
                   setState(() => daurah = value);
                   debugPrint(
-                    "Parent menerima: ${value?["group_id"]} - ${value?["group_name"]}",
+                    "Parent menerima: ${value?["daurah_id"]} - ${value?["daurah_name"]}",
                   );
                 },
               ),
-              // CustomTextField(
-              //   controller: groupController,
-              //   label: "Daurah ID",
-              //   icon: Icons.group,
-              //   keyboardType: TextInputType.number,
-              // ),
+
               const SizedBox(height: 24),
               Container(
                 decoration: BoxDecoration(
@@ -350,31 +267,49 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                       const SizedBox(height: 8),
 
                       GroupUserDropdown(
-                        value: selectedUser, // default value
+                        value: widget.anggota['group_id'], // default value
                         onChanged: (value) {
                           setState(() => selectedUser = value?['id'] as int?);
-                          // debugPrint(
-                          //   "Parent menerima: ${value?["id"]} - ${value?["name"]}",
-                          // );
                         },
                       ),
-                      const SizedBox(height: 8),
+
+                      const SizedBox(height: 2),
                       const Text(
-                        "Username",
+                        "Email",
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ), // biar teks kelihatan
                       ),
                       TextField(
-                        controller: userName,
+                        controller: email,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           filled: true, // aktifkan warna background
                           fillColor: Colors.white, // biar kotak input putih
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: isChangePassword,
+                            onChanged: (value) {
+                              setState(() {
+                                isChangePassword = value ?? false;
+                                if (!isChangePassword) {
+                                  userPass
+                                      .clear(); // reset kalau tidak jadi ganti
+                                }
+                              });
+                            },
+                          ),
+                          const Text(
+                            "Ganti Password",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
                       const Text(
                         "Password",
                         style: TextStyle(
@@ -383,6 +318,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                         ),
                       ),
                       TextField(
+                        enabled: isChangePassword,
                         controller: userPass,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
@@ -395,17 +331,6 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                     ],
                   ),
                 ),
-              ),
-              BulletText(
-                text:
-                    "Warna panel biru berarti anggota sudah memiliki user login",
-                color: Colors.blue.shade900,
-              ),
-
-              BulletText(
-                text:
-                    "Warna panel merah berarti anggota belum memiliki user login",
-                color: Colors.red.shade900,
               ),
 
               const SizedBox(height: 32),

@@ -1,23 +1,16 @@
 // services/api_service.dart
 import 'dart:convert';
-import 'package:hotmul_quran/service/token_services.dart';
-import 'package:http/http.dart' as http;
+import 'package:hotmul_quran/service/api_client.dart';
 import 'package:hotmul_quran/model/daurah_graph_report.dart';
 
 class ApiService {
   static const String baseUrl = 'https://hotmulquran.paud-arabika.com/api/v1';
 
   Future<List<DaurahData>> getDaurahData() async {
-    final token = await getValidAccessToken();
     //print(baseUrl);
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/getDaurahData'),
-        headers: {
-          "Accept": "application/json",
-          "Authorization": "Bearer $token",
-        },
-      );
+      final response = await ApiClient.get('$baseUrl/getDaurahData');
+
       //print(response.body);
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);

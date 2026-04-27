@@ -8,7 +8,7 @@ import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/custom_textfile.dart';
 import 'package:hotmul_quran/widget/datetimepicker.dart';
-import 'package:http/http.dart' as http;
+import 'package:hotmul_quran/service/api_client.dart';
 
 class EditRewardPage extends StatefulWidget {
   final Map<String, dynamic> anggota;
@@ -51,18 +51,12 @@ class _EditRewardPageState extends State<EditRewardPage> {
 
     // ambil list groups untuk dropdown
     fetchGroups();
-    //fetchUsers();
+    fetchUsers();
     _loadGroupUser();
   }
 
   Future<void> fetchUsers() async {
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/anggota");
-
-    final response = await http.get(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-    );
+    final response = await ApiClient.get("${GlobalConst.url}/api/v1/anggota");
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
 
@@ -82,28 +76,20 @@ class _EditRewardPageState extends State<EditRewardPage> {
   }
 
   Future<void> fetchGroups() async {
-    if (!mounted) return; // amanin sebelum masuk
-    setState(() {
-      isLoadingGroups = true;
-    });
+    if (!mounted) return;
+
+    setState(() => isLoadingGroups = true);
 
     try {
-      final token = await getToken();
-      final url = Uri.parse("${GlobalConst.url}/api/v1/anggota2");
-
-      final response = await http.get(
-        url,
-        headers: {
-          "Accept": "application/json",
-          "Authorization": "Bearer $token",
-        },
+      final response = await ApiClient.get(
+        "${GlobalConst.url}/api/v1/anggota2",
       );
 
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
 
         List<dynamic> list;
-        if (body is Map && body.containsKey('data') && body['data'] is List) {
+        if (body is Map && body['data'] is List) {
           list = body['data'];
         } else if (body is List) {
           list = body;
@@ -111,9 +97,11 @@ class _EditRewardPageState extends State<EditRewardPage> {
           list = [];
         }
 
-        if (!mounted) return; // <--- tambah ini
+        if (!mounted) return;
+
         setState(() {
           groups = list;
+
           if (selectedUserId != null) {
             final exists = groups.any(
               (g) => g['user_id']?.toString() == selectedUserId,
@@ -130,22 +118,16 @@ class _EditRewardPageState extends State<EditRewardPage> {
           }
         });
       } else {
-        if (!mounted) return; // <--- tambah ini
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Gagal memuat daftar group')),
-        );
+        throw Exception("Gagal load group");
       }
     } catch (e) {
-      debugPrint('fetchGroups error: $e');
-      if (!mounted) return; // <--- tambah ini
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error saat memuat daftar group')),
-      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
     } finally {
-      if (!mounted) return; // <--- tambah ini
-      setState(() {
-        isLoadingGroups = false;
-      });
+      if (!mounted) return;
+      setState(() => isLoadingGroups = false);
     }
   }
 
@@ -156,29 +138,23 @@ class _EditRewardPageState extends State<EditRewardPage> {
   }
 
   Future<void> saveDelete() async {
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/reward/${id.text}");
+    try {
+      final response = await ApiClient.delete(
+        "${GlobalConst.url}/api/v1/reward/${id.text}",
+      );
 
-    final payload = {"id": id.text};
-
-    final response = await http.delete(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode(payload),
-    );
-
-    if (response.statusCode == 200) {
       if (!mounted) return;
-      Navigator.pop(context, true);
-    } else {
+
+      if (response.statusCode == 200) {
+        Navigator.pop(context, true);
+      } else {
+        throw Exception("Gagal hapus");
+      }
+    } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Gagal hapus data")));
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
@@ -190,33 +166,34 @@ class _EditRewardPageState extends State<EditRewardPage> {
       return;
     }
 
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/reward/${id.text}");
-
     final payload = {
-      "user_id": selectedUserId,
+      "anggota_id": selectedUserId,
       "rp": rp.text,
       "tanggal": tanggal.text,
     };
-    //print(payload);
-    final response = await http.put(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode(payload),
-    );
-    //print(response.body);
-    //debugPrint('saveEdit resp: ${response.statusCode} ${response.body}');
-    if (!mounted) return;
-    if (response.statusCode == 200) {
-      Navigator.pop(context, true);
-    } else {
+    print("Payload untuk update: $payload");
+    try {
+      final response = await ApiClient.put(
+        "${GlobalConst.url}/api/v1/reward/${id.text}",
+        body: payload, // ✅ WAJIB pakai body:
+      );
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        Navigator.pop(context, true);
+      } else {
+        final body = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(body['message'] ?? "Gagal simpan data")),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Gagal simpan data")));
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
@@ -228,33 +205,36 @@ class _EditRewardPageState extends State<EditRewardPage> {
       return;
     }
 
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/reward/");
-
     final payload = {
-      "user_id": selectedUserId,
+      "anggota_id": selectedUserId, // ⬅️ samakan dengan backend (penting!)
       "rp": rp.text,
       "tanggal": tanggal.text,
     };
 
-    final response = await http.post(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode(payload),
-    );
+    try {
+      final response = await ApiClient.post(
+        "${GlobalConst.url}/api/v1/reward",
+        body: payload, // ✅ WAJIB pakai body:
+      );
 
-    debugPrint('saveNew resp: ${response.statusCode} ${response.body}');
-    if (!mounted) return;
-    if (response.statusCode == 200) {
-      Navigator.pop(context, true);
-    } else {
+      debugPrint('saveNew resp: ${response.statusCode} ${response.body}');
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Navigator.pop(context, true);
+      } else {
+        final body = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(body['message'] ?? "Gagal simpan data")),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Gagal simpan new data")));
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
@@ -289,23 +269,29 @@ class _EditRewardPageState extends State<EditRewardPage> {
                   )
                 : DropdownButtonFormField<String>(
                     value:
-                        groups.any(
-                          (g) => g['user_id']?.toString() == selectedUserId,
-                        )
+                        selectedUserId != null &&
+                            groups.any(
+                              (g) =>
+                                  g['anggota_id']?.toString() == selectedUserId,
+                            )
                         ? selectedUserId
                         : null,
                     decoration: const InputDecoration(
                       labelText: "Pilih User / Group",
                       border: OutlineInputBorder(),
                     ),
-                    items: groups.map<DropdownMenuItem<String>>((item) {
-                      final val = item['user_id']?.toString();
-                      name = item;
-                      return DropdownMenuItem<String>(
-                        value: val,
-                        child: Text(_groupLabel(item)),
-                      );
-                    }).toList(),
+                    items: groups
+                        .where(
+                          (item) => item['anggota_id'] != null,
+                        ) // ⬅️ filter null
+                        .map<DropdownMenuItem<String>>((item) {
+                          final val = item['anggota_id'].toString();
+                          return DropdownMenuItem<String>(
+                            value: val,
+                            child: Text(_groupLabel(item)),
+                          );
+                        })
+                        .toList(),
                     onChanged: group_user != "1"
                         ? null
                         : (value) {

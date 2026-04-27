@@ -84,7 +84,9 @@ class _GroupUserDropdownState extends State<GroupUserDropdown> {
                   "Silakan pilih group user",
                   style: TextStyle(color: Colors.grey),
                 ),
-                value: widget.value,
+                value: groupUsers.any((e) => e["id"] == selectedUser)
+                    ? selectedUser
+                    : null,
                 dropdownColor: Colors.white,
                 isExpanded: true,
                 items: groupUsers.map((user) {

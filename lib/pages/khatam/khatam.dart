@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use, sort_child_properties_last
-
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/khatam/khatam_crud.dart';
@@ -7,9 +5,7 @@ import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:hotmul_quran/service/token_services.dart';
+import 'package:hotmul_quran/service/api_client.dart';
 
 class KhatamPage extends StatefulWidget {
   const KhatamPage({super.key});
@@ -23,71 +19,66 @@ class _KhatamPageState extends State<KhatamPage> {
   int lastPage = 1;
   List<dynamic> anggota = [];
   bool isLoading = false;
+
   TextEditingController searchController = TextEditingController();
 
+  /// FETCH DATA (REFRACTOR)
   Future<void> fetchData({int page = 1, String? search}) async {
     if (!mounted) return;
+
     setState(() => isLoading = true);
 
-    final token = await getValidAccessToken();
+    try {
+      final response = await ApiClient.get(
+        "${GlobalConst.url}/api/v1/khatam?page=$page&search=${search ?? ''}",
+      );
 
-    if (token == null) {
-      // token kosong, langsung logout dan balik ke login
-      await logout();
-      return;
-      // hentikan proses
+      if (response.statusCode == 200) {
+        final result = ApiClient.decode(response);
+
+        setState(() {
+          anggota = result['data'];
+          currentPage = result['current_page'];
+          lastPage = result['last_page'];
+        });
+      }
+    } catch (e) {
+      if (e.toString().contains("Unauthorized")) {
+        _redirectToLogin();
+      }
     }
 
-    // Ambil token dari SharedPreferences
-    final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/khatam?page=$page&search=${search ?? ''}",
-    );
-    final response = await http.get(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-    );
-    //print(response.body);
-    if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-
-      setState(() {
-        anggota = result['data'];
-        currentPage = result['current_page'];
-        lastPage = result['last_page'];
-      });
+    if (mounted) {
+      setState(() => isLoading = false);
     }
-
-    setState(() => isLoading = false);
   }
 
+  /// APPROVE DATA (REFRACTOR)
   Future<void> approveData({int? id}) async {
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/khotmul/updateStatus/$id");
-    print("${GlobalConst.url}/api/v1/khotmul/updateStatus/$id");
-    var payload = {"status": "send_approve"};
+    try {
+      final response = await ApiClient.post(
+        "${GlobalConst.url}/api/v1/khotmul/updateStatus/$id",
+        body: {"status": "send_approve"},
+      );
 
-    print(payload);
-    final response = await http.post(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json", // penting
-      },
-      body: jsonEncode(payload), // jadi JSON
-    );
-    //print(response.body);
-    if (!mounted) return;
-    if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Approved")));
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Gagal Approved")));
+      }
+    } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Approved")));
-      //Navigator.pop(context, true);
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Gagal Approved")));
+      ).showSnackBar(const SnackBar(content: Text("Error server")));
     }
+  }
+
+  void _redirectToLogin() {
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 
   @override
@@ -137,29 +128,7 @@ class _KhatamPageState extends State<KhatamPage> {
       endDrawer: AppDrawer(),
       appBar: PrimaryAppBar(title: "Khatam"),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Tombol Refresh + Add
-          const SizedBox(width: 50),
-
-          // ElevatedButton(
-          //   onPressed: () {},
-          //   child: const Icon(Icons.refresh, color: Colors.white),
-          //   style: ButtonStyle(
-          //     backgroundColor: MaterialStateProperty.resolveWith<Color>((
-          //       Set<MaterialState> states,
-          //     ) {
-          //       if (states.contains(MaterialState.pressed)) return Colors.red;
-          //       if (states.contains(MaterialState.hovered)) {
-          //         return Colors.blue.shade900;
-          //       }
-          //       return Colors.blue.shade900;
-          //     }),
-          //     shape: MaterialStateProperty.all(
-          //       RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-          //     ),
-          //   ),
-          // ),
           ActionButtons(
             newButton: false,
             onRefresh: () => fetchData(page: currentPage),
@@ -174,12 +143,14 @@ class _KhatamPageState extends State<KhatamPage> {
               });
             },
           ),
+
           SearchFieldWidget(
             controller: searchController,
             onSubmitted: (value) => fetchData(page: 1, search: value),
           ),
+
           const SizedBox(height: 10),
-          // List Data
+
           Expanded(
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -187,10 +158,11 @@ class _KhatamPageState extends State<KhatamPage> {
                     itemCount: anggota.length,
                     itemBuilder: (context, index) {
                       final item = anggota[index];
+
                       return ListTile(
                         title: Text(
                           item['name'].toString(),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
@@ -208,40 +180,14 @@ class _KhatamPageState extends State<KhatamPage> {
                         trailing: PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, color: Colors.red),
                           onSelected: (value) {
-                            if (value == 'edit') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditKhatamPage(anggota: item),
-                                ),
-                              ).then((updated) {
-                                if (updated == true) {
-                                  fetchData(
-                                    page: currentPage,
-                                  ); // refresh list kalau ada update
-                                }
+                            if (value == 'approve') {
+                              approveData(id: item['id']).then((_) {
+                                fetchData(page: currentPage);
                               });
-                            } else {
-                              if (value == 'approve') {
-                                approveData(id: item['id']).then((_) {
-                                  fetchData(page: currentPage);
-                                });
-                              }
                             }
                           },
-                          itemBuilder: (context) => [
-                            // const PopupMenuItem(
-                            //   value: 'edit',
-                            //   child: Row(
-                            //     children: [
-                            //       Icon(Icons.edit, color: Colors.blue),
-                            //       SizedBox(width: 8),
-                            //       Text("Update"),
-                            //     ],
-                            //   ),
-                            // ),
-                            const PopupMenuItem(
+                          itemBuilder: (context) => const [
+                            PopupMenuItem(
                               value: 'approve',
                               child: Row(
                                 children: [
@@ -260,7 +206,6 @@ class _KhatamPageState extends State<KhatamPage> {
                   ),
           ),
 
-          // Pagination
           Padding(padding: const EdgeInsets.all(8.0), child: buildPagination()),
         ],
       ),

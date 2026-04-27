@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use, sort_child_properties_last
-
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/anggota/anggota_crud.dart';
@@ -7,9 +5,7 @@ import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:hotmul_quran/service/token_services.dart';
+import 'package:hotmul_quran/service/api_client.dart';
 
 class ListAnggotaPage extends StatefulWidget {
   final int group_id;
@@ -24,39 +20,43 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
   int lastPage = 1;
   List<dynamic> anggota = [];
   bool isLoading = false;
+
   TextEditingController searchController = TextEditingController();
 
+  /// FETCH DATA (REFRACTOR)
   Future<void> fetchData({int page = 1, String? search}) async {
     if (!mounted) return;
+
     setState(() => isLoading = true);
 
-    final token = await getValidAccessToken();
+    try {
+      final response = await ApiClient.get(
+        "${GlobalConst.url}/api/v1/anggota?group_id=${widget.group_id}&page=$page&search=${search ?? ''}",
+      );
 
-    if (token == null) {
-      // token kosong, langsung logout dan balik ke login
-      await logout();
-      return;
-      // hentikan proses
+      if (response.statusCode == 200) {
+        final result = ApiClient.decode(response);
+
+        setState(() {
+          anggota = result['data'];
+          currentPage = result['current_page'];
+          lastPage = result['last_page'];
+        });
+      }
+    } catch (e) {
+      if (e.toString().contains("Unauthorized")) {
+        _redirectToLogin();
+      }
     }
 
-    final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/anggota?group_id=${widget.group_id}&page=$page&search=${search ?? ''}",
-    );
-    final response = await http.get(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-    );
-    //print(response.body);
-    if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-      setState(() {
-        anggota = result['data'];
-        currentPage = result['current_page'];
-        lastPage = result['last_page'];
-      });
+    if (mounted) {
+      setState(() => isLoading = false);
     }
+  }
 
-    setState(() => isLoading = false);
+  /// AUTO LOGOUT / REDIRECT
+  void _redirectToLogin() {
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 
   @override
@@ -107,7 +107,6 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
       appBar: PrimaryAppBar(title: "Anggota"),
       body: Column(
         children: [
-          // Tombol Refresh + Add
           ActionButtons(
             onRefresh: () => fetchData(page: currentPage),
             onNew: () {
@@ -122,13 +121,14 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
               });
             },
           ),
+
           SearchFieldWidget(
             controller: searchController,
             onSubmitted: (value) => fetchData(page: 1, search: value),
           ),
+
           const SizedBox(height: 10),
 
-          // List Data
           Expanded(
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -137,13 +137,12 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
                     itemBuilder: (context, index) {
                       final item = anggota[index];
 
-                      // ambil per_page dari API (kalau ada), default 10 biar aman
                       final int perPage = anggota.isNotEmpty
                           ? anggota.length
                           : 10;
 
-                      // hitung no urut
                       final noUrut = (index + 1) + (currentPage - 1) * perPage;
+
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundColor: Colors.blue,
@@ -157,14 +156,14 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
                         ),
                         title: Text(
                           item['name'] ?? "",
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
                           ),
                         ),
-                        subtitle: Text(
-                          "User id : ${item['user_id']}, Daurah : ${item['group_id']}",
-                        ),
+                        // subtitle: Text(
+                        //   "User id : ${item['user_id']}, Daurah : ${item['daurah_id']}",
+                        // ),
                         trailing: PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, color: Colors.red),
                           onSelected: (value) {
@@ -177,9 +176,7 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
                                 ),
                               ).then((updated) {
                                 if (updated == true) {
-                                  fetchData(
-                                    page: currentPage,
-                                  ); // refresh list kalau ada update
+                                  fetchData(page: currentPage);
                                 }
                               });
                             } else if (value == 'delete') {
@@ -202,8 +199,8 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
                               );
                             }
                           },
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
+                          itemBuilder: (context) => const [
+                            PopupMenuItem(
                               value: 'edit',
                               child: Row(
                                 children: [
@@ -213,9 +210,8 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
                                 ],
                               ),
                             ),
-
-                            const PopupMenuDivider(),
-                            const PopupMenuItem(
+                            PopupMenuDivider(),
+                            PopupMenuItem(
                               value: 'khatam',
                               child: Row(
                                 children: [
@@ -225,7 +221,7 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
                                 ],
                               ),
                             ),
-                            const PopupMenuItem(
+                            PopupMenuItem(
                               value: 'donasi',
                               child: Row(
                                 children: [
@@ -247,7 +243,6 @@ class _ListAnggotaPageState extends State<ListAnggotaPage> {
                   ),
           ),
 
-          // Pagination
           Padding(padding: const EdgeInsets.all(8.0), child: buildPagination()),
         ],
       ),
