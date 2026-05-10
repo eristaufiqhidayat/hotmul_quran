@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/login.dart';
+import 'package:hotmul_quran/widget/appbar_widget.dart';
 import 'package:http/http.dart' as http;
 
 class RegisterPage extends StatefulWidget {
@@ -94,11 +95,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.green.shade50,
-      appBar: AppBar(
-        title: const Text("Register"),
-        centerTitle: true,
-        backgroundColor: Colors.green.shade700,
-      ),
+      appBar: AppBarCustom(title: "Register"),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),

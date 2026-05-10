@@ -49,8 +49,8 @@ class _SetoranHafalanPageState extends State<SetoranHafalanPage> {
     final body = jsonDecode(response.body);
 
     setState(() {
-      assignmentId = body['assignment_id'];
-      juz = body['juz'];
+      assignmentId = int.tryParse(body['assignment_id'].toString());
+      juz = int.tryParse(body['juz'].toString()) ?? 0;
       isLoading = false;
     });
   }
@@ -61,7 +61,7 @@ class _SetoranHafalanPageState extends State<SetoranHafalanPage> {
     setState(() => isSubmit = true);
 
     final response = await ApiClient.post(
-      "${GlobalConst.url}/api/hafalan",
+      "${GlobalConst.url}/api/v1/hafalan",
       body: {
         "assignment_id": assignmentId.toString(),
         "ayat_from": ayatFromController.text,
@@ -69,7 +69,7 @@ class _SetoranHafalanPageState extends State<SetoranHafalanPage> {
         "keterangan": catatanController.text,
       },
     );
-
+    print("SUBMIT RESPONSE: ${response.body}");
     setState(() => isSubmit = false);
 
     if (response.statusCode == 200) {
@@ -80,6 +80,8 @@ class _SetoranHafalanPageState extends State<SetoranHafalanPage> {
       ayatFromController.clear();
       ayatToController.clear();
       catatanController.clear();
+      Navigator.pop(context, true);
+      print("POP TRUE DIKIRIM");
     } else {
       ScaffoldMessenger.of(
         context,
@@ -89,6 +91,14 @@ class _SetoranHafalanPageState extends State<SetoranHafalanPage> {
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map;
+
+    final targetAyat = args['target_ayat'];
+    final juzTotal = args['juz'];
+    ayatFromController.text = "1";
+    ayatToController.text = targetAyat.toString();
+    catatanController.text =
+        "Setoran untuk Juz $juzTotal, Ayat 1 sampai $targetAyat";
     return Scaffold(
       appBar: AppBarCustom(title: "Setoran Hafalan"),
       body: isLoading
@@ -148,6 +158,11 @@ class _SetoranHafalanPageState extends State<SetoranHafalanPage> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                        ),
                         onPressed: isSubmit ? null : submit,
                         child: isSubmit
                             ? const CircularProgressIndicator(

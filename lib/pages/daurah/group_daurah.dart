@@ -33,7 +33,7 @@ class _DaurahPageState extends State<DaurahPage> {
       final response = await ApiClient.get(
         "${GlobalConst.url}/api/v1/daurah?page=$page&search=${search ?? ''}",
       );
-
+      print("Response daurah group: ${response.body}");
       if (response.statusCode == 200) {
         final result = ApiClient.decode(response);
 
@@ -147,8 +147,8 @@ class _DaurahPageState extends State<DaurahPage> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Daurah id : ${item['daurah_id']}"),
-                            Text("Jumlah Anggota : ${item['total_user']}"),
+                            Text("Daurah id : ${item['id']}"),
+                            Text("Jumlah Anggota : ${item['users_count']}"),
                           ],
                         ),
                         trailing: PopupMenuButton<String>(
@@ -170,9 +170,8 @@ class _DaurahPageState extends State<DaurahPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ListAnggotaPage(
-                                    group_id: item["group_id"],
-                                  ),
+                                  builder: (context) =>
+                                      ListAnggotaPage(group_id: item["id"]),
                                 ),
                               ).then((updated) {
                                 if (updated == true) {

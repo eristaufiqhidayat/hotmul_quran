@@ -1,7 +1,7 @@
 name: hotmul_quran
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.0+2
+version: 1.0.0+6
 
 environment:
   sdk: ^3.8.1
@@ -28,7 +28,7 @@ dependencies:
   provider: ^6.1.5+1
   
 dev_dependencies:
-  flutter_native_splash: ^2.4.0
+  flutter_native_splash: ^2.4.6
   flutter_launcher_icons: ^0.14.3
   flutter_test:
     sdk: flutter
@@ -53,3 +53,5 @@ flutter:
   assets:
     - assets/logo.png
     - assets/images/logo.png
+    - assets/habib-hasan.jpeg
+    - assets/barcode.jpeg

@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
+import 'package:hotmul_quran/service/api_client.dart';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/custom_textfile.dart';
@@ -57,13 +58,7 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
   }
 
   Future<void> fetchUsers() async {
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/anggota");
-
-    final response = await http.get(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-    );
+    final response = await ApiClient.get("${GlobalConst.url}/api/v1/anggota");
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
 
@@ -89,15 +84,8 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
     });
 
     try {
-      final token = await getToken();
-      final url = Uri.parse("${GlobalConst.url}/api/v1/anggota2");
-
-      final response = await http.get(
-        url,
-        headers: {
-          "Accept": "application/json",
-          "Authorization": "Bearer $token",
-        },
+      final response = await ApiClient.get(
+        "${GlobalConst.url}/api/v1/anggota2",
       );
 
       if (response.statusCode == 200) {
@@ -114,19 +102,27 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
 
         if (!mounted) return; // <--- tambah ini
         setState(() {
-          groups = list;
-          if (selectedUserId != null) {
-            final exists = groups.any(
-              (g) => g['user_id']?.toString() == selectedUserId,
-            );
-            if (!exists) {
-              selectedUserId = groups.isNotEmpty
-                  ? groups[0]['user_id']?.toString()
-                  : null;
+          final Map<String, Map<String, dynamic>> map = {};
+
+          for (var g in list) {
+            final id = g['id']?.toString(); // 🔥 pakai ID, bukan user_id
+            if (id != null) {
+              map[id] = g; // otomatis buang duplicate
             }
+          }
+
+          groups = map.values.toList();
+
+          // 🔥 VALIDASI selected
+          if (selectedUserId != null &&
+              groups
+                      .where((g) => g['id']?.toString() == selectedUserId)
+                      .length ==
+                  1) {
+            // aman
           } else {
             selectedUserId = groups.isNotEmpty
-                ? groups[0]['user_id']?.toString()
+                ? groups.first['id']?.toString()
                 : null;
           }
         });
@@ -157,19 +153,8 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
   }
 
   Future<void> saveDelete() async {
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/donasi/${id.text}");
-
-    final payload = {"id": id.text};
-
-    final response = await http.delete(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode(payload),
+    final response = await ApiClient.delete(
+      "${GlobalConst.url}/api/v1/donasi/${id.text}",
     );
 
     if (response.statusCode == 200) {
@@ -191,23 +176,16 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
       return;
     }
 
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/donasi/${id.text}");
-
     final payload = {
       "user_id": selectedUserId,
       "rp": rp.text,
       "tanggal": tanggal.text,
     };
     //print(payload);
-    final response = await http.put(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode(payload),
+    final response = await ApiClient.put(
+      "${GlobalConst.url}/api/v1/donasi/${id.text}",
+
+      body: payload,
     );
     //print(response.body);
     //debugPrint('saveEdit resp: ${response.statusCode} ${response.body}');
@@ -229,23 +207,15 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
       return;
     }
 
-    final token = await getToken();
-    final url = Uri.parse("${GlobalConst.url}/api/v1/donasi/");
-
     final payload = {
       "user_id": selectedUserId,
       "rp": rp.text,
       "tanggal": tanggal.text,
     };
 
-    final response = await http.post(
-      url,
-      headers: {
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode(payload),
+    final response = await ApiClient.post(
+      "${GlobalConst.url}/api/v1/donasi/",
+      body: payload,
     );
 
     debugPrint('saveNew resp: ${response.statusCode} ${response.body}');
@@ -291,9 +261,12 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
                   )
                 : DropdownButtonFormField<String>(
                     value:
-                        groups.any(
-                          (g) => g['user_id']?.toString() == selectedUserId,
-                        )
+                        groups
+                                .where(
+                                  (g) => g['id']?.toString() == selectedUserId,
+                                )
+                                .length ==
+                            1
                         ? selectedUserId
                         : null,
                     decoration: const InputDecoration(
@@ -301,20 +274,18 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
                       border: OutlineInputBorder(),
                     ),
                     items: groups.map<DropdownMenuItem<String>>((item) {
-                      final val = item['user_id']?.toString();
-                      name = item;
+                      final val = item['id']?.toString(); // 🔥 pakai id
+
                       return DropdownMenuItem<String>(
                         value: val,
                         child: Text(_groupLabel(item)),
                       );
                     }).toList(),
-                    onChanged: group_user != "1"
-                        ? null
-                        : (value) {
-                            setState(() {
-                              selectedUserId = value;
-                            });
-                          },
+                    onChanged: (value) {
+                      setState(() {
+                        selectedUserId = value;
+                      });
+                    },
                   ),
             const SizedBox(height: 24),
             CustomTextField(controller: rp, label: "Rp", icon: Icons.person),

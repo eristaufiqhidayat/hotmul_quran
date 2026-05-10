@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class ActionButtons extends StatelessWidget {
   final VoidCallback onRefresh;
-  final VoidCallback onNew;
+  final VoidCallback? onNew;
   final bool newButton;
 
   const ActionButtons({

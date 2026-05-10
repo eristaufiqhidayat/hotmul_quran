@@ -11,6 +11,7 @@ import 'package:hotmul_quran/pages/laporan_hapalan_page.dart';
 import 'package:hotmul_quran/pages/report/report.dart';
 import 'package:hotmul_quran/pages/reward/reward.dart';
 import 'package:hotmul_quran/pages/setor_hafalan_page.dart';
+import 'package:hotmul_quran/pages/setoranListPage.dart';
 //import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
 
 //import 'package:hotmul_quran/widget/drawer.dart';
@@ -32,7 +33,7 @@ final List<MenuItem> menuItems = [
 ];
 
 final List<MenuItem> menuItems2 = [
-  MenuItem('Khotmul', Icons.person),
+  MenuItem('Setoran Hafalan', Icons.person),
   MenuItem('Donasi', Icons.credit_card),
   MenuItem('Jadwal Khatam', Icons.calendar_today),
   MenuItem('Reward', Icons.card_giftcard),
@@ -97,10 +98,10 @@ void onMenuClick(BuildContext context, String title) {
 
 void onMenuClick2(BuildContext context, String title) {
   switch (title) {
-    case 'Khotmul':
+    case 'Setoran Hafalan':
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => SetoranHafalanPage()),
+        MaterialPageRoute(builder: (context) => SetoranListPage()),
       );
       break;
     case 'Donasi':
@@ -124,7 +125,8 @@ void onMenuClick2(BuildContext context, String title) {
     case 'Laporan':
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ReportMain()),
+        //MaterialPageRoute(builder: (context) => ReportMain()),
+        MaterialPageRoute(builder: (context) => LaporanHafalanPage()),
       );
       break;
     default:

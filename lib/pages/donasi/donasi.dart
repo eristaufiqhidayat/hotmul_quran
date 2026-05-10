@@ -3,11 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/donasi/donasi_crud.dart';
+import 'package:hotmul_quran/service/api_client.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
 import 'package:hotmul_quran/widget/searchbar.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:hotmul_quran/service/token_services.dart';
 import 'package:intl/intl.dart';
@@ -20,6 +20,7 @@ class DonasiPage extends StatefulWidget {
 }
 
 class _DonasiPageState extends State<DonasiPage> {
+  String? groupId; // nilai dari local
   int currentPage = 1;
   int lastPage = 1;
   List<dynamic> anggota = [];
@@ -45,14 +46,11 @@ class _DonasiPageState extends State<DonasiPage> {
       // hentikan proses
     }
 
-    final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/donasi?group_user=$group_user&user_id=${anggota_id}&page=$page&search=${search ?? ''}",
+    final response = await ApiClient.get(
+      "${GlobalConst.url}/api/v1/donasi?groupid=$groupId",
     );
-    final response = await http.get(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
-    );
-    //print(response.body);
+    print("${GlobalConst.url}/api/v1/donasi?groupid=$groupId");
+    print(response.body);
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
 
@@ -69,19 +67,24 @@ class _DonasiPageState extends State<DonasiPage> {
   @override
   void initState() {
     super.initState();
-    fetchData();
-    _loadAnggotaId();
-    _loadGroupUser();
+    initLoad();
   }
 
-  Future<void> _loadAnggotaId() async {
+  Future<void> initLoad() async {
+    _loadGroupId();
     anggota_id = await getAnggota_id();
-    if (mounted) setState(() {});
+    group_user = await getGroup_id();
+
+    await fetchData();
   }
 
-  Future<void> _loadGroupUser() async {
-    group_user = await getGroup_id();
-    if (mounted) setState(() {});
+  Future<void> _loadGroupId() async {
+    final idString = await getGroup_id();
+    //print(idString); // fungsi dari token_services.dart
+    setState(() {
+      groupId = idString ?? "0"; // kalau null → "0"
+      isLoading = false;
+    });
   }
 
   Widget buildPagination() {
@@ -121,25 +124,32 @@ class _DonasiPageState extends State<DonasiPage> {
 
   @override
   Widget build(BuildContext context) {
+    print("Group ID: $groupId");
     return Scaffold(
       endDrawer: AppDrawer(),
       appBar: PrimaryAppBar(title: "Donasi"),
       body: Column(
         children: [
           // Tombol Refresh + Add
-          ActionButtons(
-            onRefresh: () => fetchData(page: currentPage),
-            onNew: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditDonasiPage(anggota: {}),
+          groupId == "member"
+              ? ActionButtons(
+                  onRefresh: () => fetchData(page: currentPage),
+                  onNew: null,
+                  newButton: false, // atau bahkan ga perlu dikirim
+                )
+              : ActionButtons(
+                  onRefresh: () => fetchData(page: currentPage),
+                  onNew: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditDonasiPage(anggota: {}),
+                      ),
+                    ).then((updated) {
+                      if (updated == true) fetchData(page: currentPage);
+                    });
+                  },
                 ),
-              ).then((updated) {
-                if (updated == true) fetchData(page: currentPage);
-              });
-            },
-          ),
           SearchFieldWidget(
             controller: searchController,
             onSubmitted: (value) => fetchData(page: 1, search: value),
@@ -157,7 +167,7 @@ class _DonasiPageState extends State<DonasiPage> {
                       final item = anggota[index];
                       return ListTile(
                         title: Text(
-                          item['group_name'].toString(),
+                          item['name'].toString(),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -166,43 +176,53 @@ class _DonasiPageState extends State<DonasiPage> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(formatCurrency.format(int.parse(item["rp"]))),
+                            Text(
+                              formatCurrency.format(
+                                int.tryParse(item["rp"]?.toString() ?? '0') ??
+                                    0,
+                              ),
+                            ),
                             Text("Tanggal: ${item['tanggal']}"),
                           ],
                         ),
                         isThreeLine: true,
-                        trailing: PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_vert, color: Colors.red),
-                          onSelected: (value) {
-                            if (value == 'edit') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditDonasiPage(anggota: item),
+                        trailing: groupId == "admin"
+                            ? PopupMenuButton<String>(
+                                icon: const Icon(
+                                  Icons.more_vert,
+                                  color: Colors.red,
                                 ),
-                              ).then((updated) {
-                                if (updated == true) {
-                                  fetchData(
-                                    page: currentPage,
-                                  ); // refresh list kalau ada update
-                                }
-                              });
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'edit',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.edit, color: Colors.blue),
-                                  SizedBox(width: 8),
-                                  Text("Update"),
+                                onSelected: (value) {
+                                  if (value == 'edit') {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            EditDonasiPage(anggota: item),
+                                      ),
+                                    ).then((updated) {
+                                      if (updated == true) {
+                                        fetchData(
+                                          page: currentPage,
+                                        ); // refresh list kalau ada update
+                                      }
+                                    });
+                                  }
+                                },
+                                itemBuilder: (context) => [
+                                  const PopupMenuItem(
+                                    value: 'edit',
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.edit, color: Colors.blue),
+                                        SizedBox(width: 8),
+                                        Text("Update"),
+                                      ],
+                                    ),
+                                  ),
                                 ],
-                              ),
-                            ),
-                          ],
-                        ),
+                              )
+                            : null,
                       );
                     },
                     separatorBuilder: (context, index) =>

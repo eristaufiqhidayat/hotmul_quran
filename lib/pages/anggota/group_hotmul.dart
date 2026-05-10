@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/anggota/anggota_crud.dart';
+import 'package:hotmul_quran/service/api_client.dart';
 import 'package:hotmul_quran/widget/appbar.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 import 'package:hotmul_quran/widget/refreshNew.dart';
@@ -29,24 +30,11 @@ class _AnggotaPageState extends State<AnggotaPage> {
     if (!mounted) return;
     setState(() => isLoading = true);
 
-    final token = await getValidAccessToken();
-
-    if (token == null) {
-      // token kosong, langsung logout dan balik ke login
-      await logout();
-      return;
-      // hentikan proses
-    }
-
-    final url = Uri.parse(
-      "${GlobalConst.url}/api/v1/anggota?page=$page&search=${search ?? ''}",
-    );
     print(
       "${GlobalConst.url}/api/v1/anggota?page=$page&search=${search ?? ''}",
     );
-    final response = await http.get(
-      url,
-      headers: {"Accept": "application/json", "Authorization": "Bearer $token"},
+    final response = await ApiClient.get(
+      "${GlobalConst.url}/api/v1/anggota?page=$page&search=${search ?? ''}",
     );
     //print(response.body);
     if (response.statusCode == 200) {
@@ -113,6 +101,7 @@ class _AnggotaPageState extends State<AnggotaPage> {
           ActionButtons(
             onRefresh: () => fetchData(page: currentPage),
             onNew: () {
+              print("New Anggota");
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -146,7 +135,7 @@ class _AnggotaPageState extends State<AnggotaPage> {
                           ),
                         ),
                         subtitle: Text(
-                          "User id : ${item['user_id']}, Daurah : ${item['daurah_id']}",
+                          "User id : ${item['id']}, Daurah : ${item['group_id']}",
                         ),
                         trailing: PopupMenuButton<String>(
                           icon: const Icon(Icons.more_vert, color: Colors.red),

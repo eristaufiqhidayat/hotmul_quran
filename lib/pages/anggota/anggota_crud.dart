@@ -33,82 +33,31 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
   late MaterialColor warnaUserPanel;
   List<Map<String, dynamic>> groupUsers = [];
   int? selectedUser;
-  Map<String, dynamic>? daurah;
+  int? selectedGroupId;
   String? group_id;
+  String? selectedRole;
   bool isChangePassword = false;
 
   @override
   void initState() {
     super.initState();
-    print(widget.anggota['name']);
     _initData();
-    //print(widget.anggota);
+  }
+
+  Future<void> _initData() async {
+    selectedRole = widget.anggota['role'];
+
     nameController = TextEditingController(text: widget.anggota['name']);
     idController = TextEditingController(
       text: widget.anggota['id'] != null ? widget.anggota['id'].toString() : "",
     );
-    groupController = TextEditingController(
-      text: widget.anggota['group_id']?.toString() ?? "",
-    );
+
     userName = TextEditingController(text: widget.anggota['name']);
     userPass = TextEditingController(text: "password");
-    email = TextEditingController(text: widget.anggota['email']);
-    cekData(anggota_id: widget.anggota['user_id'] ?? 1);
-    //pri
-    if (widget.daurah_id != null) {
-      daurah = {
-        "daurah_id": widget.daurah_id,
-        "daurah_name": "Daurah ${widget.daurah_id}",
-      };
-    } else {
-      daurah = {
-        "daurah_id": widget.anggota['daurah_id'],
-        "daurah_name": "Daurah ${widget.anggota['daurah_id']}",
-      };
-    }
-    //print(daurah);
-  }
-
-  Future<void> checkGroup({String? anggota_id}) async {
-    if (!mounted || anggota_id == null) return;
-
-    final token = await getValidAccessToken();
-
-    if (token == null) {
-      await logout();
-      return;
-    }
-
-    final response = await ApiClient.post(
-      "${GlobalConst.url}/api/v1/cekAnggota?anggota_id=$anggota_id",
-    );
-
-    if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-
-      final data = result['data'];
-
-      if (data != null && data['group_id'] != null) {
-        setState(() {
-          selectedUser = data['group_id'];
-        });
-      } else {
-        setState(() {
-          selectedUser = null;
-        });
-      }
-    } else {
-      print("Error response: ${response.body}");
-    }
-  }
-
-  Future<void> _initData() async {
-    final userId = widget.anggota['user_id'];
-
-    if (userId != null) {
-      checkGroup(anggota_id: userId.toString());
-    }
-    //print("Group id dari token: $group_id");
+    email = TextEditingController(
+      text: widget.anggota['email'],
+    ); // inisialisasi daurah dengan group_id
+    selectedGroupId = widget.anggota['group_id']; //print(daurah);
   }
 
   Future<void> saveDelete() async {
@@ -129,37 +78,17 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
     updateUserAnggota();
   }
 
-  Future<void> addUserAnggota() async {
-    final payload = {
-      "anggota_id": idController.text,
-      "name": nameController.text,
-      "email": userName.text,
-      "password": userPass.text,
-    };
-
-    //print(token);
-    final response = await ApiClient.post(
-      "${GlobalConst.url}/api/v1/addUserAnggota",
-      body: payload, // jadi JSON
-    );
-
-    if (response.statusCode == 200) {
-      Navigator.pop(context, true);
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Gagal update User Login")));
-    }
-  }
-
   Future<void> addAnggota() async {
     final payload = {
       "name": nameController.text,
-      "daurah_id": widget.daurah_id,
+      "email": email.text,
+      "password": userPass.text,
+      "role": selectedRole,
+      "group_id": selectedGroupId,
     };
     print("Add Anggota $payload");
     final response = await ApiClient.post(
-      "${GlobalConst.url}/api/v1/anggota",
+      "${GlobalConst.url}/api/v1/register",
       body: payload,
     );
     print(response.body);
@@ -175,11 +104,11 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
   Future<void> updateUserAnggota() async {
     if (!mounted) return;
     final payload = {
-      "group_id": selectedUser,
       "id": idController.text,
       "name": nameController.text,
       "email": email.text,
-      "daurah_id": daurah?["group_id"],
+      "role": selectedRole,
+      "group_id": selectedGroupId, // tetap pakai role lama
     };
 
     // hanya kirim password kalau dicentang
@@ -194,6 +123,7 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
       "${GlobalConst.url}/api/v1/updateUser/${idController.text}",
       body: payload,
     );
+    print("${GlobalConst.url}/api/v1/updateUser/${idController.text}");
     print(response.body);
     if (!mounted) return;
     if (response.statusCode == 200) {
@@ -203,20 +133,6 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
         context,
       ).showSnackBar(const SnackBar(content: Text("Gagal update User Login")));
     }
-  }
-
-  Future<void> cekData({required int anggota_id}) async {
-    setState(() => cekDataPro = true);
-    final response = await ApiClient.post(
-      "${GlobalConst.url}/api/v1/cekAnggota?anggota_id=$anggota_id",
-    );
-    //print(response.body);
-    if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-      statusAnggota = result['data'] ?? {};
-    }
-
-    setState(() => cekDataPro = false);
   }
 
   @override
@@ -243,12 +159,12 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                 icon: Icons.person,
               ),
               daurahDropdown(
-                value: daurah?["daurah_id"] as int?, // default value
+                value: selectedGroupId,
                 onChanged: (value) {
-                  setState(() => daurah = value);
-                  debugPrint(
-                    "Parent menerima: ${value?["daurah_id"]} - ${value?["daurah_name"]}",
-                  );
+                  setState(() {
+                    selectedGroupId = value;
+                  });
+                  print("Selected group_id: $value");
                 },
               ),
 
@@ -266,10 +182,13 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                     children: [
                       const SizedBox(height: 8),
 
-                      GroupUserDropdown(
-                        value: widget.anggota['group_id'], // default value
-                        onChanged: (value) {
-                          setState(() => selectedUser = value?['id'] as int?);
+                      RoleDropdown(
+                        value: selectedRole, // default
+                        onChanged: (val) {
+                          setState(() {
+                            selectedRole = val;
+                          });
+                          print("Selected role: $val");
                         },
                       ),
 

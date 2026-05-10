@@ -864,3 +864,21 @@ height="2.133784995625547in"}
 > aktif.\
 > ✅ **Mendorong partisipasi** melalui reward yang terlihat.\
 > ✅ **Mempertahankan konsistensi** jadwal rolling 2 minggu.
+
+
+catatan 
+- data di berikan xls , email (dummy) -> diperbaiki oleh user sendiri
+- badal di di approve oleh admin
+
+
+catatan sql
+SELECT 
+    u.name,
+    u.group_id,
+    u.id,
+    ja.juz_number,
+    ja.status
+FROM users u
+JOIN juz_assignments ja 
+    ON u.id = ja.user_id
+    where u.group_id = 1;

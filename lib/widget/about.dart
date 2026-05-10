@@ -56,6 +56,8 @@ class _AboutScreenState extends State<AboutScreen> {
             const SizedBox(height: 32),
             _buildDeveloperInfo(),
             const SizedBox(height: 32),
+            _buildBarcode(),
+            const SizedBox(height: 32),
             _buildSocialLinks(),
           ],
         ),
@@ -65,11 +67,10 @@ class _AboutScreenState extends State<AboutScreen> {
 
   Widget _buildAppIcon() {
     return Container(
-      width: 120,
-      height: 120,
+      width: 200,
       decoration: BoxDecoration(
         color: Colors.green[500],
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(60), // bikin oval
         boxShadow: [
           BoxShadow(
             color: Colors.green[300]!.withOpacity(0.5),
@@ -78,7 +79,10 @@ class _AboutScreenState extends State<AboutScreen> {
           ),
         ],
       ),
-      child: const Icon(Icons.apps_rounded, size: 60, color: Colors.white),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(60),
+        child: Image.asset('assets/habib-hasan.jpeg', fit: BoxFit.cover),
+      ),
     );
   }
 
@@ -94,15 +98,15 @@ class _AboutScreenState extends State<AboutScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        // Text(
-        //   'Aplikasi yang dibuat dengan Flutter',
-        //   style: TextStyle(
-        //     fontSize: 16,
-        //     color: Colors.green[600],
-        //     fontStyle: FontStyle.italic,
-        //   ),
-        //   textAlign: TextAlign.center,
-        // ),
+        Text(
+          'Alhabib Hasan bin Abu Bakar Bin Salim',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.green[600],
+            fontStyle: FontStyle.italic,
+          ),
+          textAlign: TextAlign.center,
+        ),
       ],
     );
   }
@@ -216,9 +220,9 @@ class _AboutScreenState extends State<AboutScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          _buildDeveloperItem('Nama', 'Arafah Creative'),
-          _buildDeveloperItem('Email', 'eris@lembaharafah.com'),
-          _buildDeveloperItem('Website', 'https://creative.lembaharafah.com'),
+          _buildDeveloperItem('Project Leader', 'Wiyono'),
+          _buildDeveloperItem('Project Designer', 'Aang Sunarto, S.Pd.I,MM '),
+          _buildDeveloperItem('Programmer', 'Eris Taufiq H, MT'),
         ],
       ),
     );
@@ -305,6 +309,62 @@ class _AboutScreenState extends State<AboutScreen> {
                 _shareApp,
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBarcode() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green[100]!,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(color: Colors.green[200]!),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(Icons.qr_code, color: Colors.green[600], size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Donasi & Dukungan Applikasi',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green[700],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          /// 🔥 IMAGE BARCODE
+          Text(
+            'BCA No. 1640507302',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.green[700],
+            ),
+          ),
+          Text(
+            'a/n Eris Taufiq H',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.green[700],
+            ),
           ),
         ],
       ),

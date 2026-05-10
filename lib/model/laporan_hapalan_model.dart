@@ -1,5 +1,4 @@
 class LaporanHafalan {
-  final int userId;
   final String name;
   final int juz;
   final int progress;
@@ -7,7 +6,6 @@ class LaporanHafalan {
   final String lastInput;
 
   LaporanHafalan({
-    required this.userId,
     required this.name,
     required this.juz,
     required this.progress,
@@ -17,12 +15,11 @@ class LaporanHafalan {
 
   factory LaporanHafalan.fromJson(Map<String, dynamic> json) {
     return LaporanHafalan(
-      userId: json['user_id'],
-      name: json['name'],
-      juz: json['juz'],
-      progress: json['progress'],
-      status: json['status'],
-      lastInput: json['last_input'] ?? '-',
+      name: json['name'] ?? '',
+      juz: int.tryParse(json['juz'].toString()) ?? 0,
+      progress: int.tryParse(json['progress'].toString()) ?? 0,
+      status: json['status'] ?? '',
+      lastInput: json['last_input'] ?? '',
     );
   }
 }

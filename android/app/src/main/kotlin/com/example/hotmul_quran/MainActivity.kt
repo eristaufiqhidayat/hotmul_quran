@@ -1,4 +1,4 @@
-package com.example.hotmul_quran
+package com.eris.hotmul_quran
 
 import io.flutter.embedding.android.FlutterActivity
 

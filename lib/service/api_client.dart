@@ -9,7 +9,7 @@ class ApiClient {
   /// GET
   static Future<http.Response> get(String url) async {
     final token = await getToken();
-    print(token);
+    //print(token);
     final response = await http
         .get(Uri.parse(url), headers: _headers(token))
         .timeout(timeout);

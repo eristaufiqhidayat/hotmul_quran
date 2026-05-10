@@ -121,32 +121,34 @@ class _AppDrawerState extends State<AppDrawer> {
                   radius: 30,
                 ),
                 const SizedBox(width: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name.isNotEmpty ? name : "Tamu",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name.isNotEmpty ? name : "Tamu",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      email.isNotEmpty ? email : "-",
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
+                      Text(
+                        email.isNotEmpty ? email : "-",
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                    Text(
-                      groupId.isNotEmpty ? "Group id $groupId" : "",
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 14,
+                      Text(
+                        groupId.isNotEmpty ? "Group id $groupId" : "",
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),

@@ -8,9 +8,8 @@ import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/main.dart';
 //import 'package:hotmul_quran/pages/homepage.dart';
 import 'package:hotmul_quran/pages/login.dart';
+import 'package:hotmul_quran/service/api_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:http/http.dart' as http;
 
 Future<void> clearToken() async {
   final prefs = await SharedPreferences.getInstance();
@@ -181,13 +180,7 @@ Future<String?> getValidAccessToken() async {
 /// Refresh access token ke API Laravel
 Future<String?> refreshAccessToken(String oldAccessToken) async {
   try {
-    final response = await http.post(
-      Uri.parse("${GlobalConst.url}/api/v1/refresh"),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $oldAccessToken",
-      },
-    );
+    final response = await ApiClient.post("${GlobalConst.url}/api/v1/refresh");
 
     //print("Refresh response: ${response.statusCode} - ${response.body}");
 
@@ -203,7 +196,8 @@ Future<String?> refreshAccessToken(String oldAccessToken) async {
 
 /// Logout user
 Future<void> logout() async {
-  final oldAccessToken = await getToken();
+  final response = await ApiClient.post("${GlobalConst.url}/api/v1/logout");
+  print("Logout response: ${response.statusCode} - ${response.body}");
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove("access_token");
   await prefs.remove("refresh_token");
@@ -214,14 +208,7 @@ Future<void> logout() async {
   await prefs.remove("daurah_id");
   await prefs.remove("user_id");
   //misalnya arahkan ke halaman login
-  final response = await http.post(
-    Uri.parse("${GlobalConst.url}/api/logout"),
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $oldAccessToken",
-    },
-  );
-  print("Logout response: ${response.statusCode} - ${response.body}");
+
   navigatorKey.currentState?.pushAndRemoveUntil(
     MaterialPageRoute(builder: (_) => LoginPage()),
     (route) => false,

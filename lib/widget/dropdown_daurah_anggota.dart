@@ -5,7 +5,7 @@ import 'package:hotmul_quran/const/global_const.dart';
 import '../service/api_client.dart';
 
 class daurahDropdown extends StatefulWidget {
-  final void Function(Map<String, dynamic>?)? onChanged; // callback ke parent
+  final ValueChanged<int?>? onChanged; // callback ke parent
   final int? value; // default selected value
 
   const daurahDropdown({super.key, this.onChanged, this.value});
@@ -32,7 +32,7 @@ class _daurahDropdownState extends State<daurahDropdown> {
     bool isLoading = true;
     try {
       final response = await ApiClient.get("${GlobalConst.url}/api/v1/daurah");
-      // print("Response daurah group: ${response.body}");
+      //print("Response daurah group: ${response.body}");
       if (response.statusCode == 200) {
         final body = jsonDecode(response.body);
 
@@ -54,7 +54,7 @@ class _daurahDropdownState extends State<daurahDropdown> {
             selectedGroupId = widget.value;
           } else {
             selectedGroupId = groupUsers.isNotEmpty
-                ? groupUsers.first["daurah_id"]
+                ? groupUsers.first["id"]
                 : null;
           }
 
@@ -136,20 +136,16 @@ class _daurahDropdownState extends State<daurahDropdown> {
                   ),
                   items: groupUsers.map((user) {
                     return DropdownMenuItem<int>(
-                      value: user["group_id"], // ✅ hanya kirim group_id
-                      child: Text(user["group_name"] ?? "No Name"),
+                      value: user["id"], // ✅ hanya kirim group_id
+                      child: Text(user["name"] ?? "No Name"),
                     );
                   }).toList(),
                   onChanged: (value) {
                     setState(() {
                       selectedGroupId = value;
                     });
-                    // ambil map lengkap berdasarkan group_id
-                    final selectedMap = groupUsers.firstWhere(
-                      (g) => g["group_id"] == value,
-                      orElse: () => {},
-                    );
-                    widget.onChanged?.call(selectedMap);
+
+                    widget.onChanged?.call(value); // ✅ kirim int
                   },
                 ),
               ),
