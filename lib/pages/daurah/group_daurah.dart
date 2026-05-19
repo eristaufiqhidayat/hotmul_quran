@@ -63,6 +63,7 @@ class _DaurahPageState extends State<DaurahPage> {
   void initState() {
     super.initState();
     fetchData();
+    print('Masuk ke class: $runtimeType');
   }
 
   Widget buildPagination() {

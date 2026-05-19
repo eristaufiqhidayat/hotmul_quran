@@ -48,9 +48,11 @@ class ApiService {
     }
   }
 
-  Future<List<LaporanHafalan>> fetchLaporanByDaurah(int id) async {
-    final response = await ApiClient.get("$baseUrl/laporan-hafalan/$id");
-
+  Future<List<LaporanHafalan>> fetchLaporanByDaurah(int id, int periode) async {
+    final response = await ApiClient.get(
+      "$baseUrl/laporan-hafalan/$id?periode=$periode",
+    );
+    print("URL: $baseUrl/laporan-hafalan/$id?periode=$periode");
     print("LAPORAN HAFALAN RESPONSE: ${response.body}");
 
     if (response.statusCode == 200) {

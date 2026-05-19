@@ -53,6 +53,7 @@ class _AnggotaPageState extends State<AnggotaPage> {
   void initState() {
     super.initState();
     fetchData();
+    print('Masuk ke class: $runtimeType');
   }
 
   Widget buildPagination() {

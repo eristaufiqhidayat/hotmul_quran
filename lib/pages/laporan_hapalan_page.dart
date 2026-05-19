@@ -3,6 +3,7 @@ import 'package:hotmul_quran/model/daurah_model.dart';
 import 'package:hotmul_quran/model/laporan_hapalan_model.dart';
 import 'package:hotmul_quran/service/daurah_service.dart';
 import 'package:hotmul_quran/widget/appbar_widget.dart';
+import 'package:hotmul_quran/widget/dropdown_periode_widget.dart';
 
 class LaporanHafalanPage extends StatefulWidget {
   const LaporanHafalanPage({super.key});
@@ -19,10 +20,13 @@ class _LaporanHafalanPageState extends State<LaporanHafalanPage> {
 
   int? selectedDaurahId;
 
+  Map<String, dynamic>? selectedPeriode;
+
   @override
   void initState() {
     super.initState();
     loadDaurah();
+    print('Masuk ke class: $runtimeType');
   }
 
   Future<void> loadDaurah() async {
@@ -35,7 +39,7 @@ class _LaporanHafalanPageState extends State<LaporanHafalanPage> {
 
       if (result.isNotEmpty) {
         selectedDaurahId = result.first.id;
-        loadLaporan();
+        //loadLaporan();
       }
     } catch (e) {
       setState(() {
@@ -44,7 +48,7 @@ class _LaporanHafalanPageState extends State<LaporanHafalanPage> {
     }
   }
 
-  Future<void> loadLaporan() async {
+  Future<void> loadLaporan([int? daurahId]) async {
     if (selectedDaurahId == null) return;
 
     setState(() {
@@ -52,7 +56,14 @@ class _LaporanHafalanPageState extends State<LaporanHafalanPage> {
     });
 
     try {
-      final result = await ApiService().fetchLaporanByDaurah(selectedDaurahId!);
+      final result = await ApiService().fetchLaporanByDaurah(
+        selectedDaurahId!,
+        daurahId != null
+            ? daurahId
+            : selectedPeriode != null
+            ? selectedPeriode!['periode_khotmul']
+            : 0,
+      );
 
       setState(() {
         data = result;
@@ -115,12 +126,43 @@ class _LaporanHafalanPageState extends State<LaporanHafalanPage> {
               onChanged: (value) {
                 setState(() {
                   selectedDaurahId = value;
+                  //selectedPeriode = null;
                 });
 
-                loadLaporan();
+                loadLaporan(selectedDaurahId);
               },
             ),
           ),
+          if (selectedDaurahId != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: PeriodeDaurahDropdown(
+                groupId: selectedDaurahId!,
+
+                onChanged: (value) {
+                  setState(() {
+                    selectedPeriode = value;
+                  });
+
+                  debugPrint(
+                    "Periode dipilih: "
+                    "${value['periode_group']}"
+                    "$selectedDaurahId",
+                  );
+                  loadLaporan();
+                  /*
+            hasil:
+            {
+              id: 1,
+              name: Group DAUROH 1,
+              periode_group: 165,
+              periode_khotmul: 1
+            }
+            */
+                },
+              ),
+            ),
+          SizedBox(height: 12),
 
           /// TABLE
           Expanded(

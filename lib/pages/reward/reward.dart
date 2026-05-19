@@ -74,6 +74,7 @@ class _RewardPageState extends State<RewardPage> {
     fetchData();
     _loadAnggotaId();
     _loadGroupUser();
+    print('Masuk ke class: $runtimeType');
   }
 
   Future<void> _loadAnggotaId() async {

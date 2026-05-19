@@ -1,214 +1,381 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/const/global_const.dart';
-import 'package:hotmul_quran/pages/khatam/khatam_crud.dart';
-import 'package:hotmul_quran/widget/appbar.dart';
-import 'package:hotmul_quran/widget/drawer.dart';
-import 'package:hotmul_quran/widget/refreshNew.dart';
-import 'package:hotmul_quran/widget/searchbar.dart';
+import 'package:hotmul_quran/model/daurah_model.dart';
+import 'package:hotmul_quran/model/laporan_hapalan_model.dart';
 import 'package:hotmul_quran/service/api_client.dart';
+import 'package:hotmul_quran/service/daurah_service.dart';
+import 'package:hotmul_quran/widget/appbar_widget.dart';
+import 'package:hotmul_quran/widget/dropdown_periode_widget.dart';
 
-class KhatamPage extends StatefulWidget {
-  const KhatamPage({super.key});
+class AdminUpdateKhatamPage extends StatefulWidget {
+  const AdminUpdateKhatamPage({super.key});
 
   @override
-  State<KhatamPage> createState() => _KhatamPageState();
+  State<AdminUpdateKhatamPage> createState() => _AdminUpdateKhatamPageState();
 }
 
-class _KhatamPageState extends State<KhatamPage> {
-  int currentPage = 1;
-  int lastPage = 1;
-  List<dynamic> anggota = [];
-  bool isLoading = false;
+class _AdminUpdateKhatamPageState extends State<AdminUpdateKhatamPage> {
+  bool isLoading = true;
 
-  TextEditingController searchController = TextEditingController();
+  //List daurahList = [];
+  List<Daurah> daurahList = [];
+  List<LaporanHafalan> anggotaList = [];
 
-  /// FETCH DATA (REFRACTOR)
-  Future<void> fetchData({int page = 1, String? search}) async {
-    if (!mounted) return;
+  Daurah? selectedDaurah;
+  LaporanHafalan? selectedAnggota;
 
-    setState(() => isLoading = true);
-
-    try {
-      final response = await ApiClient.get(
-        "${GlobalConst.url}/api/v1/khatam?page=$page&search=${search ?? ''}",
-      );
-
-      if (response.statusCode == 200) {
-        final result = ApiClient.decode(response);
-
-        setState(() {
-          anggota = result['data'];
-          currentPage = result['current_page'];
-          lastPage = result['last_page'];
-        });
-      }
-    } catch (e) {
-      if (e.toString().contains("Unauthorized")) {
-        _redirectToLogin();
-      }
-    }
-
-    if (mounted) {
-      setState(() => isLoading = false);
-    }
-  }
-
-  /// APPROVE DATA (REFRACTOR)
-  Future<void> approveData({int? id}) async {
-    try {
-      final response = await ApiClient.post(
-        "${GlobalConst.url}/api/v1/khotmul/updateStatus/$id",
-        body: {"status": "send_approve"},
-      );
-
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Approved")));
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Gagal Approved")));
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Error server")));
-    }
-  }
-
-  void _redirectToLogin() {
-    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-  }
+  String selectedStatus = "active";
+  int? selectedDaurahId;
+  Map<String, dynamic>? selectedPeriode;
 
   @override
   void initState() {
     super.initState();
-    fetchData();
+
+    print('Masuk ke class: $runtimeType');
+
+    loadDaurah();
   }
 
-  Widget buildPagination() {
-    List<Widget> pages = [];
-
-    for (int i = 1; i <= lastPage; i++) {
-      if (i == 1 ||
-          i == lastPage ||
-          (i >= currentPage - 2 && i <= currentPage + 2)) {
-        pages.add(
-          InkWell(
-            onTap: () => fetchData(page: i),
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: i == currentPage ? Colors.blue : Colors.white,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.grey),
-              ),
-              child: Text(
-                "$i",
-                style: TextStyle(
-                  color: i == currentPage ? Colors.white : Colors.black,
-                ),
-              ),
-            ),
-          ),
-        );
-      } else if (i == currentPage - 3 || i == currentPage + 3) {
-        pages.add(const Text("..."));
+  /// ===============================
+  /// LOAD DAURAH
+  /// ===============================
+  Future<void> loadDaurah() async {
+    try {
+      final res = await ApiService().fetchDaurah();
+      ;
+      if (res.isNotEmpty) {
+        selectedDaurahId = res.first.id;
+        //loadLaporan();
       }
-    }
+      // final body = ApiClient.decode(res);
 
-    return Row(mainAxisAlignment: MainAxisAlignment.center, children: pages);
+      setState(() {
+        daurahList = res;
+        isLoading = false;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  /// ===============================
+  /// LOAD ANGGOTA BERDASARKAN DAURAH
+  /// ===============================
+  Future<void> loadAnggota(int groupId) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      // final res = await ApiClient.get(
+      //   "${GlobalConst.url}/api/v1/laporan-hafalan/$groupId",
+      // );
+      final res = await ApiService().fetchLaporanByDaurah(
+        selectedDaurahId!,
+        groupId != null
+            ? groupId
+            : selectedPeriode != null
+            ? selectedPeriode!['periode_khotmul']
+            : 0,
+      );
+      //print(res.body);
+      //final body = ApiClient.decode(res);
+
+      setState(() {
+        // anggotaList = body['data'] ?? [];
+        anggotaList = res;
+        isLoading = false;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  /// ===============================
+  /// UPDATE STATUS
+  /// ===============================
+  Future<void> updateStatus() async {
+    try {
+      final res = await ApiClient.put(
+        "${GlobalConst.url}/api/v1/khatam/update-status",
+        body: {
+          "assignment_id": selectedAnggota!.assignmentId,
+          "status": selectedStatus,
+        },
+      );
+      print(
+        'Assignment ID: ${selectedAnggota!.assignmentId}, Status: $selectedStatus',
+      );
+      print('Update Status Response: ${res.body}');
+      final body = ApiClient.decode(res);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(body['message'] ?? 'Berhasil update')),
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Color getStatusColor(String status) {
+    switch (status) {
+      case 'done':
+        return Colors.green;
+      case 'expired':
+        return Colors.red;
+      case 'active':
+        return Colors.orange;
+      default:
+        return Colors.grey;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      endDrawer: AppDrawer(),
-      appBar: PrimaryAppBar(title: "Khatam"),
-      body: Column(
-        children: [
-          ActionButtons(
-            newButton: false,
-            onRefresh: () => fetchData(page: currentPage),
-            onNew: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => EditKhatamPage(anggota: {}),
-                ),
-              ).then((updated) {
-                if (updated == true) fetchData(page: currentPage);
-              });
-            },
-          ),
+      appBar: AppBarCustom(title: "Update Status Khatam"),
 
-          SearchFieldWidget(
-            controller: searchController,
-            onSubmitted: (value) => fetchData(page: 1, search: value),
-          ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// ===============================
+                  /// DROPDOWN DAURAH
+                  /// ===============================
+                  const Text(
+                    "Pilih Daurah",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
 
-          const SizedBox(height: 10),
+                  const SizedBox(height: 8),
 
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : ListView.separated(
-                    itemCount: anggota.length,
-                    itemBuilder: (context, index) {
-                      final item = anggota[index];
+                  DropdownButtonFormField(
+                    value: selectedDaurah,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
 
-                      return ListTile(
-                        title: Text(
-                          item['name'].toString(),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        subtitle: Column(
+                    items: daurahList.map((e) {
+                      return DropdownMenuItem(
+                        value: e,
+                        child: Text(e.name ?? '-'),
+                      );
+                    }).toList(),
+
+                    onChanged: (value) async {
+                      if (value == null) return;
+
+                      final item = value as Daurah;
+
+                      setState(() {
+                        selectedDaurah = item;
+                        selectedAnggota = null;
+                      });
+
+                      await loadAnggota(item.id);
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// ===============================
+                  /// DROPDOWN ANGGOTA
+                  /// ===============================
+                  const Text(
+                    "Pilih Periode Khatam",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+
+                  const SizedBox(height: 8),
+                  if (selectedDaurahId != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: PeriodeDaurahDropdown(
+                        groupId: selectedDaurahId!,
+
+                        onChanged: (value) {
+                          setState(() {
+                            selectedPeriode = value;
+                          });
+
+                          debugPrint(
+                            "Periode dipilih: "
+                            "${value['periode_group']}"
+                            "$selectedDaurahId",
+                          );
+                          //loadLaporan();
+                          /*
+            hasil:
+            {
+              id: 1,
+              name: Group DAUROH 1,
+              periode_group: 165,
+              periode_khotmul: 1
+            }
+            */
+                        },
+                      ),
+                    ),
+                  SizedBox(height: 12),
+                  const Text(
+                    "Pilih Anggota",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  DropdownButtonFormField(
+                    value: selectedAnggota,
+
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+
+                    items: anggotaList.map((e) {
+                      return DropdownMenuItem(
+                        value: e,
+                        child: Text("${e.name} - Juz ${e.juz}"),
+                      );
+                    }).toList(),
+
+                    onChanged: (value) {
+                      if (value == null) return;
+
+                      final item = value as LaporanHafalan;
+
+                      setState(() {
+                        selectedAnggota = item;
+
+                        selectedStatus = item.status ?? 'active';
+                      });
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// ===============================
+                  /// STATUS CARD
+                  /// ===============================
+                  if (selectedAnggota != null)
+                    Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Group id: ${item['group_id']}"),
-                            Text("Period id: ${item['periode']}"),
-                            Text("Tanggal: ${item['tanggal']}"),
-                            Text("Juz: ${item['juz']}"),
-                          ],
-                        ),
-                        isThreeLine: true,
-                        trailing: PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_vert, color: Colors.red),
-                          onSelected: (value) {
-                            if (value == 'approve') {
-                              approveData(id: item['id']).then((_) {
-                                fetchData(page: currentPage);
-                              });
-                            }
-                          },
-                          itemBuilder: (context) => const [
-                            PopupMenuItem(
-                              value: 'approve',
-                              child: Row(
-                                children: [
-                                  Icon(Icons.approval, color: Colors.blue),
-                                  SizedBox(width: 8),
-                                  Text("Approve"),
-                                ],
+                            Text(
+                              selectedAnggota!.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+
+                            const SizedBox(height: 10),
+
+                            Text("Juz ${selectedAnggota!.juz}"),
+
+                            // Text(
+                            //   "Ayat ${selectedAnggota.ayat_from} - ${selectedAnggota.ayat_to}",
+                            // ),
+                            const SizedBox(height: 15),
+
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: getStatusColor(selectedStatus),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                selectedStatus.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            /// ===============================
+                            /// DROPDOWN STATUS
+                            /// ===============================
+                            DropdownButtonFormField(
+                              value: selectedStatus,
+                              decoration: InputDecoration(
+                                labelText: "Status",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+
+                              items: const [
+                                DropdownMenuItem(
+                                  value: "active",
+                                  child: Text("ACTIVE"),
+                                ),
+                                DropdownMenuItem(
+                                  value: "done",
+                                  child: Text("DONE"),
+                                ),
+                                DropdownMenuItem(
+                                  value: "expired",
+                                  child: Text("EXPIRED"),
+                                ),
+                                DropdownMenuItem(
+                                  value: "late",
+                                  child: Text("LATE"),
+                                ),
+                              ],
+
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedStatus = value.toString();
+                                });
+                              },
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            SizedBox(
+                              width: double.infinity,
+                              height: 50,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                ),
+
+                                onPressed: () async {
+                                  await updateStatus();
+                                },
+
+                                child: const Text(
+                                  "UPDATE STATUS",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const Divider(color: Colors.grey, height: 1),
-                  ),
-          ),
-
-          Padding(padding: const EdgeInsets.all(8.0), child: buildPagination()),
-        ],
-      ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
     );
   }
 }

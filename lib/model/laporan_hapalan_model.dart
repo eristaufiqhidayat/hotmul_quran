@@ -1,4 +1,5 @@
 class LaporanHafalan {
+  int? assignmentId;
   final String name;
   final int juz;
   final int progress;
@@ -6,6 +7,7 @@ class LaporanHafalan {
   final String lastInput;
 
   LaporanHafalan({
+    this.assignmentId,
     required this.name,
     required this.juz,
     required this.progress,
@@ -15,6 +17,7 @@ class LaporanHafalan {
 
   factory LaporanHafalan.fromJson(Map<String, dynamic> json) {
     return LaporanHafalan(
+      assignmentId: json['assignment_id'],
       name: json['name'] ?? '',
       juz: int.tryParse(json['juz'].toString()) ?? 0,
       progress: int.tryParse(json['progress'].toString()) ?? 0,

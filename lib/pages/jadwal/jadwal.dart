@@ -80,6 +80,7 @@ class _jadwalPageState extends State<jadwalPage> {
     fetchData();
     _loadAnggotaId();
     _loadGroupUser();
+    print('Masuk ke class: $runtimeType');
   }
 
   @override

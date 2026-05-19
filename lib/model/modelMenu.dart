@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/pages/anggota/group_hotmul.dart';
-import 'package:hotmul_quran/pages/dashboard_page.dart';
+import 'package:hotmul_quran/pages/khotmulperiode_page.dart';
 import 'package:hotmul_quran/pages/daurah/group_daurah.dart';
 import 'package:hotmul_quran/pages/donasi/donasi.dart';
 import 'package:hotmul_quran/pages/jadwal/jadwal.dart';
 import 'package:hotmul_quran/pages/khatam/khatam.dart';
 import 'package:hotmul_quran/pages/khotmul/khotmul.dart';
-import 'package:hotmul_quran/pages/khotmulperiode/khotmulperiode.dart';
+import 'package:hotmul_quran/pages/khotmulperiode_page.dart';
 import 'package:hotmul_quran/pages/laporan_hapalan_page.dart';
 import 'package:hotmul_quran/pages/report/report.dart';
 import 'package:hotmul_quran/pages/reward/reward.dart';
 import 'package:hotmul_quran/pages/setor_hafalan_page.dart';
 import 'package:hotmul_quran/pages/setoranListPage.dart';
+
 //import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
 
 //import 'package:hotmul_quran/widget/drawer.dart';
@@ -56,7 +57,7 @@ void onMenuClick(BuildContext context, String title) {
     case 'Khatam':
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => KhatamPage()),
+        MaterialPageRoute(builder: (context) => AdminUpdateKhatamPage()),
       );
       break;
     case 'Donasi':
@@ -86,7 +87,7 @@ void onMenuClick(BuildContext context, String title) {
     case 'Khotmul Periode':
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => DashboardPage()),
+        MaterialPageRoute(builder: (context) => KhotmulPeriode_Page()),
       );
       break;
     default:

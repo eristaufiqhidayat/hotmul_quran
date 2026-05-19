@@ -68,6 +68,7 @@ class _DonasiPageState extends State<DonasiPage> {
   void initState() {
     super.initState();
     initLoad();
+    print('Masuk ke class: $runtimeType');
   }
 
   Future<void> initLoad() async {

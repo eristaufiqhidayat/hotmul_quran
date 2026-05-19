@@ -20,7 +20,7 @@ class HafalanRepo {
         "keterangan": keterangan,
       },
     );
-
+    print("Response Log Hafalan: ${response.body}");
     return response.statusCode == 200 || response.statusCode == 201;
   }
 }

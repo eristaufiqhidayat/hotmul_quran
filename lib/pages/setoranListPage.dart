@@ -26,6 +26,7 @@ class _SetoranListPageState extends State<SetoranListPage> {
 
     loadData();
     _user_id();
+    print('Masuk ke class: $runtimeType');
   }
 
   List get filteredData {
