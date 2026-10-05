@@ -11,46 +11,54 @@ import 'package:hotmul_quran/pages/login.dart';
 import 'package:hotmul_quran/service/api_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const List<String> _sessionKeys = [
+  'access_token',
+  'refresh_token',
+  'name',
+  'email',
+  'role',
+  'anggota_id',
+  'group_id',
+  'daurah_id',
+  'user_id',
+  'juz',
+  // kunci lama: password dulu disimpan polos, sekarang selalu dihapus
+  'password',
+];
+
 Future<void> clearToken() async {
   final prefs = await SharedPreferences.getInstance();
-
-  await prefs.remove('token');
-  await prefs.remove('refresh_token');
-  await prefs.remove('name');
-  await prefs.remove('email');
-  await prefs.remove('anggota_id');
-  await prefs.remove('group_id');
-  await prefs.remove('daurah_id');
-  await prefs.remove('password');
-  await prefs.remove('user_id');
-  await prefs.remove('juz');
+  for (final key in _sessionKeys) {
+    await prefs.remove(key);
+  }
 }
 
-Future<void> saveToken(
-  String token,
-  String refresh_token,
-  String name,
-  String email,
-  String anggota_id,
-  String group_id,
-  String daurah_id,
-  String password,
-  String user_id,
-  String juz,
-) async {
+/// Simpan sesi login. Password tidak pernah disimpan di perangkat.
+Future<void> saveToken({
+  required String token,
+  String refreshToken = '',
+  required String name,
+  required String email,
+  required String role,
+  required String userId,
+  String groupId = '',
+  String anggotaId = '',
+  String daurahId = '',
+  String juz = '',
+}) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString('access_token', token);
-  await prefs.setString('refresh_token', refresh_token);
+  await prefs.setString('refresh_token', refreshToken);
   await prefs.setString('name', name);
   await prefs.setString('email', email);
-  await prefs.setString('anggota_id', anggota_id);
-  await prefs.setString('group_id', group_id);
-  await prefs.setString('daurah_id', daurah_id);
   await prefs.setString('username', email);
-  await prefs.setString('password', password);
-  await prefs.setString('user_id', user_id);
+  await prefs.setString('role', role);
+  await prefs.setString('user_id', userId);
+  await prefs.setString('group_id', groupId);
+  await prefs.setString('anggota_id', anggotaId);
+  await prefs.setString('daurah_id', daurahId);
   await prefs.setString('juz', juz);
-  //print("refresh token disimpan: $refresh_token");
+  await prefs.remove('password');
 }
 
 Future<String?> getToken() async {
@@ -63,14 +71,17 @@ Future<String?> getJuz() async {
   return prefs.getString('juz'); // null kalau belum ada
 }
 
+/// Role user dari API: `admin` atau `member`.
+Future<String?> getRole() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('role');
+}
+
+Future<bool> isAdmin() async => (await getRole()) == 'admin';
+
 Future<String?> getUsername() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getString('username'); // null kalau belum ada
-}
-
-Future<String?> getPassword() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString('password'); // null kalau belum ada
 }
 
 Future<String?> getUser_id() async {
@@ -196,17 +207,12 @@ Future<String?> refreshAccessToken(String oldAccessToken) async {
 
 /// Logout user
 Future<void> logout() async {
-  final response = await ApiClient.post("${GlobalConst.url}/api/v1/logout");
-  print("Logout response: ${response.statusCode} - ${response.body}");
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.remove("access_token");
-  await prefs.remove("refresh_token");
-  await prefs.remove("name");
-  await prefs.remove("email");
-  await prefs.remove("anggota_id");
-  await prefs.remove("group_id");
-  await prefs.remove("daurah_id");
-  await prefs.remove("user_id");
+  try {
+    await ApiClient.post("${GlobalConst.apiV1}/logout");
+  } catch (_) {
+    // tetap hapus sesi lokal walau server tidak terjangkau
+  }
+  await clearToken();
   //misalnya arahkan ke halaman login
 
   navigatorKey.currentState?.pushAndRemoveUntil(

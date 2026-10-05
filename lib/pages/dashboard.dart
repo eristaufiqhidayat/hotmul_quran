@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/config/theme_config.dart';
+import 'package:hotmul_quran/model/modelMenu.dart';
 import 'package:hotmul_quran/pages/messege/inbox_icon.dart';
 import 'package:hotmul_quran/pages/messege/inbox_messege.dart';
-import 'package:hotmul_quran/model/messege_model.dart';
 import 'package:hotmul_quran/service/messege_service.dart';
+import 'package:hotmul_quran/service/token_services.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 
-import 'package:hotmul_quran/service/token_services.dart';
-import 'package:hotmul_quran/model/modelMenu.dart';
-
+/// Menu utama setelah login. Isi menu mengikuti `users.role` dari API
+/// (`admin` → kelola grup & monitoring, `member` → lapor hafalan).
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
 
@@ -16,97 +17,79 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  String? groupId; // nilai dari local
   bool isLoading = true;
-  var user_id;
-  var countUnread;
-  // ignore: unused_field
-  late Future<List<MessageUser>> _inboxFuture;
+  String role = 'member';
+  String name = '';
+  int userId = 0;
+  int unreadCount = 0;
+
   @override
   void initState() {
     super.initState();
-    _loadGroupId();
-    _user_id();
-
-    //_inboxFuture = MessageService().getInbox(user_id);
+    _loadSession();
   }
 
-  Future<void> _loadGroupId() async {
-    final idString = await getGroup_id();
-    //print(idString); // fungsi dari token_services.dart
+  Future<void> _loadSession() async {
+    final r = await getRole();
+    final n = await getUser();
+    final id = int.tryParse(await getUser_id() ?? '') ?? 0;
+    if (!mounted) return;
     setState(() {
-      groupId = idString ?? "0"; // kalau null → "0"
+      role = (r == null || r.isEmpty) ? 'member' : r;
+      name = n ?? '';
+      userId = id;
       isLoading = false;
     });
+    _loadUnread();
   }
 
-  Future<void> _user_id() async {
-    final idString = await getUser_id();
-    user_id = int.tryParse(idString ?? "0"); // ✅ conv
-    print("user_id di dashboard: $user_id");
+  Future<void> _loadUnread() async {
+    if (userId == 0) return;
+    try {
+      final count = await MessageService().getcountUnread(userId);
+      if (mounted) setState(() => unreadCount = count);
+    } catch (_) {
+      // badge pesan bersifat opsional
+    }
   }
 
-  Future<int> getUnredCount(int user_id) async {
-    final count = await MessageService().getcountUnread(user_id);
-    return count; // harus int
-  }
-
-  @override
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // kasih default value 0 kalau null
-    final gId = groupId ?? "0";
-    print("groupId di dashboard: $gId");
-
-    // ambil count unread
-    // pilih menu berdasarkan groupId
-    final items = gId == 'admin' ? menuItems : menuItems2;
-    final onClick = gId == 'admin' ? onMenuClick : onMenuClick2;
+    final admin = role == 'admin';
+    final items = admin ? menuItems : menuItems2;
+    final onClick = admin ? onMenuClick : onMenuClick2;
 
     return Scaffold(
-      drawer: AppDrawer(),
+      drawer: const AppDrawer(),
       appBar: AppBar(
         actions: [
           InboxIcon(
-            unreadCount: countUnread ?? 0, // ✅ default kalau null
+            unreadCount: unreadCount,
             onTap: () async {
-              final result = await Navigator.push(
+              await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => InboxPage(userId: user_id ?? 0),
-                ),
+                MaterialPageRoute(builder: (_) => InboxPage(userId: userId)),
               );
-              if (result == true) {
-                setState(() {
-                  // panggil lagi API / refresh state dashboard
-                  countUnread();
-                });
-              }
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (_) => InboxPage(userId: user_id ?? 0),
-              //   ), // ✅ default kalau null
-              // );
+              _loadUnread();
             },
           ),
         ],
         iconTheme: const IconThemeData(color: Colors.white),
-        title: Row(
+        title: const Row(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               backgroundImage: AssetImage('assets/logo.png'),
               radius: 20,
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "MAJELIS KHOTMUL QUR'AN",
                     style: TextStyle(
@@ -128,43 +111,76 @@ class _DashboardState extends State<Dashboard> {
             ),
           ],
         ),
-        backgroundColor: const Color.fromARGB(255, 15, 99, 18),
-        toolbarHeight: 100,
+        backgroundColor: ThemeConfig.primaryDark,
+        toolbarHeight: 80,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.builder(
-          itemCount: items.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 1,
-          ),
-          itemBuilder: (context, index) {
-            final item = items[index];
-            return ElevatedButton(
-              onPressed: () => onClick(context, item.title),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.green.shade900,
-                shadowColor: Colors.grey.withOpacity(0.5),
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Card(
+            color: ThemeConfig.primaryDark,
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              leading: const CircleAvatar(
+                backgroundColor: Colors.white24,
+                child: Icon(Icons.person, color: Colors.white),
+              ),
+              title: Text(
+                name.isEmpty ? 'Sahabat Qur\'an' : name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(item.icon, size: 40),
-                  const SizedBox(height: 8),
-                  Text(item.title, textAlign: TextAlign.center),
-                ],
+              subtitle: Text(
+                admin ? 'Admin kelompok' : 'Anggota',
+                style: const TextStyle(color: Colors.white70),
               ),
-            );
-          },
-        ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: items.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemBuilder: (context, index) {
+              final item = items[index];
+              return Card(
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: () => onClick(context, item.title),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          item.icon,
+                          size: 34,
+                          color: ThemeConfig.primaryDark,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          item.title,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

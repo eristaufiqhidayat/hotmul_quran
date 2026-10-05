@@ -23,13 +23,9 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _loadEmail() async {
     final prefs = await SharedPreferences.getInstance();
     String? savedEmail = prefs.getString('username');
-    String? savedPassword = prefs.getString('password');
-
-    if (savedEmail != null) {
-      setState(() {
-        _emailController.text = savedEmail;
-        _passwordController.text = savedPassword ?? ''; // isi ke textfield
-      });
+    // Password sengaja tidak disimpan di perangkat.
+    if (savedEmail != null && mounted) {
+      setState(() => _emailController.text = savedEmail);
     }
   }
 
@@ -47,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
 
     await auth.checkAuth();
 
-    if (auth.isAuthenticated) {
+    if (auth.isAuthenticated && mounted) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => Dashboard()),
@@ -56,13 +52,21 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> login() async {
+    if (_emailController.text.trim().isEmpty ||
+        _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Email dan password wajib diisi")),
+      );
+      return;
+    }
     final auth = Provider.of<AuthProvider>(context, listen: false);
-
+    setState(() => _loading = true);
     final success = await auth.login(
       email: _emailController.text,
       password: _passwordController.text,
     );
-    print("Login success: $success");
+    if (!mounted) return;
+    setState(() => _loading = false);
     if (success) {
       Navigator.pushReplacement(
         context,
