@@ -39,16 +39,34 @@ class _SetoranListPageState extends State<SetoranListPage> {
 
   Future<void> _user_id() async {
     final idString = await getUser_id();
-    currentUserId = int.tryParse(idString ?? "0"); // ✅ conv
-    print("Current User ID: $currentUserId");
+    if (!mounted) return;
+    setState(() => currentUserId = int.tryParse(idString ?? "0"));
   }
 
   Future<void> loadData() async {
-    final res = await ApiClient.get("${GlobalConst.url}/api/v1/hafalan/today");
+    setState(() => isLoading = true);
+    final res = await ApiClient.get("${GlobalConst.apiV1}/hafalan/today");
+
+    if (res.statusCode != 200) {
+      if (!mounted) return;
+      setState(() {
+        data = [];
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            res.statusCode == 500
+                ? 'Akun belum dimasukkan ke grup atau periode aktif belum dibuat admin.'
+                : ApiClient.errorMessage(res),
+          ),
+        ),
+      );
+      return;
+    }
+
     final body = ApiClient.decode(res);
-
-    print("LOAD SETORAN: ${res.body}");
-
+    if (!mounted) return;
     setState(() {
       data = body['data'] ?? [];
       groupName = body['group_name'] ?? '-';
@@ -74,6 +92,7 @@ class _SetoranListPageState extends State<SetoranListPage> {
     switch (status) {
       case 'done':
         return Colors.green;
+      case 'late':
       case 'expired':
         return Colors.red;
       case 'active':
@@ -102,7 +121,6 @@ class _SetoranListPageState extends State<SetoranListPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("Current User ID: $currentUserId");
     return Scaffold(
       appBar: AppBarCustom(title: "Setoran Hafalan"),
       body: isLoading
@@ -242,17 +260,14 @@ class _SetoranListPageState extends State<SetoranListPage> {
                           itemCount: filteredData.length,
                           itemBuilder: (context, i) {
                             final item = filteredData[i];
-                            print(
-                              "Total Ayat: ${item['target_ayat']}, Total Setoran: ${item['total_ayat']}",
-                            );
                             final totalAyat = item['total_ayat'] ?? 0;
                             final targetAyat = item['target_ayat'] ?? 0;
                             final progress = getProgress(totalAyat, targetAyat);
                             final percent = (progress * 100).toStringAsFixed(0);
                             final isAllowed =
                                 item['id'] == currentUserId &&
-                                (item['status_assignment'] == 'active' ||
-                                    item['status_assignment'] == 'done');
+                                // API menolak setoran bila status bukan active
+                                item['status_assignment'] == 'active';
                             return Card(
                               color: isAllowed
                                   ? Colors.lightGreenAccent
@@ -278,7 +293,7 @@ class _SetoranListPageState extends State<SetoranListPage> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          "Data ini tidak bisa diakses oleh user lain atau sudah expired",
+                                          "Hanya juz aktif milik Anda yang bisa disetor",
                                         ),
                                         duration: const Duration(seconds: 2),
                                       ),

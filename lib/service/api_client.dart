@@ -3,6 +3,16 @@ import 'package:hotmul_quran/main.dart';
 import 'package:http/http.dart' as http;
 import 'package:hotmul_quran/service/token_services.dart';
 
+/// Error dari API dengan pesan yang bisa ditampilkan ke user.
+class ApiException implements Exception {
+  final String message;
+  final int? statusCode;
+  ApiException(this.message, {this.statusCode});
+
+  @override
+  String toString() => message;
+}
+
 class ApiClient {
   static const Duration timeout = Duration(seconds: 30);
 
@@ -110,5 +120,21 @@ class ApiClient {
   /// RESPONSE PARSER
   static dynamic decode(http.Response response) {
     return jsonDecode(response.body);
+  }
+
+  /// Ambil pesan error dari respon Laravel (`message` / `errors`).
+  static String errorMessage(http.Response response, {String? fallback}) {
+    try {
+      final body = jsonDecode(response.body);
+      if (body is Map) {
+        final errors = body['errors'];
+        if (errors is Map && errors.isNotEmpty) {
+          final first = errors.values.first;
+          if (first is List && first.isNotEmpty) return first.first.toString();
+        }
+        if (body['message'] != null) return body['message'].toString();
+      }
+    } catch (_) {}
+    return fallback ?? 'Terjadi kesalahan (${response.statusCode})';
   }
 }

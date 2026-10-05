@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hotmul_quran/const/global_const.dart';
 import 'package:hotmul_quran/pages/login.dart';
+import 'package:hotmul_quran/service/api_client.dart';
 import 'package:hotmul_quran/widget/appbar_widget.dart';
 import 'package:http/http.dart' as http;
 
@@ -31,25 +32,42 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _isLoading = true);
 
     try {
+      // Alur README: user daftar sebagai anggota, lalu admin yang
+      // menentukan grupnya. API mewajibkan `group_id`, jadi 0 dipakai
+      // sebagai penanda "belum ditentukan admin".
       final response = await http.post(
-        Uri.parse("${GlobalConst.url}/api/v1/register"),
+        Uri.parse("${GlobalConst.apiV1}/register"),
+        headers: {"Accept": "application/json"},
         body: {
-          "name": _nameController.text,
-          "email": _emailController.text,
+          "name": _nameController.text.trim(),
+          "email": _emailController.text.trim(),
           "password": _passwordController.text,
+          "role": "member",
+          "group_id": "0",
         },
       );
-      //print(response.body);
+      if (!mounted) return;
       if (response.statusCode == 201) {
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text("Registrasi berhasil")));
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginPage()),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Registrasi berhasil. Silakan login; admin akan memasukkan "
+              "Anda ke grup.",
+            ),
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              ApiClient.errorMessage(response, fallback: "Registrasi gagal"),
+            ),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -58,7 +76,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ).showSnackBar(SnackBar(content: Text("Error: $e")));
       }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -154,8 +172,15 @@ class _RegisterPageState extends State<RegisterPage> {
                           color: Colors.green,
                         ),
                       ),
-                      validator: (value) =>
-                          value!.isEmpty ? "Email tidak boleh kosong" : null,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        final v = value?.trim() ?? '';
+                        if (v.isEmpty) return "Email tidak boleh kosong";
+                        if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(v)) {
+                          return "Format email tidak valid";
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 15),
 

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hotmul_quran/pages/admin_monitoring_page.dart';
 import 'package:hotmul_quran/pages/anggota/group_hotmul.dart';
-import 'package:hotmul_quran/pages/khotmulperiode_page.dart';
 import 'package:hotmul_quran/pages/daurah/group_daurah.dart';
 import 'package:hotmul_quran/pages/donasi/donasi.dart';
 import 'package:hotmul_quran/pages/jadwal/jadwal.dart';
 import 'package:hotmul_quran/pages/khatam/khatam.dart';
-import 'package:hotmul_quran/pages/khotmul/khotmul.dart';
 import 'package:hotmul_quran/pages/khotmulperiode_page.dart';
 import 'package:hotmul_quran/pages/laporan_hapalan_page.dart';
-import 'package:hotmul_quran/pages/report/report.dart';
+import 'package:hotmul_quran/pages/member_home_page.dart';
+import 'package:hotmul_quran/pages/notification_page.dart';
 import 'package:hotmul_quran/pages/reward/reward.dart';
-import 'package:hotmul_quran/pages/setor_hafalan_page.dart';
 import 'package:hotmul_quran/pages/setoranListPage.dart';
 
 //import 'package:hotmul_quran/pages/khotmul/rekaman_audio.dart';
@@ -22,7 +21,9 @@ class MenuItem {
   MenuItem(this.title, this.icon);
 }
 
+/// Menu admin kelompok (BRD 3: membuat grup, mengatur anggota, memantau).
 final List<MenuItem> menuItems = [
+  MenuItem('Monitoring', Icons.insights),
   MenuItem('Anggota', Icons.person),
   MenuItem('Dauroh', Icons.menu),
   MenuItem('Khatam', Icons.check_circle),
@@ -33,8 +34,11 @@ final List<MenuItem> menuItems = [
   MenuItem('Laporan', Icons.pie_chart),
 ];
 
+/// Menu anggota (BRD 3: lapor hafalan, lihat jadwal, notifikasi).
 final List<MenuItem> menuItems2 = [
-  MenuItem('Setoran Hafalan', Icons.person),
+  MenuItem('Beranda Hafalan', Icons.home_outlined),
+  MenuItem('Setoran Hafalan', Icons.edit_note),
+  MenuItem('Notifikasi', Icons.notifications_outlined),
   MenuItem('Donasi', Icons.credit_card),
   MenuItem('Jadwal Khatam', Icons.calendar_today),
   MenuItem('Reward', Icons.card_giftcard),
@@ -42,6 +46,12 @@ final List<MenuItem> menuItems2 = [
 ];
 void onMenuClick(BuildContext context, String title) {
   switch (title) {
+    case 'Monitoring':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const AdminMonitoringPage()),
+      );
+      break;
     case 'Anggota':
       Navigator.push(
         context,
@@ -99,6 +109,18 @@ void onMenuClick(BuildContext context, String title) {
 
 void onMenuClick2(BuildContext context, String title) {
   switch (title) {
+    case 'Beranda Hafalan':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MemberHomePage()),
+      );
+      break;
+    case 'Notifikasi':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const NotificationPage()),
+      );
+      break;
     case 'Setoran Hafalan':
       Navigator.push(
         context,

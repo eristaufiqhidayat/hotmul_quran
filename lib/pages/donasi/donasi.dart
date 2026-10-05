@@ -74,13 +74,13 @@ class _DonasiPageState extends State<DonasiPage> {
   Future<void> initLoad() async {
     _loadGroupId();
     anggota_id = await getAnggota_id();
-    group_user = await getGroup_id();
+    group_user = await getRole();
 
     await fetchData();
   }
 
   Future<void> _loadGroupId() async {
-    final idString = await getGroup_id();
+    final idString = await getRole();
     //print(idString); // fungsi dari token_services.dart
     setState(() {
       groupId = idString ?? "0"; // kalau null → "0"

@@ -70,7 +70,7 @@ class _jadwalPageState extends State<jadwalPage> {
   }
 
   Future<void> _loadGroupUser() async {
-    group_user = await getGroup_id();
+    group_user = await getRole();
     if (mounted) setState(() {});
   }
 

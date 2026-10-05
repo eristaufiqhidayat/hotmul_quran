@@ -175,3 +175,18 @@ adb logcat | grep flutter
 * Gunakan **flutter\_launcher\_icons** agar ikon dan nama aplikasi konsisten.
 
 ---
+
+---
+
+## URL API saat development
+
+Base URL API diatur lewat `--dart-define` (lihat `lib/const/global_const.dart`).
+Default-nya `https://hotmul.pusaka-ilahi.com`.
+
+```bash
+# jalankan dengan API Laravel lokal (hotmul_api)
+flutter run --dart-define=API_URL=http://localhost:8016
+
+# build release ke server produksi (default)
+flutter build apk --release
+```
