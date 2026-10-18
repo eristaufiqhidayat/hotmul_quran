@@ -457,7 +457,9 @@ class _KhotmulPeriode_PageState extends State<KhotmulPeriode_Page> {
 
                               const SizedBox(width: 8),
 
-                              Text("Mulai: ${item['tanggal_mulai']}"),
+                              Flexible(
+                                child: Text("Mulai: ${item['tanggal_mulai']}"),
+                              ),
                             ],
                           ),
 
@@ -473,49 +475,56 @@ class _KhotmulPeriode_PageState extends State<KhotmulPeriode_Page> {
 
                               const SizedBox(width: 8),
 
-                              Text("Selesai: ${item['tanggal_selesai']}"),
+                              Flexible(
+                                child: Text("Selesai: ${item['tanggal_selesai']}"),
+                              ),
                             ],
                           ),
 
                           const SizedBox(height: 16),
 
                           /// BUTTON
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                          SizedBox(
+                            width: double.infinity,
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              alignment: WrapAlignment.end,
 
-                            children: [
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
-                                  foregroundColor: Colors.white,
+                              children: [
+                                ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange,
+                                    foregroundColor: Colors.white,
+                                  ),
+
+                                  onPressed: () {
+                                    showForm(item: item);
+                                  },
+
+                                  icon: const Icon(Icons.edit),
+
+                                  label: const Text("Edit"),
                                 ),
 
-                                onPressed: () {
-                                  showForm(item: item);
-                                },
+                                const SizedBox(width: 10),
 
-                                icon: const Icon(Icons.edit),
+                                ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white,
+                                  ),
 
-                                label: const Text("Edit"),
-                              ),
+                                  onPressed: () {
+                                    deleteData(item);
+                                  },
 
-                              const SizedBox(width: 10),
+                                  icon: const Icon(Icons.delete),
 
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
+                                  label: const Text("Delete"),
                                 ),
-
-                                onPressed: () {
-                                  deleteData(item);
-                                },
-
-                                icon: const Icon(Icons.delete),
-
-                                label: const Text("Delete"),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),

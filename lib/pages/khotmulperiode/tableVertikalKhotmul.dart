@@ -54,7 +54,9 @@ class VerticalDataTableKhotmul extends StatelessWidget {
         const SizedBox(height: 8),
 
         // Tombol Refresh + Add
-        Row(
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
           children: [
             ElevatedButton.icon(
               onPressed: onRefresh,
@@ -166,7 +168,10 @@ class VerticalDataTableKhotmul extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
-                                    width: 120,
+                                    // Lebar label ikut ukuran font sistem.
+                                    width: MediaQuery.textScalerOf(
+                                      context,
+                                    ).scale(120),
                                     //padding: const EdgeInsets.all(6),
                                     color: headerColor.withOpacity(0.1),
                                     child: Text(

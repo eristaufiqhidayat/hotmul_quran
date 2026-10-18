@@ -256,30 +256,35 @@ class _AssignmentCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             // Wrap agar teks sisa hari pindah ke baris baru saat font besar.
-            Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              spacing: 8,
-              runSpacing: 4,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.calendar_today, size: 16),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Hari ke-${day > GlobalConst.hariPerPeriode ? GlobalConst.hariPerPeriode : day} '
-                      'dari ${GlobalConst.hariPerPeriode}',
-                    ),
-                  ],
-                ),
-                if (remaining != null)
-                  Text(
-                    remaining >= 0
-                        ? '$remaining hari tersisa'
-                        : 'Lewat tenggat',
-                    style: TextStyle(color: color, fontWeight: FontWeight.w600),
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.calendar_today, size: 16),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'Hari ke-${day > GlobalConst.hariPerPeriode ? GlobalConst.hariPerPeriode : day} '
+                          'dari ${GlobalConst.hariPerPeriode}',
+                        ),
+                      ),
+                    ],
                   ),
-              ],
+                  if (remaining != null)
+                    Text(
+                      remaining >= 0
+                          ? '$remaining hari tersisa'
+                          : 'Lewat tenggat',
+                      style: TextStyle(color: color, fontWeight: FontWeight.w600),
+                    ),
+                ],
+              ),
             ),
             if (reminder != null) ...[
               const SizedBox(height: 12),

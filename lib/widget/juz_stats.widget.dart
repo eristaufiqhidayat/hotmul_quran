@@ -204,22 +204,31 @@ class _JuzStatsWidgetState extends State<JuzStatsWidget> {
   }
 
   Widget _buildSummaryItem(String title, String value) {
-    return Column(
-      children: [
-        Text(title, style: const TextStyle(fontSize: 12)),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-      ],
+    return Expanded(
+      child: Column(
+        children: [
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildFilterInfo() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Row(
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
         children: [
           if (_groupController.text.isNotEmpty)
             Chip(

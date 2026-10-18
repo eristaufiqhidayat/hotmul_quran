@@ -138,12 +138,14 @@ class _AboutScreenState extends State<AboutScreen> {
                 size: 20,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Informasi Versi',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green[700],
+              Expanded(
+                child: Text(
+                  'Informasi Versi',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[700],
+                  ),
                 ),
               ),
             ],
@@ -160,23 +162,20 @@ class _AboutScreenState extends State<AboutScreen> {
   Widget _buildInfoItem(String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
+      // Label di atas nilai agar label panjang tidak terpotong per huruf
+      // saat ukuran font sistem besar.
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              title,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Colors.green[700],
-              ),
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.green[700],
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: Text(value, style: const TextStyle(color: Colors.black87)),
-          ),
+          const SizedBox(height: 2),
+          Text(value, style: const TextStyle(color: Colors.black87)),
         ],
       ),
     );
@@ -209,12 +208,14 @@ class _AboutScreenState extends State<AboutScreen> {
                 size: 20,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Developer',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green[700],
+              Expanded(
+                child: Text(
+                  'Developer',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[700],
+                  ),
                 ),
               ),
             ],
@@ -231,23 +232,20 @@ class _AboutScreenState extends State<AboutScreen> {
   Widget _buildDeveloperItem(String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
+      // Label di atas nilai agar label panjang tidak terpotong per huruf
+      // saat ukuran font sistem besar.
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              title,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Colors.green[700],
-              ),
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.green[700],
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: Text(value, style: const TextStyle(color: Colors.black87)),
-          ),
+          const SizedBox(height: 2),
+          Text(value, style: const TextStyle(color: Colors.black87)),
         ],
       ),
     );
@@ -276,39 +274,46 @@ class _AboutScreenState extends State<AboutScreen> {
             children: [
               Icon(Icons.share_rounded, color: Colors.green[600], size: 20),
               const SizedBox(width: 8),
-              Text(
-                'Temukan Kami',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green[700],
+              Expanded(
+                child: Text(
+                  'Temukan Kami',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[700],
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildSocialButton(
-                Icons.email_rounded,
-                'Email',
-                Colors.green[600]!,
-                () => _launchUrl('mailto:eristaufiq@gmail.com'),
-              ),
-              _buildSocialButton(
-                Icons.language_rounded,
-                'Website',
-                Colors.green[600]!,
-                () => _launchUrl('https://creative.lembaharafah.com'),
-              ),
-              _buildSocialButton(
-                Icons.share_rounded,
-                'Share',
-                Colors.green[600]!,
-                _shareApp,
-              ),
-            ],
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.spaceAround,
+              children: [
+                _buildSocialButton(
+                  Icons.email_rounded,
+                  'Email',
+                  Colors.green[600]!,
+                  () => _launchUrl('mailto:eristaufiq@gmail.com'),
+                ),
+                _buildSocialButton(
+                  Icons.language_rounded,
+                  'Website',
+                  Colors.green[600]!,
+                  () => _launchUrl('https://creative.lembaharafah.com'),
+                ),
+                _buildSocialButton(
+                  Icons.share_rounded,
+                  'Share',
+                  Colors.green[600]!,
+                  _shareApp,
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -337,12 +342,14 @@ class _AboutScreenState extends State<AboutScreen> {
             children: [
               Icon(Icons.qr_code, color: Colors.green[600], size: 20),
               const SizedBox(width: 8),
-              Text(
-                'Donasi & Dukungan Applikasi',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green[700],
+              Expanded(
+                child: Text(
+                  'Donasi & Dukungan Aplikasi',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green[700],
+                  ),
                 ),
               ),
             ],

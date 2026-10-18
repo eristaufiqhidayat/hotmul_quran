@@ -266,27 +266,32 @@ class _RecorderPageState extends State<RecorderPage> {
             if (_filePath != null) ...[
               Text("Saved at: $_filePath"),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: _playRecording,
-                    icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
-                    label: Text(_isPlaying ? "..." : "..."),
-                  ),
-                  const SizedBox(width: 20),
-                  ElevatedButton.icon(
-                    onPressed: _shareRecording,
-                    icon: const Icon(Icons.share),
-                    label: const Text("Share"),
-                  ),
-                  const SizedBox(width: 20),
-                  ElevatedButton.icon(
-                    onPressed: saveRecording,
-                    icon: const Icon(Icons.save),
-                    label: const Text("Save"),
-                  ),
-                ],
+              SizedBox(
+                width: double.infinity,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _playRecording,
+                      icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
+                      label: Text(_isPlaying ? "..." : "..."),
+                    ),
+                    const SizedBox(width: 20),
+                    ElevatedButton.icon(
+                      onPressed: _shareRecording,
+                      icon: const Icon(Icons.share),
+                      label: const Text("Share"),
+                    ),
+                    const SizedBox(width: 20),
+                    ElevatedButton.icon(
+                      onPressed: saveRecording,
+                      icon: const Icon(Icons.save),
+                      label: const Text("Save"),
+                    ),
+                  ],
+                ),
               ),
             ],
             Expanded(

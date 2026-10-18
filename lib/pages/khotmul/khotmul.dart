@@ -206,7 +206,9 @@ class _KhotmulPageState extends State<KhotmulPage> {
           children: [
             const SizedBox(height: 8),
             // Tombol Refresh + Add
-            Row(
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 SizedBox(width: 8),
                 ElevatedButton.icon(
