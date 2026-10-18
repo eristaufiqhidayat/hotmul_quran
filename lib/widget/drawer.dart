@@ -108,45 +108,58 @@ class _AppDrawerState extends State<AppDrawer> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Color.fromARGB(255, 15, 99, 18),
+          // Header dibuat tanpa DrawerHeader (tinggi tetap) agar tidak
+          // overflow saat ukuran font sistem besar atau nama/email panjang.
+          Container(
+            color: const Color.fromARGB(255, 15, 99, 18),
+            padding: EdgeInsets.fromLTRB(
+              16,
+              MediaQuery.of(context).padding.top + 16,
+              16,
+              16,
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const CircleAvatar(
                   backgroundImage: AssetImage('assets/logo.png'),
                   radius: 30,
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         name.isNotEmpty ? name : "Tamu",
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      const SizedBox(height: 4),
                       Text(
                         email.isNotEmpty ? email : "-",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
                         ),
                       ),
-                      Text(
-                        groupId.isNotEmpty ? "Group id $groupId" : "",
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
+                      if (groupId.isNotEmpty)
+                        Text(
+                          "Group id $groupId",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
