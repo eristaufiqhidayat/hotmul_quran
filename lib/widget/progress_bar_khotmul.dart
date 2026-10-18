@@ -27,9 +27,12 @@ class ProgressBarKhotmul extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Progress Khatam",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                const Flexible(
+                  child: Text(
+                    "Progress Khatam",
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                 ),
                 Text("$done / $total"),
               ],
