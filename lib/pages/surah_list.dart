@@ -61,12 +61,19 @@ class SurahListPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     mainAxisSize: MainAxisSize.min, // jangan expand penuh
                     children: [
-                      Text(
-                        s.nameArabic,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
+                      // Nama Arab mengecil otomatis bila tidak muat
+                      // (mis. saat ukuran font sistem besar).
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            s.nameArabic,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),

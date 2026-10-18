@@ -31,6 +31,12 @@ class MyApp extends StatelessWidget {
         navigatorKey: navigatorKey,
         title: 'Hotmul Quran',
         theme: ThemeConfig.light(),
+        // Batasi skala font sistem agar layout tidak overflow di HP dengan
+        // ukuran font sangat besar.
+        builder: (context, child) => MediaQuery.withClampedTextScaling(
+          maxScaleFactor: 1.3,
+          child: child!,
+        ),
         initialRoute: '/',
         routes: {
           '/': (context) => const QuranApp(),
