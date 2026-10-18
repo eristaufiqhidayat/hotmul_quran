@@ -219,10 +219,21 @@ class _AssignmentCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Juz ${assignment.juzNumber}',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            'Juz ${assignment.juzNumber}',
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          StatusChip(
+                            label: labelForLevel(level),
+                            color: color,
+                          ),
+                        ],
                       ),
                       if (assignment.startDate != null &&
                           assignment.endDate != null)
@@ -233,7 +244,6 @@ class _AssignmentCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                StatusChip(label: labelForLevel(level), color: color),
               ],
             ),
             const SizedBox(height: 16),
@@ -245,15 +255,23 @@ class _AssignmentCard extends StatelessWidget {
                   : 'Target ayat belum tersedia',
             ),
             const SizedBox(height: 12),
-            Row(
+            // Wrap agar teks sisa hari pindah ke baris baru saat font besar.
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              spacing: 8,
+              runSpacing: 4,
               children: [
-                const Icon(Icons.calendar_today, size: 16),
-                const SizedBox(width: 6),
-                Text(
-                  'Hari ke-${day > GlobalConst.hariPerPeriode ? GlobalConst.hariPerPeriode : day} '
-                  'dari ${GlobalConst.hariPerPeriode}',
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.calendar_today, size: 16),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Hari ke-${day > GlobalConst.hariPerPeriode ? GlobalConst.hariPerPeriode : day} '
+                      'dari ${GlobalConst.hariPerPeriode}',
+                    ),
+                  ],
                 ),
-                const Spacer(),
                 if (remaining != null)
                   Text(
                     remaining >= 0
