@@ -137,7 +137,10 @@ class _daurahDropdownState extends State<daurahDropdown> {
                   items: groupUsers.map((user) {
                     return DropdownMenuItem<int>(
                       value: user["id"], // ✅ hanya kirim group_id
-                      child: Text(user["name"] ?? "No Name"),
+                      child: Text(
+                        user["name"] ?? "No Name",
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     );
                   }).toList(),
                   onChanged: (value) {

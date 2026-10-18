@@ -268,6 +268,7 @@ class _EditRewardPageState extends State<EditRewardPage> {
                     ),
                   )
                 : DropdownButtonFormField<String>(
+                    isExpanded: true,
                     value:
                         selectedUserId != null &&
                             groups.any(
@@ -288,7 +289,10 @@ class _EditRewardPageState extends State<EditRewardPage> {
                           final val = item['anggota_id'].toString();
                           return DropdownMenuItem<String>(
                             value: val,
-                            child: Text(_groupLabel(item)),
+                            child: Text(
+                              _groupLabel(item),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           );
                         })
                         .toList(),

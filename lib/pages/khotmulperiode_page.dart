@@ -164,6 +164,7 @@ class _KhotmulPeriode_PageState extends State<KhotmulPeriode_Page> {
 
                     /// STATUS
                     DropdownButtonFormField(
+                      isExpanded: true,
                       value: status,
                       decoration: const InputDecoration(
                         labelText: "Status",

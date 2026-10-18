@@ -141,11 +141,15 @@ class _AdminMonitoringPageState extends State<AdminMonitoringPage> {
           padding: const EdgeInsets.all(16),
           children: [
             DropdownButtonFormField<int>(
+              isExpanded: true,
               initialValue: _group?.id,
               decoration: const InputDecoration(labelText: 'Grup'),
               items: _groups
                   .map(
-                    (g) => DropdownMenuItem(value: g.id, child: Text(g.name)),
+                    (g) => DropdownMenuItem(
+                      value: g.id,
+                      child: Text(g.name, overflow: TextOverflow.ellipsis),
+                    ),
                   )
                   .toList(),
               onChanged: (id) {

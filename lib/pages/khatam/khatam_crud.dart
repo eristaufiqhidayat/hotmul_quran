@@ -180,6 +180,7 @@ class _EditKhatamPageState extends State<EditKhatamPage> {
             isLoadingGroups
                 ? const CircularProgressIndicator()
                 : DropdownButtonFormField<String>(
+                    isExpanded: true,
                     value: selectedUserId,
                     decoration: const InputDecoration(
                       labelText: "User/Group",
@@ -189,7 +190,10 @@ class _EditKhatamPageState extends State<EditKhatamPage> {
                       final val = e['user_id']?.toString();
                       return DropdownMenuItem(
                         value: val,
-                        child: Text(_groupLabel(e)),
+                        child: Text(
+                          _groupLabel(e),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       );
                     }).toList(),
                     onChanged: (val) => setState(() => selectedUserId = val),

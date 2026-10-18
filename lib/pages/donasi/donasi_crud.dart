@@ -260,6 +260,7 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
                     ),
                   )
                 : DropdownButtonFormField<String>(
+                    isExpanded: true,
                     value:
                         groups
                                 .where(
@@ -278,7 +279,10 @@ class _EditDonasiPageState extends State<EditDonasiPage> {
 
                       return DropdownMenuItem<String>(
                         value: val,
-                        child: Text(_groupLabel(item)),
+                        child: Text(
+                          _groupLabel(item),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       );
                     }).toList(),
                     onChanged: (value) {

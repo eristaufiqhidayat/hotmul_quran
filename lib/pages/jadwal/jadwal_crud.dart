@@ -296,6 +296,7 @@ class _EditjadwalPageState extends State<EditjadwalPage> {
                     ),
                   )
                 : DropdownButtonFormField<String>(
+                    isExpanded: true,
                     value:
                         groups.any(
                           (g) => g['user_id']?.toString() == selectedUserId,
@@ -310,7 +311,10 @@ class _EditjadwalPageState extends State<EditjadwalPage> {
                       final val = item['user_id']?.toString();
                       return DropdownMenuItem<String>(
                         value: val,
-                        child: Text(_groupLabel(item)),
+                        child: Text(
+                          _groupLabel(item),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       );
                     }).toList(),
                     onChanged: (value) {
