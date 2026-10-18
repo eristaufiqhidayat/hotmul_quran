@@ -222,9 +222,11 @@ class _EditAnggotaPageState extends State<EditAnggotaPage> {
                               });
                             },
                           ),
-                          const Text(
-                            "Ganti Password",
-                            style: TextStyle(color: Colors.white),
+                          const Flexible(
+                            child: Text(
+                              "Ganti Password",
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
                         ],
                       ),

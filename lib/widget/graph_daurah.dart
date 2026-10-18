@@ -75,29 +75,34 @@ class _DaurahScreenState extends State<DaurahScreen> {
               child: Column(
                 children: [
                   // Chart Type Selector
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ChoiceChip(
-                        label: Text('Bar Chart'),
-                        selected: _selectedChartType == 0,
-                        onSelected: (selected) {
-                          setState(() {
-                            _selectedChartType = 0;
-                          });
-                        },
-                      ),
-                      SizedBox(width: 10),
-                      ChoiceChip(
-                        label: Text('Pie Chart'),
-                        selected: _selectedChartType == 1,
-                        onSelected: (selected) {
-                          setState(() {
-                            _selectedChartType = 1;
-                          });
-                        },
-                      ),
-                    ],
+                  SizedBox(
+                    width: double.infinity,
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        ChoiceChip(
+                          label: Text('Bar Chart'),
+                          selected: _selectedChartType == 0,
+                          onSelected: (selected) {
+                            setState(() {
+                              _selectedChartType = 0;
+                            });
+                          },
+                        ),
+                        SizedBox(width: 10),
+                        ChoiceChip(
+                          label: Text('Pie Chart'),
+                          selected: _selectedChartType == 1,
+                          onSelected: (selected) {
+                            setState(() {
+                              _selectedChartType = 1;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 20),
 
