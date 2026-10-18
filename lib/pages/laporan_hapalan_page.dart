@@ -113,6 +113,7 @@ class _LaporanHafalanPageState extends State<LaporanHafalanPage> {
           Padding(
             padding: const EdgeInsets.all(12),
             child: DropdownButtonFormField<int>(
+              isExpanded: true,
               value: selectedDaurahId,
               decoration: InputDecoration(
                 labelText: "Pilih Daurah",
@@ -121,7 +122,10 @@ class _LaporanHafalanPageState extends State<LaporanHafalanPage> {
                 ),
               ),
               items: daurahList.map((e) {
-                return DropdownMenuItem<int>(value: e.id, child: Text(e.name));
+                return DropdownMenuItem<int>(
+                  value: e.id,
+                  child: Text(e.name, overflow: TextOverflow.ellipsis),
+                );
               }).toList(),
               onChanged: (value) {
                 setState(() {

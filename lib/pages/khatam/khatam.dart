@@ -154,6 +154,7 @@ class _AdminUpdateKhatamPageState extends State<AdminUpdateKhatamPage> {
                   const SizedBox(height: 8),
 
                   DropdownButtonFormField(
+                    isExpanded: true,
                     value: selectedDaurah,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
@@ -164,7 +165,10 @@ class _AdminUpdateKhatamPageState extends State<AdminUpdateKhatamPage> {
                     items: daurahList.map((e) {
                       return DropdownMenuItem(
                         value: e,
-                        child: Text(e.name ?? '-'),
+                        child: Text(
+                          e.name ?? '-',
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       );
                     }).toList(),
 
@@ -228,6 +232,7 @@ class _AdminUpdateKhatamPageState extends State<AdminUpdateKhatamPage> {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   DropdownButtonFormField(
+                    isExpanded: true,
                     value: selectedAnggota,
 
                     decoration: InputDecoration(
@@ -239,7 +244,10 @@ class _AdminUpdateKhatamPageState extends State<AdminUpdateKhatamPage> {
                     items: anggotaList.map((e) {
                       return DropdownMenuItem(
                         value: e,
-                        child: Text("${e.name} - Juz ${e.juz}"),
+                        child: Text(
+                          "${e.name} - Juz ${e.juz}",
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       );
                     }).toList(),
 
@@ -312,6 +320,7 @@ class _AdminUpdateKhatamPageState extends State<AdminUpdateKhatamPage> {
                             /// DROPDOWN STATUS
                             /// ===============================
                             DropdownButtonFormField(
+                              isExpanded: true,
                               value: selectedStatus,
                               decoration: InputDecoration(
                                 labelText: "Status",

@@ -28,6 +28,7 @@ class _SendMessagePageState extends State<SendMessagePage> {
           children: [
             // Dropdown target type
             DropdownButtonFormField<String>(
+              isExpanded: true,
               value: targetType,
               decoration: const InputDecoration(labelText: "Target Type"),
               items: const [

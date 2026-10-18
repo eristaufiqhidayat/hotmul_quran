@@ -31,6 +31,7 @@ class _RoleDropdownState extends State<RoleDropdown> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
+          isExpanded: true,
           decoration: const InputDecoration(
             filled: true,
             fillColor: Colors.white,
