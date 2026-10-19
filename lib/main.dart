@@ -7,6 +7,7 @@ import 'package:hotmul_quran/pages/setor_hafalan_page.dart';
 import 'package:provider/provider.dart';
 
 import 'package:hotmul_quran/providers/auth_provider.dart';
+import 'package:hotmul_quran/service/http_override/http_override.dart';
 import 'package:hotmul_quran/pages/login.dart';
 import 'package:hotmul_quran/pages/dashboard.dart';
 import 'package:hotmul_quran/pages/homepage.dart';
@@ -15,6 +16,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  setupHttpOverrides();
 
   runApp(const MyApp());
 }
