@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:hotmul_quran/pages/admin_monitoring_page.dart';
 import 'package:hotmul_quran/pages/anggota/group_hotmul.dart';
 import 'package:hotmul_quran/pages/daurah/group_daurah.dart';
-import 'package:hotmul_quran/pages/donasi/donasi.dart';
+import 'package:hotmul_quran/pages/badal_page.dart';
+import 'package:hotmul_quran/pages/dokumentasi/dokumentasi_page.dart';
+import 'package:hotmul_quran/pages/jadwal_bergulir_page.dart';
+import 'package:hotmul_quran/pages/kas/kas_grup_page.dart';
 import 'package:hotmul_quran/pages/jadwal/jadwal.dart';
 import 'package:hotmul_quran/pages/khatam/khatam.dart';
 import 'package:hotmul_quran/pages/khotmulperiode_page.dart';
@@ -18,7 +21,10 @@ import 'package:hotmul_quran/pages/setoranListPage.dart';
 class MenuItem {
   final String title;
   final IconData icon;
-  MenuItem(this.title, this.icon);
+
+  /// Tampilkan label "Baru" di grid dashboard.
+  final bool isNew;
+  MenuItem(this.title, this.icon, {this.isNew = false});
 }
 
 /// Menu admin kelompok (BRD 3: membuat grup, mengatur anggota, memantau).
@@ -27,24 +33,47 @@ final List<MenuItem> menuItems = [
   MenuItem('Anggota', Icons.person),
   MenuItem('Dauroh', Icons.menu),
   MenuItem('Khatam', Icons.check_circle),
-  MenuItem('Donasi', Icons.credit_card),
+  MenuItem('Donasi / Kas Grup', Icons.credit_card),
   MenuItem('Jadwal Khatam', Icons.calendar_today),
   MenuItem('Khotmul Periode', Icons.crisis_alert_outlined),
   MenuItem('Reward', Icons.card_giftcard),
   MenuItem('Laporan', Icons.pie_chart),
+  MenuItem('Jadwal Bergulir', Icons.event_repeat, isNew: true),
+  MenuItem('Badal', Icons.swap_horiz, isNew: true),
+  MenuItem('Dokumentasi Khotaman', Icons.drive_folder_upload, isNew: true),
 ];
 
 /// Menu anggota (BRD 3: lapor hafalan, lihat jadwal, notifikasi).
 final List<MenuItem> menuItems2 = [
   MenuItem('Beranda Hafalan', Icons.home_outlined),
   MenuItem('Setoran Hafalan', Icons.edit_note),
+  MenuItem('Jadwal Bergulir', Icons.event_repeat, isNew: true),
+  MenuItem('Badal', Icons.swap_horiz, isNew: true),
   MenuItem('Notifikasi', Icons.notifications_outlined),
-  MenuItem('Donasi', Icons.credit_card),
+  MenuItem('Donasi / Kas Grup', Icons.credit_card),
   MenuItem('Jadwal Khatam', Icons.calendar_today),
   MenuItem('Reward', Icons.card_giftcard),
   MenuItem('Laporan', Icons.pie_chart),
+  MenuItem('Dokumentasi Khotaman', Icons.drive_folder_upload, isNew: true),
 ];
+
+/// Menu fitur BRD yang sama untuk admin dan anggota. Mengembalikan true
+/// jika [title] ditangani di sini.
+bool _onMenuBersama(BuildContext context, String title) {
+  final Widget? page = switch (title) {
+    'Donasi / Kas Grup' => const KasGrupPage(),
+    'Jadwal Bergulir' => const JadwalBergulirPage(),
+    'Badal' => const BadalPage(),
+    'Dokumentasi Khotaman' => const DokumentasiPage(),
+    _ => null,
+  };
+  if (page == null) return false;
+  Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+  return true;
+}
+
 void onMenuClick(BuildContext context, String title) {
+  if (_onMenuBersama(context, title)) return;
   switch (title) {
     case 'Monitoring':
       Navigator.push(
@@ -68,12 +97,6 @@ void onMenuClick(BuildContext context, String title) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => AdminUpdateKhatamPage()),
-      );
-      break;
-    case 'Donasi':
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => DonasiPage()),
       );
       break;
     case 'Jadwal Khatam':
@@ -108,6 +131,7 @@ void onMenuClick(BuildContext context, String title) {
 }
 
 void onMenuClick2(BuildContext context, String title) {
+  if (_onMenuBersama(context, title)) return;
   switch (title) {
     case 'Beranda Hafalan':
       Navigator.push(
@@ -125,12 +149,6 @@ void onMenuClick2(BuildContext context, String title) {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => SetoranListPage()),
-      );
-      break;
-    case 'Donasi':
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => DonasiPage()),
       );
       break;
     case 'Jadwal Khatam':

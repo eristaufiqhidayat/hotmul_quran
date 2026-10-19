@@ -24,6 +24,7 @@ class _SetoranHafalanPageState extends State<SetoranHafalanPage> {
   final catatanController = TextEditingController();
 
   Assignment? _assignment;
+  Assignment? _badal;
   int _targetAyat = 0;
   bool _argsRead = false;
   bool isLoading = true;
@@ -33,7 +34,8 @@ class _SetoranHafalanPageState extends State<SetoranHafalanPage> {
   @override
   void initState() {
     super.initState();
-    loadAssignment();
+    // microtask: tunggu argumen route (juz badal) dibaca di didChangeDependencies
+    Future.microtask(loadAssignment);
   }
 
   @override
@@ -47,6 +49,14 @@ class _SetoranHafalanPageState extends State<SetoranHafalanPage> {
     if (args is Map) {
       _targetAyat = int.tryParse(args['target_ayat']?.toString() ?? '') ?? 0;
       final juz = args['juz'];
+      // setoran untuk juz badal (BadalPage) memakai assignment_id juz itu
+      final badalId = int.tryParse(args['assignment_id']?.toString() ?? '');
+      if (badalId != null) {
+        _badal = Assignment(
+          id: badalId,
+          juzNumber: int.tryParse(juz?.toString() ?? '') ?? 0,
+        );
+      }
       ayatFromController.text = '1';
       if (_targetAyat > 0) {
         ayatToController.text = '$_targetAyat';
@@ -70,10 +80,10 @@ class _SetoranHafalanPageState extends State<SetoranHafalanPage> {
       _error = null;
     });
     try {
-      final a = await _repo.getActiveAssignment();
+      final a = _badal ?? await _repo.getActiveAssignment();
       if (!mounted) return;
       setState(() {
-        _assignment = a;
+        _assignment = _badal ?? a;
         isLoading = false;
       });
     } catch (e) {
