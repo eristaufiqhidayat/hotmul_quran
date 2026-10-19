@@ -1,10 +1,9 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/model/hadith_model.dart';
 import 'package:hotmul_quran/pages/hadith/hadith_detail_page.dart';
 import 'package:hotmul_quran/pages/hadith/hadith_style.dart';
 
-/// Daftar hadits satu kitab, dimuat bertahap saat digulir.
+/// Daftar hadits satu kitab, dimuat per bagian (kitab/bab) saat digulir.
 class HadithListPage extends StatefulWidget {
   final HadithBook book;
 
@@ -15,20 +14,25 @@ class HadithListPage extends StatefulWidget {
 }
 
 class _HadithListPageState extends State<HadithListPage> {
-  static const int _pageSize = 50;
+  /// Nomor bagian yang hilang berturut-turut sebelum dianggap akhir kitab.
+  static const int _maxMisses = 3;
 
-  final List<Hadith> _hadiths = [];
+  final List<HadithSection> _sections = [];
   final ScrollController _scroll = ScrollController();
   final TextEditingController _search = TextEditingController();
 
+  int _nextSection = 0;
+  int _misses = 0;
+  bool _ended = false;
   bool _loading = false;
   bool _failed = false;
   bool _loadingAll = false;
   String _query = '';
 
-  bool get _hasMore => _hadiths.length < widget.book.available;
-
   int? get _queryNumber => int.tryParse(_query);
+
+  int get _loadedCount =>
+      _sections.fold<int>(0, (sum, s) => sum + s.hadiths.length);
 
   @override
   void initState() {
@@ -49,20 +53,39 @@ class _HadithListPageState extends State<HadithListPage> {
     super.dispose();
   }
 
-  Future<void> _loadMore({int size = _pageSize}) async {
-    if (_loading || !_hasMore) return;
+  Future<void> _loadMore() async {
+    if (_loading || _ended) return;
     setState(() {
       _loading = true;
       _failed = false;
     });
     try {
-      final start = _hadiths.length + 1;
-      final end = math.min(start + size - 1, widget.book.available);
-      final data = await HadithApi.fetchRange(widget.book.id, start, end);
+      // Lewati bagian yang kosong supaya layar tidak berhenti tanpa isi.
+      while (!_ended) {
+        final number = _nextSection;
+        try {
+          final section = await HadithApi.fetchSection(widget.book.id, number);
+          _nextSection++;
+          _misses = 0;
+          if (section.hadiths.isEmpty) continue;
+          _sections.add(section);
+          break;
+        } on HadithNotFound {
+          _nextSection++;
+          // Bagian 0 (mukadimah) memang tidak selalu ada.
+          if (number > 0 && ++_misses >= _maxMisses) _ended = true;
+        }
+      }
       if (!mounted) return;
-      setState(() {
-        _hadiths.addAll(data);
-        _loading = false;
+      setState(() => _loading = false);
+      // Isi layar sampai bisa digulir.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted &&
+            _query.isEmpty &&
+            _scroll.hasClients &&
+            _scroll.position.maxScrollExtent < 600) {
+          _loadMore();
+        }
       });
     } catch (e) {
       debugPrint('Error: $e');
@@ -80,13 +103,13 @@ class _HadithListPageState extends State<HadithListPage> {
       _loadingAll = true;
       _failed = false;
     });
-    while (mounted && _hasMore && !_failed) {
+    while (mounted && !_ended && !_failed) {
       if (_loading) {
         // Tunggu permintaan yang sedang berjalan selesai dulu.
         await Future<void>.delayed(const Duration(milliseconds: 200));
         continue;
       }
-      await _loadMore(size: HadithApi.maxRange);
+      await _loadMore();
     }
     if (mounted) setState(() => _loadingAll = false);
   }
@@ -104,26 +127,27 @@ class _HadithListPageState extends State<HadithListPage> {
     );
   }
 
-  List<Hadith> get _filtered {
-    if (_query.isEmpty) return _hadiths;
-    final n = _queryNumber;
-    if (n != null) {
-      return _hadiths
-          .where((h) => h.number.toString().startsWith(_query))
-          .toList();
+  bool _matches(Hadith h) {
+    if (_query.isEmpty) return true;
+    if (_queryNumber != null) return h.number.toString().startsWith(_query);
+    return h.terjemah.toLowerCase().contains(_query.toLowerCase()) ||
+        h.arab.contains(_query);
+  }
+
+  /// Baris daftar: judul bagian (String) atau hadits (Hadith).
+  List<Object> get _rows {
+    final rows = <Object>[];
+    for (final s in _sections) {
+      final hadiths = s.hadiths.where(_matches).toList();
+      if (hadiths.isEmpty) continue;
+      if (_query.isEmpty && s.title.isNotEmpty) rows.add(s.title);
+      rows.addAll(hadiths);
     }
-    final q = _query.toLowerCase();
-    return _hadiths
-        .where(
-          (h) =>
-              h.terjemah.toLowerCase().contains(q) || h.arab.contains(_query),
-        )
-        .toList();
+    return rows;
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = _filtered;
     return Scaffold(
       backgroundColor: hadithPageBg,
       appBar: AppBar(
@@ -134,8 +158,8 @@ class _HadithListPageState extends State<HadithListPage> {
           children: [
             Text(widget.book.name),
             Text(
-              '${formatNumber(widget.book.available)} hadits',
-              style: const TextStyle(fontSize: 12, color: Colors.white70),
+              widget.book.arabicName,
+              style: const TextStyle(fontSize: 13, color: Colors.white70),
             ),
           ],
         ),
@@ -151,9 +175,7 @@ class _HadithListPageState extends State<HadithListPage> {
               textInputAction: TextInputAction.search,
               onSubmitted: (_) {
                 final n = _queryNumber;
-                if (n != null && n >= 1 && n <= widget.book.available) {
-                  _openHadith(n);
-                }
+                if (n != null && n >= 1) _openHadith(n);
               },
               decoration: InputDecoration(
                 hintText: 'Cari nomor atau kata, mis. niat',
@@ -177,57 +199,55 @@ class _HadithListPageState extends State<HadithListPage> {
               ),
             ),
           ),
-          Expanded(child: _buildList(items)),
+          Expanded(child: _buildList()),
         ],
       ),
     );
   }
 
-  Widget _buildList(List<Hadith> items) {
-    if (_hadiths.isEmpty && _loading) {
+  Widget _buildList() {
+    if (_sections.isEmpty && (_loading || (!_failed && !_ended))) {
       return const Center(
         child: CircularProgressIndicator(color: hadithGreenMid),
       );
     }
-    if (_hadiths.isEmpty && _failed) {
+    if (_sections.isEmpty && _failed) {
       return HadithErrorView(
         message: 'Gagal memuat hadits.',
         onRetry: _loadMore,
       );
     }
 
+    final rows = _rows;
     final header = <Widget>[];
     final n = _queryNumber;
     if (n != null) {
-      header.add(
-        n >= 1 && n <= widget.book.available
-            ? _ActionTile(
-                icon: Icons.open_in_new,
-                text: 'Buka hadits nomor $n',
-                onTap: () => _openHadith(n),
-              )
-            : _InfoTile(
-                text:
-                    'Nomor hadits ${widget.book.shortName} hanya 1 sampai '
-                    '${formatNumber(widget.book.available)}.',
-              ),
-      );
+      if (n >= 1) {
+        header.add(
+          _ActionTile(
+            icon: Icons.open_in_new,
+            text: 'Buka hadits nomor $n',
+            onTap: () => _openHadith(n),
+          ),
+        );
+      }
     } else if (_query.isNotEmpty) {
       header.add(
         _InfoTile(
           text:
-              '${items.length} hasil dari ${formatNumber(_hadiths.length)} '
+              '${rows.length} hasil dari ${formatNumber(_loadedCount)} '
               'hadits yang sudah dimuat.',
         ),
       );
-      if (_hasMore) {
+      if (!_ended) {
         header.add(
           _loadingAll
               ? _InfoTile(
                   text:
-                      'Memuat semua hadits… ${formatNumber(_hadiths.length)}'
-                      ' / ${formatNumber(widget.book.available)}',
-                  progress: _hadiths.length / widget.book.available,
+                      'Memuat semua hadits… '
+                      '${formatNumber(_loadedCount)} hadits dimuat',
+                  progress: null,
+                  busy: true,
                 )
               : _ActionTile(
                   icon: Icons.manage_search,
@@ -238,15 +258,15 @@ class _HadithListPageState extends State<HadithListPage> {
       }
     }
 
-    final showFooter = _query.isEmpty && (_hasMore || _failed);
+    final showFooter = _query.isEmpty && (!_ended || _failed);
     return ListView.builder(
       controller: _scroll,
       padding: const EdgeInsets.only(top: 8, bottom: 24),
-      itemCount: header.length + items.length + (showFooter ? 1 : 0),
+      itemCount: header.length + rows.length + (showFooter ? 1 : 0),
       itemBuilder: (context, i) {
         if (i < header.length) return header[i];
         final idx = i - header.length;
-        if (idx == items.length) {
+        if (idx == rows.length) {
           return Padding(
             padding: const EdgeInsets.all(16),
             child: Center(
@@ -260,13 +280,44 @@ class _HadithListPageState extends State<HadithListPage> {
             ),
           );
         }
-        final h = items[idx];
+        final row = rows[idx];
+        if (row is String) return _SectionTitle(title: row);
+        final h = row as Hadith;
         return _HadithCard(
           hadith: h,
           bookName: widget.book.shortName,
           onTap: () => _openHadith(h.number, h),
         );
       },
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String title;
+
+  const _SectionTitle({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+      child: Row(
+        children: [
+          const Icon(Icons.bookmark, size: 18, color: hadithGreenMid),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: hadithGreen,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -339,7 +390,9 @@ class _HadithCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  hadith.terjemah,
+                  hadith.terjemah.isEmpty
+                      ? 'Terjemah belum tersedia'
+                      : hadith.terjemah,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -393,8 +446,9 @@ class _ActionTile extends StatelessWidget {
 class _InfoTile extends StatelessWidget {
   final String text;
   final double? progress;
+  final bool busy;
 
-  const _InfoTile({required this.text, this.progress});
+  const _InfoTile({required this.text, this.progress, this.busy = false});
 
   @override
   Widget build(BuildContext context) {
@@ -404,7 +458,7 @@ class _InfoTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(text, style: TextStyle(color: Colors.grey.shade700)),
-          if (progress != null) ...[
+          if (progress != null || busy) ...[
             const SizedBox(height: 6),
             LinearProgressIndicator(
               value: progress,
