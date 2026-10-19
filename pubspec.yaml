@@ -55,3 +55,9 @@ flutter:
     - assets/images/logo.png
     - assets/habib-hasan.jpeg
     - assets/barcode.jpeg
+
+  fonts:
+    # Amiri Quran (SIL OFL 1.1, lihat assets/fonts/AmiriQuran-OFL.txt)
+    - family: AmiriQuran
+      fonts:
+        - asset: assets/fonts/AmiriQuran-Regular.ttf
