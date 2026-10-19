@@ -80,7 +80,7 @@ class _MainPageState extends State<MainPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.menu_book_outlined),
-            label: 'Surat',
+            label: 'Qur\'an',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.auto_stories_outlined),

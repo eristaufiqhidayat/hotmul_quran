@@ -27,6 +27,7 @@ class _HadithDetailPageState extends State<HadithDetailPage> {
   Hadith? _hadith;
   bool _loading = false;
   bool _failed = false;
+  bool _notFound = false;
   double _arabicSize = 26;
 
   @override
@@ -40,35 +41,56 @@ class _HadithDetailPageState extends State<HadithDetailPage> {
     }
   }
 
-  Future<void> _fetch() async {
-    setState(() {
-      _loading = true;
-      _failed = false;
-    });
-    try {
-      final h = await HadithApi.fetchOne(widget.book.id, _number);
-      if (!mounted) return;
-      setState(() {
-        _hadith = h;
-        _loading = false;
-      });
-    } catch (e) {
-      debugPrint('Error: $e');
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        _failed = true;
-      });
-    }
-  }
+  Future<void> _fetch() => _load(_number, 0);
 
-  void _goTo(int number) {
-    if (number < 1 || number > widget.book.available) return;
+  /// Muat hadits [number]. Nomor di kitab ini tidak selalu berurutan, jadi
+  /// saat bergeser dengan [step] nomor yang kosong dilewati.
+  Future<void> _load(int number, int step) async {
     setState(() {
       _number = number;
       _hadith = null;
+      _loading = true;
+      _failed = false;
+      _notFound = false;
     });
-    _fetch();
+    var n = number;
+    for (int attempt = 0; ; attempt++) {
+      try {
+        final h = await HadithApi.fetchOne(widget.book.id, n);
+        if (!mounted) return;
+        setState(() {
+          _number = n;
+          _hadith = h;
+          _loading = false;
+        });
+        return;
+      } on HadithNotFound {
+        if (step != 0 && attempt < 10 && n + step >= 1) {
+          n += step;
+          continue;
+        }
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _failed = true;
+          _notFound = true;
+        });
+        return;
+      } catch (e) {
+        debugPrint('Error: $e');
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _failed = true;
+        });
+        return;
+      }
+    }
+  }
+
+  void _goTo(int step) {
+    if (_number + step < 1) return;
+    _load(_number + step, step);
   }
 
   String get _shareText {
@@ -118,7 +140,7 @@ class _HadithDetailPageState extends State<HadithDetailPage> {
               Expanded(
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(foregroundColor: hadithGreen),
-                  onPressed: _number > 1 ? () => _goTo(_number - 1) : null,
+                  onPressed: _number > 1 && !_loading ? () => _goTo(-1) : null,
                   icon: const Icon(Icons.chevron_left),
                   label: const Text('Sebelumnya'),
                 ),
@@ -129,9 +151,7 @@ class _HadithDetailPageState extends State<HadithDetailPage> {
                   style: FilledButton.styleFrom(
                     backgroundColor: hadithGreenMid,
                   ),
-                  onPressed: _number < widget.book.available
-                      ? () => _goTo(_number + 1)
-                      : null,
+                  onPressed: _loading ? null : () => _goTo(1),
                   icon: const Icon(Icons.chevron_right),
                   label: const Text('Berikutnya'),
                 ),
@@ -150,6 +170,17 @@ class _HadithDetailPageState extends State<HadithDetailPage> {
       );
     }
     if (_failed) {
+      if (_notFound) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              'Hadits nomor $_number tidak ditemukan di ${widget.book.name}.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
       return HadithErrorView(message: 'Gagal memuat hadits.', onRetry: _fetch);
     }
     final h = _hadith!;
@@ -181,8 +212,7 @@ class _HadithDetailPageState extends State<HadithDetailPage> {
                       ),
                     ),
                     Text(
-                      'Hadits nomor ${h.number} dari '
-                      '${formatNumber(widget.book.available)}',
+                      'Hadits nomor ${h.number}',
                       style: const TextStyle(color: Colors.white70),
                     ),
                   ],
@@ -233,7 +263,7 @@ class _HadithDetailPageState extends State<HadithDetailPage> {
         ),
         const SizedBox(height: 6),
         SelectableText(
-          h.terjemah,
+          h.terjemah.isEmpty ? 'Terjemah belum tersedia.' : h.terjemah,
           style: const TextStyle(fontSize: 16, height: 1.6),
         ),
       ],

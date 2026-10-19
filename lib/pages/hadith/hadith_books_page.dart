@@ -12,85 +12,50 @@ class HadithBooksPage extends StatefulWidget {
 }
 
 class _HadithBooksPageState extends State<HadithBooksPage> {
-  late Future<List<HadithBook>> _future;
   String _query = '';
 
   @override
-  void initState() {
-    super.initState();
-    _future = HadithApi.fetchBooks();
-  }
-
-  void _reload() {
-    setState(() => _future = HadithApi.fetchBooks());
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final q = _query.toLowerCase();
+    final books = HadithBook.all
+        .where(
+          (b) =>
+              q.isEmpty ||
+              b.name.toLowerCase().contains(q) ||
+              b.author.toLowerCase().contains(q),
+        )
+        .toList();
+
     return Container(
       color: hadithPageBg,
-      child: FutureBuilder<List<HadithBook>>(
-        future: _future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: hadithGreenMid),
-            );
-          }
-          if (snapshot.hasError) {
-            return HadithErrorView(
-              message: 'Gagal memuat daftar kitab hadits.',
-              onRetry: _reload,
-            );
-          }
-          final q = _query.toLowerCase();
-          final books = snapshot.data!
-              .where(
-                (b) =>
-                    q.isEmpty ||
-                    b.name.toLowerCase().contains(q) ||
-                    b.author.toLowerCase().contains(q),
-              )
-              .toList();
-          final total = snapshot.data!.fold<int>(0, (s, b) => s + b.available);
-
-          return RefreshIndicator(
-            color: hadithGreenMid,
-            onRefresh: () async {
-              _reload();
-              await _future;
-            },
-            child: ListView(
-              padding: const EdgeInsets.only(bottom: 24),
-              children: [
-                _Header(bookCount: snapshot.data!.length, total: total),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                  child: TextField(
-                    onChanged: (v) => setState(() => _query = v.trim()),
-                    decoration: InputDecoration(
-                      hintText: 'Cari kitab, mis. Bukhari',
-                      prefixIcon: const Icon(Icons.search),
-                      filled: true,
-                      fillColor: Colors.white,
-                      isDense: true,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
+      child: ListView(
+        padding: const EdgeInsets.only(bottom: 24),
+        children: [
+          _Header(bookCount: HadithBook.all.length),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: TextField(
+              onChanged: (v) => setState(() => _query = v.trim()),
+              decoration: InputDecoration(
+                hintText: 'Cari kitab, mis. Bukhari',
+                prefixIcon: const Icon(Icons.search),
+                filled: true,
+                fillColor: Colors.white,
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
-                if (books.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(child: Text('Kitab tidak ditemukan')),
-                  ),
-                for (final b in books) _BookCard(book: b),
-              ],
+              ),
             ),
-          );
-        },
+          ),
+          if (books.isEmpty)
+            const Padding(
+              padding: EdgeInsets.all(32),
+              child: Center(child: Text('Kitab tidak ditemukan')),
+            ),
+          for (final b in books) _BookCard(book: b),
+        ],
       ),
     );
   }
@@ -98,9 +63,8 @@ class _HadithBooksPageState extends State<HadithBooksPage> {
 
 class _Header extends StatelessWidget {
   final int bookCount;
-  final int total;
 
-  const _Header({required this.bookCount, required this.total});
+  const _Header({required this.bookCount});
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +95,7 @@ class _Header extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '$bookCount kitab · ${formatNumber(total)} hadits\n'
+                  '$bookCount kitab hadits\n'
                   'Teks Arab dan terjemah Indonesia',
                   style: const TextStyle(color: Colors.white70, height: 1.4),
                 ),
@@ -204,33 +168,23 @@ class _BookCard extends StatelessWidget {
                             color: Colors.grey.shade700,
                           ),
                         ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${formatNumber(book.available)} hadits',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: hadithGreenMid,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
                     ],
                   ),
                 ),
-                if (book.arabicName.isNotEmpty)
-                  Flexible(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        book.arabicName,
-                        textDirection: TextDirection.rtl,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          color: hadithGreen,
-                          fontWeight: FontWeight.bold,
-                        ),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      book.arabicName,
+                      textDirection: TextDirection.rtl,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: hadithGreen,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
+                ),
                 const SizedBox(width: 6),
                 const Icon(Icons.chevron_right, color: Colors.grey),
               ],

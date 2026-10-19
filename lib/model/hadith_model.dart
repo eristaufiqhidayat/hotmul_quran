@@ -1,64 +1,68 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-/// Kitab hadits (Bukhari, Muslim, dst.) dari api.hadith.gading.dev.
+/// Kitab hadits yang punya terjemah Indonesia di Hadith API (fawazahmed0),
+/// disajikan lewat CDN jsDelivr. Daftarnya disimpan di aplikasi supaya
+/// halaman kitab tidak bergantung pada server.
 class HadithBook {
   final String id;
   final String name;
-  final int available;
+  final String arabicName;
+  final String author;
 
-  HadithBook({required this.id, required this.name, required this.available});
-
-  factory HadithBook.fromJson(Map<String, dynamic> json) {
-    return HadithBook(
-      id: json['id'] as String,
-      name: (json['name'] ?? json['id']) as String,
-      available: (json['available'] as num?)?.toInt() ?? 0,
-    );
-  }
+  const HadithBook({
+    required this.id,
+    required this.name,
+    required this.arabicName,
+    required this.author,
+  });
 
   /// Nama imam tanpa awalan "HR. ", mis. "Bukhari".
   String get shortName => name.replaceFirst(RegExp(r'^HR\.?\s*'), '');
 
-  String get arabicName => _arabicNames[id] ?? '';
-
-  String get author => _authors[id] ?? '';
-
-  static const Map<String, String> _arabicNames = {
-    'bukhari': 'صحيح البخاري',
-    'muslim': 'صحيح مسلم',
-    'abu-daud': 'سنن أبي داود',
-    'tirmidzi': 'سنن الترمذي',
-    'nasai': 'سنن النسائي',
-    'ibnu-majah': 'سنن ابن ماجه',
-    'ahmad': 'مسند أحمد',
-    'malik': 'موطأ مالك',
-    'darimi': 'سنن الدارمي',
-  };
-
-  static const Map<String, String> _authors = {
-    'bukhari': 'Imam Muhammad bin Ismail al-Bukhari',
-    'muslim': 'Imam Muslim bin al-Hajjaj',
-    'abu-daud': 'Imam Abu Dawud as-Sijistani',
-    'tirmidzi': 'Imam Abu Isa at-Tirmidzi',
-    'nasai': 'Imam Ahmad bin Syu\'aib an-Nasa\'i',
-    'ibnu-majah': 'Imam Muhammad bin Yazid Ibnu Majah',
-    'ahmad': 'Imam Ahmad bin Hanbal',
-    'malik': 'Imam Malik bin Anas',
-    'darimi': 'Imam Abdullah bin Abdurrahman ad-Darimi',
-  };
-
-  /// Urutan tampilan: Kutubus Sittah dulu, lalu kitab lain.
-  static const List<String> order = [
-    'bukhari',
-    'muslim',
-    'abu-daud',
-    'tirmidzi',
-    'nasai',
-    'ibnu-majah',
-    'ahmad',
-    'malik',
-    'darimi',
+  static const List<HadithBook> all = [
+    HadithBook(
+      id: 'bukhari',
+      name: 'HR. Bukhari',
+      arabicName: 'صحيح البخاري',
+      author: 'Imam Muhammad bin Ismail al-Bukhari',
+    ),
+    HadithBook(
+      id: 'muslim',
+      name: 'HR. Muslim',
+      arabicName: 'صحيح مسلم',
+      author: 'Imam Muslim bin al-Hajjaj',
+    ),
+    HadithBook(
+      id: 'abudawud',
+      name: 'HR. Abu Dawud',
+      arabicName: 'سنن أبي داود',
+      author: 'Imam Abu Dawud as-Sijistani',
+    ),
+    HadithBook(
+      id: 'tirmidhi',
+      name: 'HR. Tirmidzi',
+      arabicName: 'جامع الترمذي',
+      author: 'Imam Abu Isa at-Tirmidzi',
+    ),
+    HadithBook(
+      id: 'nasai',
+      name: 'HR. Nasa\'i',
+      arabicName: 'سنن النسائي',
+      author: 'Imam Ahmad bin Syu\'aib an-Nasa\'i',
+    ),
+    HadithBook(
+      id: 'ibnmajah',
+      name: 'HR. Ibnu Majah',
+      arabicName: 'سنن ابن ماجه',
+      author: 'Imam Muhammad bin Yazid Ibnu Majah',
+    ),
+    HadithBook(
+      id: 'malik',
+      name: 'HR. Malik',
+      arabicName: 'موطأ مالك',
+      author: 'Imam Malik bin Anas',
+    ),
   ];
 }
 
@@ -68,63 +72,73 @@ class Hadith {
   final String terjemah;
 
   Hadith({required this.number, required this.arab, required this.terjemah});
-
-  factory Hadith.fromJson(Map<String, dynamic> json) {
-    return Hadith(
-      number: (json['number'] as num).toInt(),
-      arab: (json['arab'] ?? '') as String,
-      terjemah: (json['id'] ?? '') as String,
-    );
-  }
 }
 
+/// Satu bagian (kitab/bab) dari sebuah kitab hadits.
+class HadithSection {
+  final int number;
+  final String title;
+  final List<Hadith> hadiths;
+
+  HadithSection({
+    required this.number,
+    required this.title,
+    required this.hadiths,
+  });
+}
+
+class HadithNotFound implements Exception {}
+
 class HadithApi {
-  static const String _base = 'https://api.hadith.gading.dev/books';
+  static const String _base =
+      'https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions';
 
-  /// Batas maksimal satu permintaan range dari API.
-  static const int maxRange = 300;
-
-  static Future<dynamic> _getData(String url) async {
+  static Future<Map<String, dynamic>> _getJson(String url) async {
     final res = await http.get(Uri.parse(url));
+    if (res.statusCode == 404) throw HadithNotFound();
     if (res.statusCode != 200) throw Exception('HTTP ${res.statusCode}');
-    final map = json.decode(res.body) as Map<String, dynamic>;
-    if (map['error'] == true) {
-      throw Exception(map['message'] ?? 'Gagal memuat hadits');
-    }
-    return map['data'];
+    return json.decode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
   }
 
-  static Future<List<HadithBook>> fetchBooks() async {
-    final data = await _getData(_base) as List;
-    final books = data
-        .map((e) => HadithBook.fromJson(e as Map<String, dynamic>))
-        .toList();
-    int rank(HadithBook b) {
-      final i = HadithBook.order.indexOf(b.id);
-      return i < 0 ? HadithBook.order.length : i;
-    }
-
-    books.sort((a, b) => rank(a).compareTo(rank(b)));
-    return books;
-  }
-
-  /// Hadits nomor [start] sampai [end] (inklusif) dari kitab [bookId].
-  static Future<List<Hadith>> fetchRange(
+  /// Ambil edisi Indonesia dan Arab untuk [path] lalu gabungkan per nomor.
+  static Future<(Map<String, dynamic>, List<Hadith>)> _fetchPair(
     String bookId,
-    int start,
-    int end,
+    String path,
   ) async {
-    final data =
-        await _getData('$_base/$bookId?range=$start-$end')
-            as Map<String, dynamic>;
-    return (data['hadiths'] as List)
-        .map((e) => Hadith.fromJson(e as Map<String, dynamic>))
-        .toList();
+    final results = await Future.wait([
+      _getJson('$_base/ind-$bookId/$path.min.json'),
+      _getJson('$_base/ara-$bookId/$path.min.json'),
+    ]);
+    final ind = results[0];
+    final ara = results[1];
+
+    int numberOf(dynamic h) => (h['hadithnumber'] as num).toInt();
+    final arabByNumber = <int, String>{
+      for (final h in ara['hadiths'] as List)
+        numberOf(h): (h['text'] ?? '') as String,
+    };
+    final hadiths = <Hadith>[];
+    for (final h in ind['hadiths'] as List) {
+      final n = numberOf(h);
+      final arab = arabByNumber[n] ?? '';
+      final terjemah = ((h['text'] ?? '') as String).trim();
+      if (arab.isEmpty && terjemah.isEmpty) continue;
+      hadiths.add(Hadith(number: n, arab: arab, terjemah: terjemah));
+    }
+    return (ind['metadata'] as Map<String, dynamic>, hadiths);
+  }
+
+  /// Bagian ke-[number]; melempar [HadithNotFound] bila tidak ada.
+  static Future<HadithSection> fetchSection(String bookId, int number) async {
+    final (meta, hadiths) = await _fetchPair(bookId, 'sections/$number');
+    final section = meta['section'];
+    final title = section is Map ? (section['$number'] ?? '') as String : '';
+    return HadithSection(number: number, title: title, hadiths: hadiths);
   }
 
   static Future<Hadith> fetchOne(String bookId, int number) async {
-    final data =
-        await _getData('$_base/$bookId/$number') as Map<String, dynamic>;
-    return Hadith.fromJson(data['contents'] as Map<String, dynamic>);
+    final (_, hadiths) = await _fetchPair(bookId, '$number');
+    if (hadiths.isEmpty) throw HadithNotFound();
+    return hadiths.first;
   }
 }
