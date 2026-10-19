@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/pages/doa.dart';
+import 'package:hotmul_quran/pages/hadith/hadith_books_page.dart';
 import 'package:hotmul_quran/pages/home.dart';
 //import 'package:hotmul_quran/pages/profile.dart';
 import 'package:hotmul_quran/pages/surah_list.dart';
-import 'package:hotmul_quran/pages/surah_detil_page.dart';
 import 'package:hotmul_quran/widget/drawer.dart';
 
 class MainPage extends StatefulWidget {
@@ -19,7 +19,7 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _pages = [
     const KhotmilQuranPage(),
     const SurahListPage(),
-    const SurahDetailPage(number: 1, name: 'Al-Fatihah'),
+    const HadithBooksPage(),
     const DoaApp(),
     //const ProfilePage(),
   ];
@@ -84,7 +84,7 @@ class _MainPageState extends State<MainPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.auto_stories_outlined),
-            label: 'Qur\'an',
+            label: 'Hadits',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.pan_tool_alt_outlined),
