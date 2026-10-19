@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hotmul_quran/config/theme_config.dart';
 import 'package:hotmul_quran/model/modelMenu.dart';
+import 'package:hotmul_quran/pages/badal_page.dart';
+import 'package:hotmul_quran/repositories/brd_repo.dart';
 import 'package:hotmul_quran/pages/messege/inbox_icon.dart';
 import 'package:hotmul_quran/pages/messege/inbox_messege.dart';
 import 'package:hotmul_quran/service/messege_service.dart';
@@ -22,6 +24,7 @@ class _DashboardState extends State<Dashboard> {
   String name = '';
   int userId = 0;
   int unreadCount = 0;
+  int badgePengganti = 0;
 
   @override
   void initState() {
@@ -41,6 +44,12 @@ class _DashboardState extends State<Dashboard> {
       isLoading = false;
     });
     _loadUnread();
+    _loadBadge();
+  }
+
+  Future<void> _loadBadge() async {
+    final n = await BrdRepo().jumlahBadge();
+    if (mounted) setState(() => badgePengganti = n);
   }
 
   Future<void> _loadUnread() async {
@@ -135,9 +144,18 @@ class _DashboardState extends State<Dashboard> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              subtitle: Text(
-                admin ? 'Admin kelompok' : 'Anggota',
-                style: const TextStyle(color: Colors.white70),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    admin ? 'Admin kelompok' : 'Anggota',
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                  if (badgePengganti > 0) ...[
+                    const SizedBox(height: 4),
+                    PenggantiAktifBadge(jumlah: badgePengganti),
+                  ],
+                ],
               ),
             ),
           ),
@@ -157,24 +175,53 @@ class _DashboardState extends State<Dashboard> {
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   onTap: () => onClick(context, item.title),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          item.icon,
-                          size: 34,
-                          color: ThemeConfig.primaryDark,
+                  child: Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                item.icon,
+                                size: 34,
+                                color: ThemeConfig.primaryDark,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                item.title,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          item.title,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 12),
+                      ),
+                      if (item.isNew)
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFC25E00),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text(
+                              'Baru',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               );

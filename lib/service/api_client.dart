@@ -78,6 +78,31 @@ class ApiClient {
     return response;
   }
 
+  /// POST multipart (upload file). [files] berisi nama field → path file.
+  static Future<http.Response> postMultipart(
+    String url, {
+    Map<String, String> fields = const {},
+    Map<String, String> files = const {},
+    Duration uploadTimeout = const Duration(minutes: 5),
+  }) async {
+    final token = await getToken();
+    final request = http.MultipartRequest('POST', Uri.parse(url));
+    request.headers.addAll({
+      "Accept": "application/json",
+      if (token != null) "Authorization": "Bearer $token",
+    });
+    request.fields.addAll(fields);
+    for (final f in files.entries) {
+      request.files.add(await http.MultipartFile.fromPath(f.key, f.value));
+    }
+
+    final streamed = await request.send().timeout(uploadTimeout);
+    final response = await http.Response.fromStream(streamed);
+
+    await _handleUnauthorized(response);
+    return response;
+  }
+
   /// HEADER DEFAULT
   static Map<String, String> _headers(String? token) {
     return {
