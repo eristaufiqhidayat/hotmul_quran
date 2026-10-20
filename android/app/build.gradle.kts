@@ -45,13 +45,24 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Sertakan simbol debug native di AAB agar Play Console bisa
+        // menampilkan stack trace crash native yang terbaca.
+        ndk {
+            debugSymbolLevel = "FULL"
+        }
     }
 
     buildTypes {
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = false
-            isShrinkResources = false
+            // R8: shrink + obfuscate kode Java/Kotlin (DEX) untuk rilis.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }
