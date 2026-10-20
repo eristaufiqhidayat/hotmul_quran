@@ -10,7 +10,10 @@ import 'package:hotmul_quran/widget/hafalan_widgets.dart';
 /// Jadwal bergulir anggota: kalender 14 hari periode berjalan (Masehi +
 /// Hijriah), riwayat juz, dan juz berikutnya (BRD FR-02, 4.6).
 class JadwalBergulirPage extends StatefulWidget {
-  const JadwalBergulirPage({super.key});
+  const JadwalBergulirPage({super.key, this.loader});
+
+  /// Sumber data; default `BrdRepo().getJadwalBergulir` (diganti di test).
+  final Future<JadwalBergulir> Function()? loader;
 
   @override
   State<JadwalBergulirPage> createState() => _JadwalBergulirPageState();
@@ -20,14 +23,17 @@ class _JadwalBergulirPageState extends State<JadwalBergulirPage> {
   late Future<JadwalBergulir> _future;
   bool _hijriSaja = false;
 
+  Future<JadwalBergulir> _load() =>
+      (widget.loader ?? BrdRepo().getJadwalBergulir)();
+
   @override
   void initState() {
     super.initState();
-    _future = BrdRepo().getJadwalBergulir();
+    _future = _load();
   }
 
   Future<void> _reload() async {
-    setState(() => _future = BrdRepo().getJadwalBergulir());
+    setState(() => _future = _load());
     await _future;
   }
 
@@ -158,7 +164,7 @@ class _JadwalBergulirPageState extends State<JadwalBergulirPage> {
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 4,
               crossAxisSpacing: 4,
-              childAspectRatio: 0.8,
+              childAspectRatio: 0.7,
               children: [for (final h in data.hari) _sel(h)],
             ),
             const SizedBox(height: 10),
@@ -198,27 +204,35 @@ class _JadwalBergulirPageState extends State<JadwalBergulirPage> {
           width: h.hariIni ? 2 : 1,
         ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            TanggalId.namaHari(h.tanggal),
-            style: TextStyle(fontSize: 9, color: fg.withValues(alpha: 0.8)),
-          ),
-          Text(
-            _hijriSaja ? '${hijri.day}' : '${h.tanggal.day}',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: fg,
-            ),
-          ),
-          if (!_hijriSaja)
+      // FittedBox: sel tetap muat di layar sempit / ukuran huruf besar
+      padding: const EdgeInsets.all(2),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
             Text(
-              '${hijri.day}',
-              style: TextStyle(fontSize: 10, color: fg.withValues(alpha: 0.85)),
+              TanggalId.namaHari(h.tanggal),
+              style: TextStyle(fontSize: 9, color: fg.withValues(alpha: 0.8)),
             ),
-        ],
+            Text(
+              _hijriSaja ? '${hijri.day}' : '${h.tanggal.day}',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: fg,
+              ),
+            ),
+            if (!_hijriSaja)
+              Text(
+                '${hijri.day}',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: fg.withValues(alpha: 0.85),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -256,8 +270,15 @@ class _JadwalBergulirPageState extends State<JadwalBergulirPage> {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      title: Text('Periode ${j.periodIndex}: Juz ${j.juz}'),
-      subtitle: Text(_rentang(j)),
+      title: Text(
+        'Juz ${j.juz}',
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      subtitle: Text(
+        'Periode ${j.periodIndex} · ${_rentang(j)}',
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
       trailing: Text(
         st.label,
         style: TextStyle(color: st.color, fontWeight: FontWeight.w600),
