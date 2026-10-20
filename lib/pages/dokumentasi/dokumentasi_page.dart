@@ -48,8 +48,11 @@ class _DokumentasiPageState extends State<DokumentasiPage> {
   }
 
   Future<void> _reload() async {
-    setState(() => _future = _repo.getDokumentasi());
-    await _future;
+    setState(() {
+      _future = _repo.getDokumentasi();
+    });
+    // error ditampilkan oleh FutureBuilder; jangan sampai jadi unhandled
+    await _future.then((_) {}, onError: (_) {});
   }
 
   void _snack(String msg) {
