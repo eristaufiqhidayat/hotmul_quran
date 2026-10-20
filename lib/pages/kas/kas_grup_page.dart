@@ -49,8 +49,11 @@ class _KasGrupPageState extends State<KasGrupPage> {
   }
 
   Future<void> _reload() async {
-    setState(() => _future = _repo.getKas(periode: _filterPeriode));
-    await _future;
+    setState(() {
+      _future = _repo.getKas(periode: _filterPeriode);
+    });
+    // error ditampilkan oleh FutureBuilder; jangan sampai jadi unhandled
+    await _future.then((_) {}, onError: (_) {});
   }
 
   void _snack(String msg) {

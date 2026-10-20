@@ -33,8 +33,11 @@ class _JadwalBergulirPageState extends State<JadwalBergulirPage> {
   }
 
   Future<void> _reload() async {
-    setState(() => _future = _load());
-    await _future;
+    setState(() {
+      _future = _load();
+    });
+    // error ditampilkan oleh FutureBuilder; jangan sampai jadi unhandled
+    await _future.then((_) {}, onError: (_) {});
   }
 
   String _rentang(JadwalJuz j) {

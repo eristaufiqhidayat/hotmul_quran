@@ -25,8 +25,11 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Future<void> _reload() async {
-    setState(() => _future = NotificationRepo().getAll());
-    await _future;
+    setState(() {
+      _future = NotificationRepo().getAll();
+    });
+    // error ditampilkan oleh FutureBuilder; jangan sampai jadi unhandled
+    await _future.then((_) {}, onError: (_) {});
   }
 
   ({IconData icon, Color color}) _style(AppNotification n) {
